@@ -1,31 +1,45 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>WilliamBlog</title>
-    <link>https://deemoprobe.github.io/</link>
-    <description>Recent content on WilliamBlog</description>
-    <image>
-      <title>WilliamBlog</title>
-      <url>https://deemoprobe.github.io/papermod-cover.png</url>
-      <link>https://deemoprobe.github.io/papermod-cover.png</link>
-    </image>
+    <title>My New Hugo Site</title>
+    <link>http://example.org/</link>
+    <description>Recent content on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Tue, 25 Apr 2023 16:07:39 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language>
+    <lastBuildDate>Tue, 25 Apr 2023 16:07:39 +0800</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Features</title>
-      <link>https://deemoprobe.github.io/posts/papermod/papermod-features/</link>
+      <link>http://example.org/posts/papermod/papermod-features/</link>
       <pubDate>Wed, 20 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/papermod/papermod-features/</guid>
+      <guid>http://example.org/posts/papermod/papermod-features/</guid>
       <description>Learn About All Features in PaperMod</description>
     </item>
     
     <item>
+      <title>Markdown Syntax Guide For L2</title>
+      <link>http://example.org/posts/markdown-syntax.fr/</link>
+      <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/posts/markdown-syntax.fr/</guid>
+      <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Markdown Syntax Guide For RTL</title>
+      <link>http://example.org/posts/markdown-syntax.fa/</link>
+      <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/posts/markdown-syntax.fa/</guid>
+      <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>KubernetesInstallation Binary</title>
-      <link>https://deemoprobe.github.io/posts/kubernetesinstallation-binary/</link>
+      <link>http://example.org/posts/kubernetesinstallation-binary/</link>
       <pubDate>Tue, 25 Apr 2023 16:07:39 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/kubernetesinstallation-binary/</guid>
+      <guid>http://example.org/posts/kubernetesinstallation-binary/</guid>
       <description>环境说明 宿主机系统：Windows 10 虚拟机版本：VMware® Workstation 16 Pro IOS镜像版本：CentOS Linux release 7.9.2009 Kubernetes版本：1.26.4 Runtime：Containerd v1.6.20 Etcd版本：3.5.6 集群操作用户：root 更新时间：2023-04-21 CentOS7安装请参考博客文章：LINUX之VMWARE WORKSTATION安装CENTOS-7
 资源分配 网段划分
 Kubernetes集群需要规划三个网段：
@@ -37,41 +51,75 @@ k8s-master01/k8s-master02/k8s-master03 集群的Master节点 三个master节点�
     
     <item>
       <title>Markdown Syntax Guide</title>
-      <link>https://deemoprobe.github.io/posts/markdown-syntax/</link>
+      <link>http://example.org/posts/markdown-syntax/</link>
       <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/markdown-syntax/</guid>
-      <description>Sample article showcasing basic Markdown syntax and formatting for HTML elements.</description>
+      <guid>http://example.org/posts/markdown-syntax/</guid>
+      <description>&lt;p&gt;This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Placeholder Text</title>
-      <link>https://deemoprobe.github.io/posts/placeholder-text/</link>
+      <link>http://example.org/posts/placeholder-text/</link>
       <pubDate>Sat, 09 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/placeholder-text/</guid>
-      <description>Lorem Ipsum Dolor Si Amet</description>
+      <guid>http://example.org/posts/placeholder-text/</guid>
+      <description>&lt;p&gt;Lorem est tota propiore conpellat pectoribus de pectora summo.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Math Typesetting</title>
-      <link>https://deemoprobe.github.io/posts/math-typesetting/</link>
+      <link>http://example.org/posts/math-typesetting/</link>
       <pubDate>Fri, 08 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/math-typesetting/</guid>
-      <description>A brief guide to setup KaTeX</description>
+      <guid>http://example.org/posts/math-typesetting/</guid>
+      <description>&lt;p&gt;Mathematical notation in a Hugo project can be enabled by using third party JavaScript libraries.&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Emoji Support</title>
-      <link>https://deemoprobe.github.io/posts/emoji-support/</link>
+      <link>http://example.org/posts/emoji-support/</link>
       <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/emoji-support/</guid>
-      <description>Guide to emoji usage in Hugo</description>
+      <guid>http://example.org/posts/emoji-support/</guid>
+      <description>&lt;p&gt;Emoji can be enabled in a Hugo project in a number of ways.&lt;/p&gt;</description>
     </item>
     
+    <item>
+      <title>Archive</title>
+      <link>http://example.org/archives.fr/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/archives.fr/</guid>
+      <description>archives</description>
+    </item>
     
+    <item>
+      <title>Archive</title>
+      <link>http://example.org/archives/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/archives/</guid>
+      <description>archives</description>
+    </item>
+    
+    <item>
+      <title>Search</title>
+      <link>http://example.org/search/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/search/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>SearchL2</title>
+      <link>http://example.org/search.fr/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/search.fr/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>

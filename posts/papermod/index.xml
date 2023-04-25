@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>PaperMod on WilliamBlog</title>
-    <link>https://deemoprobe.github.io/posts/papermod/</link>
-    <description>Recent content in PaperMod on WilliamBlog</description>
-    <image>
-      <title>WilliamBlog</title>
-      <url>https://deemoprobe.github.io/papermod-cover.png</url>
-      <link>https://deemoprobe.github.io/papermod-cover.png</link>
-    </image>
+    <title>PaperMod on My New Hugo Site</title>
+    <link>http://example.org/posts/papermod/</link>
+    <description>Recent content in PaperMod on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Wed, 20 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://deemoprobe.github.io/posts/papermod/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language>
+    <lastBuildDate>Wed, 20 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/posts/papermod/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Features</title>
-      <link>https://deemoprobe.github.io/posts/papermod/papermod-features/</link>
+      <link>http://example.org/posts/papermod/papermod-features/</link>
       <pubDate>Wed, 20 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/papermod/papermod-features/</guid>
+      <guid>http://example.org/posts/papermod/papermod-features/</guid>
       <description>Learn About All Features in PaperMod</description>
     </item>
     

@@ -26,6 +26,15 @@
     </item>
     
     <item>
+      <title>🙋🏻‍♂️ 关于作者</title>
+      <link>https://deemoprobe.github.io/about/</link>
+      <pubDate>Sun, 06 Nov 2022 14:57:28 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/about/</guid>
+      <description>有Linux基础，曾从事Docker、Kubernetes和中间件运维工作，熟悉常见的网络协议和网络数据包分析，熟悉常见的中间件，熟悉Docker、Kubernetes、Helm和Operator等云原生技术。了解架构设计的基本理念，对云原生和业务架构设计很感兴趣，目标是成为一名</description>
+    </item>
+    
+    <item>
       <title>Blog</title>
       <link>https://deemoprobe.github.io/posts/blog/blog/</link>
       <pubDate>Thu, 05 May 2022 00:18:23 +0800</pubDate>
@@ -67,16 +76,7 @@
       <pubDate>Sat, 06 Nov 2021 15:15:53 +0800</pubDate>
       
       <guid>https://deemoprobe.github.io/links/</guid>
-      <description>William&amp;#39;s Blog 一个记录技术、阅读、生活的博客 👉友链格式 名称： William&amp;rsquo;s Blog 网址： https://YOUR_DOMAIN 图标： https://YOUR_DOMAIN/img/Q.gif 描述： 一个记录技术、阅读、生活的博客 👉友链申请要求 秉承互换友链原则、文章定期更新、不能有太多广告、个人描述字数控制在15字内 👉Hugo博客交流群 YOUR_QQ</description>
-    </item>
-    
-    <item>
-      <title>🙋🏻‍♂️关于</title>
-      <link>https://deemoprobe.github.io/about/</link>
-      <pubDate>Sat, 06 Nov 2021 14:57:28 +0800</pubDate>
-      
-      <guid>https://deemoprobe.github.io/about/</guid>
-      <description>关于我 英文名: Kevin Xu 职业: 程序员 运动: 跑步、乒乓球、爬山</description>
+      <description>William&amp;#39;s Blog 一个记录技术、阅读、生活的博客 👉友链格式 名称： William&amp;rsquo;s Blog 网址： https://YOUR_DOMAIN 图标： https://YOUR_DOMAIN/img/bear.gif 描述： 一个记录技术、阅读、生活的博客 👉友链申请要求 秉承互换友链原则、文章定期更新、不能有太多广告、个人描述字数控制在15字内 👉Hugo博客交流群 YOUR_QQ</description>
     </item>
     
     

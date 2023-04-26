@@ -6,7 +6,34 @@
     <description>Recent content in 👨🏻‍💻 技术 on William&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 25 Apr 2023 18:56:52 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/posts/tech/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 26 Apr 2023 14:52:37 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/posts/tech/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Dockerfile</title>
+      <link>https://deemoprobe.github.io/posts/tech/dockerfile/</link>
+      <pubDate>Wed, 26 Apr 2023 14:52:37 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/dockerfile/</guid>
+      <description>Dockerfile是构建容器镜像的命令合集文本文件，类似脚本。 字段解析 简介 # 主要字段 FROM image[基础镜像,该文件创建新镜像所依赖的镜像] MAINTAINER user&amp;lt;email&amp;gt;[作者姓名和邮箱] RUN command[镜像构建时运行的命令] ADD [文件拷贝进镜像并解压] COPY [文件拷贝进镜像]</description>
+    </item>
+    
+    <item>
+      <title>Docker Command</title>
+      <link>https://deemoprobe.github.io/posts/tech/docker-command/</link>
+      <pubDate>Wed, 26 Apr 2023 14:52:26 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/docker-command/</guid>
+      <description>本文整理了docker常用的一些命令。包括镜像命令，容器命令，日志查看，容器的高级操作以及从容器传输文件到宿主机</description>
+    </item>
+    
+    <item>
+      <title>Docker</title>
+      <link>https://deemoprobe.github.io/posts/tech/docker/</link>
+      <pubDate>Wed, 26 Apr 2023 14:51:34 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/docker/</guid>
+      <description>环境说明 操作系统：CentOS Linux release 7.9.2009 (Core) 操作用户：root 内核版本：5.18.12-1 涉及技术：Linux、Docker、Vm 容器技术的基石 Linux内核功能中，Namespaces和Cgroups技术是实现轻量级进程虚拟化的基础，是Linux Container的基石，这两个Lin</description>
+    </item>
+    
     <item>
       <title>KubernetesInstallation Binary</title>
       <link>https://deemoprobe.github.io/posts/tech/kubernetesinstallation-binary/</link>

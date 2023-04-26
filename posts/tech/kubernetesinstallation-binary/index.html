@@ -10,7 +10,7 @@
 <meta name="description" content="环境说明 宿主机系统：Windows 10 虚拟机版本：VMware® Workstation 16 Pro IOS镜像版本：CentOS Linux release 7.9.2009 Kubernetes版本：1.26.4 Runtime：Containerd v1.6.20 Etcd版本：3.5.6 集群操作用户：root 更新时间：2023-04-20 CentOS7安装请参考博">
 <meta name="author" content="deemoprobe">
 <link rel="canonical" href="https://deemoprobe.github.io/posts/tech/kubernetesinstallation-binary/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.c17973ebc09fd154865f5c6748fea20fa1c5d0325ddca89dd42076c32d885a84.css" integrity="sha256-wXlz68Cf0VSGX1xnSP6iD6HF0DJd3Kid1CB2wy2IWoQ=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.c21a8fab83e9ed5d9d40d121d2fc468485f78e3612ace865f5a35e0928e25c25.css" integrity="sha256-whqPq4Pp7V2dQNEh0vxGhIX3jjYSrOhl9aNeCSjiXCU=" rel="preload stylesheet" as="style">
 <script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
         onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://deemoprobe.github.io/img/bear.gif">
@@ -321,42 +321,7 @@ var _hmt = _hmt || [];
                             &nbsp;&nbsp;
                         </span>
                     </span>
-                    <span id="post_meta_style_8">
-                        <span class="fa fa-commenting-o"></span>
-                        <span>
-                            <script src="https://cdn.staticfile.org/twikoo//twikoo.all.min.js"></script>
-                            <script>
-                                let url = document.documentURI
-                                
-                                let dnsUrl = "https://deemoprobe.github.io/"
-                                let urlSplit = url.split(dnsUrl)
-                                let finalUrl = urlSplit[1]
-                                if (finalUrl[0] !== '/') {
-                                    finalUrl = '/'+finalUrl
-                                }
-                                twikoo.getCommentsCount({
-                                    envId:  null , 
-                                region:  null , 
-                                urls: [ 
-                                    
-                                    finalUrl,
-                                ],
-                                    includeReply: false 
-                                }).then(function (res) {
-                                    let count = res[0].count
-                                    const obj = document.getElementById("comment_count");
-                                    obj.innerText = count
-                                    
-                                    
-                                    
-                                }).catch(function (err) {
-                                    
-                                    console.error(err);
-                                });
-                            </script>
-                            <span id="comment_count"></span>
-                        </span>
-                    </span>
+                    
                 </span>
 
 </div>
@@ -2256,10 +2221,15 @@ var _hmt = _hmt || [];
         <footer class="post-footer">
             
 <nav class="paginav">
-  <a class="next" href="https://deemoprobe.github.io/posts/tech/tech1/">
+  <a class="prev" href="https://deemoprobe.github.io/posts/read/read/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>Read</span>
+  </a>
+  <a class="next" href="https://deemoprobe.github.io/posts/blog/blog/">
     <span class="title">下一页 »</span>
     <br>
-    <span>Tech1</span>
+    <span>Blog</span>
   </a>
 </nav>
 
@@ -2269,25 +2239,12 @@ var _hmt = _hmt || [];
 </main>
 
 <footer class="footer">
-    <a href="https://gohugo.io/" target="_blank">
-        <img src="https://img.shields.io/static/v1?&style=plastic&color=308fb5&label=Power by&message=hugo&logo=hugo"
-            style="display: unset;">
-    </a>
-    <a href="https://github.com/adityatelange/hugo-PaperMod" target="_blank">
-        <img style="display: unset;" src="https://image.lvbibir.cn/blog/theme-papermod-lightgrey.svg">
-    </a>
-    <br>
+    
         <span id="runtime_span"></span>
         <script
-            type="text/javascript">function show_runtime() { window.setTimeout("show_runtime()", 1000); X = new Date("7/13/2021 1:00:00"); Y = new Date(); T = (Y.getTime() - X.getTime()); M = 24 * 60 * 60 * 1000; a = T / M; A = Math.floor(a); b = (a - A) * 24; B = Math.floor(b); c = (b - B) * 60; C = Math.floor((b - B) * 60); D = Math.floor((c - C) * 60); runtime_span.innerHTML = "网站已运行" + A + "天" + B + "小时" + C + "分" + D + "秒" } show_runtime();</script>
-    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span id="busuanzi_container">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-        总访客数: <i class="fa fa-user"></i><span id="busuanzi_value_site_uv"></span>
-        |
-        总访问量: <i class="fa fa-eye"></i><span id="busuanzi_value_site_pv"></span>
-        
-    </span>
+            type="text/javascript">function show_runtime() { window.setTimeout("show_runtime()", 1000); X = new Date("1/1/2023 1:00:00"); Y = new Date(); T = (Y.getTime() - X.getTime()); M = 24 * 60 * 60 * 1000; a = T / M; A = Math.floor(a); b = (a - A) * 24; B = Math.floor(b); c = (b - B) * 60; C = Math.floor((b - B) * 60); D = Math.floor((c - C) * 60); runtime_span.innerHTML = "网站已运行" + A + "天" + B + "小时" + C + "分" + D + "秒" } show_runtime();</script>
+    
+    
     <br>
     <span>
         Copyright

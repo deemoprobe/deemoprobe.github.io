@@ -16,23 +16,5 @@
       <description>环境说明 宿主机系统：Windows 10 虚拟机版本：VMware® Workstation 16 Pro IOS镜像版本：CentOS Linux release 7.9.2009 Kubernetes版本：1.26.4 Runtime：Containerd v1.6.20 Etcd版本：3.5.6 集群操作用户：root 更新时间：2023-04-20 CentOS7安装请参考博</description>
     </item>
     
-    <item>
-      <title>Tech1</title>
-      <link>https://deemoprobe.github.io/posts/tech/tech1/</link>
-      <pubDate>Tue, 21 Feb 2023 12:20:21 +0800</pubDate>
-      
-      <guid>https://deemoprobe.github.io/posts/tech/tech1/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Tech</title>
-      <link>https://deemoprobe.github.io/posts/tech/tech/</link>
-      <pubDate>Thu, 05 May 2022 00:17:58 +0800</pubDate>
-      
-      <guid>https://deemoprobe.github.io/posts/tech/tech/</guid>
-      <description>科技代码</description>
-    </item>
-    
   </channel>
 </rss>

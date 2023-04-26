@@ -13,7 +13,7 @@
       <pubDate>Tue, 25 Apr 2023 18:56:52 +0800</pubDate>
       
       <guid>https://deemoprobe.github.io/posts/tech/kubernetesinstallation-binary/</guid>
-      <description>环境说明 宿主机系统：Windows 10 虚拟机版本：VMware® Workstation 16 Pro IOS镜像版本：CentOS Linux release 7.9.2009 Kubernetes版本：1.26.4 Runtime：Containerd v1.6.20 Etcd版本：3.5.6 集群操作用户：root 更新时间：2023-04-20 CentOS7安装请参考博</description>
+      <description>二进制方式部署kubernetes高可用集群</description>
     </item>
     
   </channel>

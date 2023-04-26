@@ -7,10 +7,10 @@
 <meta name="robots" content="index, follow">
 <title>Docker Command | William&#39;s Blog</title>
 <meta name="keywords" content="">
-<meta name="description" content="本文整理了docker常用的一些命令。包括镜像命令，容器命令，日志查看，容器的高级操作以及从容器传输文件到宿主机">
+<meta name="description" content="docker常用命令一览">
 <meta name="author" content="deemoprobe">
 <link rel="canonical" href="https://deemoprobe.github.io/posts/tech/docker-command/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.4c6df1fd875d55897b44f08ec2c1d9a9ab0c0c2edb9033aec069cee957a74970.css" integrity="sha256-TG3x/YddVYl7RPCOwsHZqasMDC7bkDOuwGnO6VenSXA=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4ff503bcd1fac86ff7aae2a7670a5373c685d74bf74dc61eb3b14254f795b8f7.css" integrity="sha256-T/UDvNH6yG/3quKnZwpTc8aF10v3TcYes7FCVPeVuPc=" rel="preload stylesheet" as="style">
 <script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
         onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://deemoprobe.github.io/img/bear.gif">
@@ -75,15 +75,17 @@ var _hmt = _hmt || [];
 })();
 </script>
 <meta property="og:title" content="Docker Command" />
-<meta property="og:description" content="本文整理了docker常用的一些命令。包括镜像命令，容器命令，日志查看，容器的高级操作以及从容器传输文件到宿主机" />
+<meta property="og:description" content="docker常用命令一览" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://deemoprobe.github.io/posts/tech/docker-command/" /><meta property="article:section" content="posts" />
+<meta property="og:url" content="https://deemoprobe.github.io/posts/tech/docker-command/" />
+<meta property="og:image" content="https://deemoprobe.github.io/img/docker.png" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2023-04-26T14:52:26+08:00" />
 <meta property="article:modified_time" content="2023-04-26T14:52:26+08:00" />
 
-<meta name="twitter:card" content="summary"/>
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://deemoprobe.github.io/img/docker.png" />
 <meta name="twitter:title" content="Docker Command"/>
-<meta name="twitter:description" content="本文整理了docker常用的一些命令。包括镜像命令，容器命令，日志查看，容器的高级操作以及从容器传输文件到宿主机"/>
+<meta name="twitter:description" content="docker常用命令一览"/>
 
 
 <script type="application/ld+json">
@@ -120,14 +122,14 @@ var _hmt = _hmt || [];
   "@type": "BlogPosting",
   "headline": "Docker Command",
   "name": "Docker Command",
-  "description": "本文整理了docker常用的一些命令。包括镜像命令，容器命令，日志查看，容器的高级操作以及从容器传输文件到宿主机",
+  "description": "docker常用命令一览",
   "keywords": [
     ""
   ],
   "articleBody": "本文整理了docker常用的一些命令。包括镜像命令，容器命令，日志查看，容器的高级操作以及从容器传输文件到宿主机。\n常用 # 查看docker版本 docker version # 查看docker系统信息 docker info # 实时监控容器的运行情况 docker stats # 查看容器或镜像的底层信息 docker inspect ID/NAME # 查看容器中进程情况 docker top ID/NAME # 查看容器中进程的日志 docker logs ID/NAME # 进入某个容器系统 docker exec -it ID/NAME bash 详细用法 Usage: docker COMMAND A self-sufficient runtime for containers Commands: attach Attach local standard input, output, and error streams to a running container build Build an image from a Dockerfile commit Create a new image from a container changes cp Copy files/folders between a container and the local filesystem create Create a new container diff Inspect changes to files or directories on a container filesystem events Get real time events from the server exec Run a command in a running container export Export a container filesystem as a tar archive history Show the history of an image images List images import Import the contents from a tarball to create a filesystem image info Display system-wide information inspect Return low-level information on Docker objects kill Kill one or more running containers load Load an image from a tar archive or STDIN login Log in to a Docker registry logout Log out from a Docker registry logs Fetch the logs of a container pause Pause all processes within one or more containers port List port mappings or a specific mapping for the container ps List containers pull Pull an image or a repository from a registry push Push an image or a repository to a registry rename Rename a container restart Restart one or more containers rm Remove one or more containers rmi Remove one or more images run Run a command in a new container save Save one or more images to a tar archive (streamed to STDOUT by default) search Search the Docker Hub for images start Start one or more stopped containers stats Display a live stream of container(s) resource usage statistics stop Stop one or more running containers tag Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE top Display the running processes of a container unpause Unpause all processes within one or more containers update Update configuration of one or more containers version Show the Docker version information wait Block until one or more containers stop, then print their exit codes 镜像命令 REPOSITORY: 镜像的仓库源 TAG: 镜像标签 IMAGE ID: 镜像ID CREATED: 镜像已创建时间 SIZE: 镜像大小 docker images Usage: docker images [OPTIONS] [REPOSITORY[:TAG]] List images Options: -a, --all Show all images (default hides intermediate images) --digests Show digests -f, --filter filter Filter output based on conditions provided --format string Pretty-print images using a Go template --no-trunc Do not truncate output -q, --quiet Only show image IDs # 查看镜像 [root@demo ~]# docker images REPOSITORY TAG IMAGE ID CREATED SIZE tomcat latest fb5657adc892 12 days ago 680MB hello-world latest feb5d9fea6a5 3 months ago 13.3kB centos latest 5d0da3dc9764 3 months ago 231MB # 查看所有镜像 docker images -a # 查看镜像ID docker images -q # 查看所有镜像ID docker images -qa docker search Usage: docker search [OPTIONS] [IMAGE] Search the Docker Hub for images Options: -f, --filter filter Filter output based on conditions provided --format string Pretty-print search using a Go template --limit int Max number of search results (default 25) --no-trunc Do not truncate output # 从Docker Hub上查询已存在镜像 [root@demo ~]# docker search nginx NAME DESCRIPTION STARS OFFICIAL AUTOMATED nginx Official build of Nginx. 16062 [OK] jwilder/nginx-proxy Automated Nginx reverse proxy for docker con… 2105 [OK] richarvey/nginx-php-fpm Container running Nginx + PHP-FPM capable of… 819 [OK] jc21/nginx-proxy-manager Docker container for managing Nginx proxy ho… 303 linuxserver/nginx An Nginx container, brought to you by LinuxS… 161 tiangolo/nginx-rtmp Docker image with Nginx using the nginx-rtmp… 148 [OK] ... # 根据stars数目来搜索IMAGE # 查看800星以上的nginx镜像 [root@demo ~]# docker search nginx -f stars=800 NAME DESCRIPTION STARS OFFICIAL AUTOMATED nginx Official build of Nginx. 16062 [OK] jwilder/nginx-proxy Automated Nginx reverse proxy for docker con… 2105 [OK] richarvey/nginx-php-fpm Container running Nginx + PHP-FPM capable of… 819 [OK] # 搜索800星以上的nginx镜像，并且不切割摘要信息（摘要全部显示） [root@demo ~]# docker search nginx --no-trunc -f stars=800 NAME DESCRIPTION STARS OFFICIAL AUTOMATED nginx Official build of Nginx. 16062 [OK] jwilder/nginx-proxy Automated Nginx reverse proxy for docker containers 2105 [OK] richarvey/nginx-php-fpm Container running Nginx + PHP-FPM capable of pulling application code from git 819 [OK] docker pull Usage: docker pull [OPTIONS] NAME[:TAG|@DIGEST] Pull an image or a repository from a registry Options: -a, --all-tags Download all tagged images in the repository --disable-content-trust Skip image verification (default true) --platform string Set platform if server is multi-platform capable -q, --quiet Suppress verbose output # 从配置好的仓库拉取镜像, 未配置的话默认从Docker Hub上获取 docker pull IMAGE \u003c==\u003e docker pull IMAGE:latest # 拉取指定版本镜像 docker pull IMAGE:TAG docker rmi Usage: docker rmi [OPTIONS] IMAGE [IMAGE...] Remove one or more images Options: -f, --force Force removal of the image --no-prune Do not delete untagged parents # 删除最新版本镜像 docker rmi IMAGE \u003c==\u003e docker rmi IMAGE:latest # 删除指定版本镜像 docker rmi IMAGE:TAG # -f 强制删除镜像(可删除多层镜像) docker rmi -f IMAGE # 指定镜像ID进行删除 docker rmi -f IMAGE_ID # 删除多个镜像 docker rmi -f IMAGE1 IMAGE2 IMAGE3 # 删除所有镜像 docker rmi -f $(docker images -qa) # 实例 [root@demo ~]# docker rmi hello-world Untagged: hello-world:latest Untagged: hello-world@sha256:2498fce14358aa50ead0cc6c19990fc6ff866ce72aeb5546e1d59caac3d0d60f Deleted: sha256:feb5d9fea6a5e9606aa995e879d862b825965ba48de054caab5ef356dc6b3412 Deleted: sha256:e07ee1baac5fae6a26f30cabfe54a36d3402f96afda318fe0a96cec4ca393359 dangling悬挂镜像 仓库名、标签均为的镜像被称为悬挂镜像，这种镜像已经失去了存在的价值。出现悬挂镜像原因一般是在docker pull *:latest时产生。当新版本发布后重新pull，镜像名会被新镜像所占用，旧镜像的名字会变成。\n# 删除悬挂镜像（dangling），-f不显示提示确认信息，直接强制删除 [root@harbor ~]# docker image prune WARNING! This will remove all dangling images. Are you sure you want to continue? [y/N] # 删除所有未使用的镜像（即未运行容器的镜像），-f不显示提示确认信息，直接强制删除 [root@harbor ~]# docker image prune -a WARNING! This will remove all images without at least one container associated to them. Are you sure you want to continue? [y/N] 容器命令 docker run docker run [OPTIONS] IMAGE [COMMAND] [ARG...] OPTIONS字段说明: - --name 自定义容器名 - -d 后台运行容器 - -it 新建伪终端交互运行容器 - -P 随机分配端口映射 - -p 指定端口映射, 有以下四种方式 - ip:hostPort:containerPort - ip::containerPort - hostPort:containerPort - containerPort # 先获取镜像 [root@demo ~]# docker pull centos [root@demo ~]# docker images REPOSITORY TAG IMAGE ID CREATED SIZE tomcat latest fb5657adc892 12 days ago 680MB centos latest 5d0da3dc9764 3 months ago 231MB # 启动运行CentOS容器(本地有该镜像就直接启动, 没有就自动拉取) [root@demo ~]# docker run -it centos [root@f75fd428066f /]# cat /etc/redhat-release CentOS Linux release 8.4.2105 [root@f75fd428066f /]# exit [root@demo ~]# docker run -it --namecentos8 centos [root@dd16aaf5cbcd /]# exit [root@demo ~]# docker ps -a CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES dd16aaf5cbcd centos \"/bin/bash\" 58 seconds ago Exited (0) 52 seconds ago centos8 f75fd428066f centos \"/bin/bash\" 3 minutes ago Exited (0) 2 minutes ago silly_engelbart # 为nginx镜像随机分配端口映射 [root@demo ~]# docker run -it -P nginx:1.18.0 Unable to find image 'nginx:1.18.0' locally 1.18.0: Pulling from library/nginx f7ec5a41d630: Pull complete 0b20d28b5eb3: Pull complete 1576642c9776: Pull complete c12a848bad84: Pull complete 03f221d9cf00: Pull complete Digest: sha256:e90ac5331fe095cea01b121a3627174b2e33e06e83720e9a934c7b8ccc9c55a0 Status: Downloaded newer image for nginx:1.18.0 /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration /docker-entrypoint.sh: Looking for bash scripts in /docker-entrypoint.d/ /docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh 10-listen-on-ipv6-by-default.sh: Getting the checksum of /etc/nginx/conf.d/default.conf 10-listen-on-ipv6-by-default.sh: Enabled listen on IPv6 in /etc/nginx/conf.d/default.conf /docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh /docker-entrypoint.sh: Configuration complete; ready for start up # 另起一个终端，查看分配的端口 [root@demo ~]# docker ps CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES 97c9f5f24db2 nginx:1.18.0 \"/docker-entrypoint.…\" 42 seconds ago Up 40 seconds 0.0.0.0:49153-\u003e80/tcp, :::49153-\u003e80/tcp jovial_burnell # 指定端口映射 [root@demo ~]# docker run -it --name nginx-web -p 8080:80 nginx:1.18.0 /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration /docker-entrypoint.sh: Looking for bash scripts in /docker-entrypoint.d/ /docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh 10-listen-on-ipv6-by-default.sh: Getting the checksum of /etc/nginx/conf.d/default.conf 10-listen-on-ipv6-by-default.sh: Enabled listen on IPv6 in /etc/nginx/conf.d/default.conf /docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh /docker-entrypoint.sh: Configuration complete; ready for start up # 另起一个终端查看容器信息 [root@demo ~]# docker ps CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES 7e243e46f6f6 nginx:1.18.0 \"/docker-entrypoint.…\" 23 seconds ago Up 22 seconds 0.0.0.0:8080-\u003e80/tcp, :::8080-\u003e80/tcp nginx-web # 访问nginx [root@demo ~]# curl localhost:8080 \u003c!DOCTYPE html\u003e Welcome to nginx! Welcome to nginx! If you see this page, the nginx web server is successfully installed and working. Further configuration is required.\nFor online documentation and support please refer to ",
   "wordCount" : "4959",
   "inLanguage": "en",
-  "datePublished": "2023-04-26T14:52:26+08:00",
+  "image":"https://deemoprobe.github.io/img/docker.png","datePublished": "2023-04-26T14:52:26+08:00",
   "dateModified": "2023-04-26T14:52:26+08:00",
   "author":[{
     "@type": "Person",
@@ -244,12 +246,12 @@ var _hmt = _hmt || [];
 <article class="post-single">
     <div id="single-content">
         <header class="post-header">
-            <div class="breadcrumbs"><a href="https://deemoprobe.github.io/">🏠 主页</a>&nbsp;»&nbsp;<a href="https://deemoprobe.github.io/posts/">📚文章</a>&nbsp;»&nbsp;<a href="https://deemoprobe.github.io/posts/tech/">👨🏻‍💻 技术</a></div>
+            
             <h1 class="post-title">
                 Docker Command
             </h1>
             <div class="post-description">
-                本文整理了docker常用的一些命令。包括镜像命令，容器命令，日志查看，容器的高级操作以及从容器传输文件到宿主机
+                docker常用命令一览
             </div>
             <div class="post-meta">
 
@@ -303,6 +305,7 @@ var _hmt = _hmt || [];
         <span class="fa fa-tags" style="opacity: 0.8"></span>
         <span>
             <span class="post-tags-meta">
+                <a href="https://deemoprobe.github.io/tags/docker/" style="color: var(--secondary)!important;">docker</a>
             </span>
         </span>
     </span>
@@ -320,7 +323,10 @@ var _hmt = _hmt || [];
                 </span>
 
 </div>
-        </header> <aside id="toc-container" class="toc-container wide">
+        </header> 
+<figure class="entry-cover1"><img style="zoom:;" loading="lazy" src="https://deemoprobe.github.io/img/docker.png" alt="">
+    
+</figure><aside id="toc-container" class="toc-container wide">
     <div class="toc">
         <details  open>
         <summary accesskey="c" title="(Alt + C)">

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>👨🏻‍💻 技术 on William&#39;s Blog</title>
-    <link>https://deemoprobe.github.io/posts/tech/</link>
-    <description>Recent content in 👨🏻‍💻 技术 on William&#39;s Blog</description>
+    <title>docker on William&#39;s Blog</title>
+    <link>https://deemoprobe.github.io/tags/docker/</link>
+    <description>Recent content in docker on William&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 26 Apr 2023 14:52:37 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/posts/tech/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 26 Apr 2023 14:52:37 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Dockerfile</title>
       <link>https://deemoprobe.github.io/posts/tech/dockerfile/</link>
@@ -32,15 +32,6 @@
       
       <guid>https://deemoprobe.github.io/posts/tech/docker/</guid>
       <description>docker容器技术基础</description>
-    </item>
-    
-    <item>
-      <title>KubernetesInstallation Binary</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetesinstallation-binary/</link>
-      <pubDate>Tue, 25 Apr 2023 18:56:52 +0800</pubDate>
-      
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetesinstallation-binary/</guid>
-      <description>二进制方式部署kubernetes高可用集群</description>
     </item>
     
   </channel>

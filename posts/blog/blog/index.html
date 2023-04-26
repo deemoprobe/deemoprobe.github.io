@@ -10,7 +10,7 @@
 <meta name="description" content="页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能">
 <meta name="author" content="deemoprobe">
 <link rel="canonical" href="https://deemoprobe.github.io/posts/blog/blog/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.c21a8fab83e9ed5d9d40d121d2fc468485f78e3612ace865f5a35e0928e25c25.css" integrity="sha256-whqPq4Pp7V2dQNEh0vxGhIX3jjYSrOhl9aNeCSjiXCU=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4c6df1fd875d55897b44f08ec2c1d9a9ab0c0c2edb9033aec069cee957a74970.css" integrity="sha256-TG3x/YddVYl7RPCOwsHZqasMDC7bkDOuwGnO6VenSXA=" rel="preload stylesheet" as="style">
 <script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
         onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://deemoprobe.github.io/img/bear.gif">
@@ -210,11 +210,6 @@ var _hmt = _hmt || [];
                 </a>
             </li>
             <li>
-                <a href="https://deemoprobe.github.io/posts" title="📚 文章">
-                <span>📚 文章</span>
-                </a>
-            </li>
-            <li>
                 <a href="https://deemoprobe.github.io/tags" title="🧩 标签">
                 <span>🧩 标签</span>
                 </a>
@@ -225,8 +220,8 @@ var _hmt = _hmt || [];
                 </a>
             </li>
             <li>
-                <a href="https://deemoprobe.github.io/about" title="🙋🏻‍♂️ 关于">
-                <span>🙋🏻‍♂️ 关于</span>
+                <a href="https://deemoprobe.github.io/tools" title="🧱 工具">
+                <span>🧱 工具</span>
                 </a>
             </li>
             <li>
@@ -402,33 +397,6 @@ var _hmt = _hmt || [];
 
 
         </div>
-        <div class="post-reward">
-            <div style="padding: 0 0 0 0; margin: 0 0 0 0; width: 100%; font-size:16px; text-align: center;">
-                <div id="QR" style="opacity: 0;">
-                    <div id="wechat" style="display: inline-block">
-                        <a class="fancybox" rel="group">
-                            <img id="wechat_qr" src="https://deemoprobe.github.io/" alt="wechat_pay"></a>
-                        <p>微信</p>
-                    </div>
-                    <div id="alipay" style="display: inline-block">
-                        <a class="fancybox" rel="group">
-                            <img id="alipay_qr" src="https://deemoprobe.github.io/" alt="alipay"></a>
-                        <p>支付宝</p>
-                    </div>
-                </div>
-                <button id="rewardButton"
-                        onclick="
-                    var qr = document.getElementById('QR');
-                    if (qr.style.opacity === '0') {
-                        qr.style.opacity='1';
-                    } else {
-                        qr.style.opacity='0'
-                    }"
-                >
-                    <span>🧧 鼓励</span>
-                </button>
-            </div>
-        </div>
 
         <footer class="post-footer">
             
@@ -442,40 +410,6 @@ var _hmt = _hmt || [];
 
         </footer>
     </div>
-
-<style>
-    .comments_details summary::marker {
-        font-size: 20px;
-        content: '👉展开评论';
-        color: var(--content);
-    }
-    .comments_details[open] summary::marker{
-        font-size: 20px;
-        content: '👇关闭评论';
-        color: var(--content);
-    }
-</style>
-
-
-<div>
-    <details class="comments_details">
-        <summary style="cursor: pointer; margin: 50px 0 20px 0;width: 130px;">
-            <span style="font-size: 20px;color: var(--content);">...</span>
-        </summary>
-        <div id="tcomment"></div>
-    </details>
-    <script src="https://cdn.staticfile.org/twikoo//twikoo.all.min.js">
-    </script>
-    <script>
-        twikoo.init({
-            envId:  null ,
-        el: "#tcomment",
-            lang: 'zh-CN',
-            region:  null ,
-        path: window.TWIKOO_MAGIC_PATH||window.location.pathname,
-        })
-    </script>
-</div>
 </article>
 </main>
 

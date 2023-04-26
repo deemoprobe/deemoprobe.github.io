@@ -6,14 +6,23 @@
     <description>Recent content on William&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 26 Apr 2023 12:17:50 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 26 Apr 2023 12:50:41 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Post</title>
-      <link>https://deemoprobe.github.io/posts/post/</link>
-      <pubDate>Wed, 26 Apr 2023 12:17:50 +0800</pubDate>
+      <title>Tools</title>
+      <link>https://deemoprobe.github.io/tools/</link>
+      <pubDate>Wed, 26 Apr 2023 12:51:27 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/post/</guid>
-      <description>页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能</description>
+      <guid>https://deemoprobe.github.io/tools/</guid>
+      <description>备用下载链接是本人存在阿里云OSS的安装包，不能保证版本是最新的，仅供交流使用，请支持正版，若有侵权请联系删除</description>
+    </item>
+    
+    <item>
+      <title>4k Wallpaper</title>
+      <link>https://deemoprobe.github.io/posts/life/4k-wallpaper/</link>
+      <pubDate>Wed, 26 Apr 2023 12:50:41 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/life/4k-wallpaper/</guid>
+      <description></description>
     </item>
     
     <item>
@@ -49,7 +58,7 @@
       <pubDate>Sun, 06 Nov 2022 14:57:28 +0800</pubDate>
       
       <guid>https://deemoprobe.github.io/about/</guid>
-      <description>有Linux基础，曾从事Docker、Kubernetes和中间件运维工作，熟悉常见的网络协议和网络数据包分析，熟悉常见的中间件，熟悉Docker、Kubernetes、Helm和Operator等云原生技术。了解架构设计的基本理念，对云原生和业务架构设计很感兴趣，目标是成为一名</description>
+      <description>擅长Linux、Docker、Kubernetes等运维工作，熟悉常见的网络协议和网络数据包分析，熟悉常见的中间件，熟悉CI/CD、Kubesphere、Harbor、Helm、Prometheus、Microservices等云原生相关技术。了解业务架构设计的基本理念，对云原生</description>
     </item>
     
     <item>

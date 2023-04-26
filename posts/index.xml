@@ -6,15 +6,6 @@
     <description>Recent content in 📚文章 on William&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 26 Apr 2023 12:17:50 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Post</title>
-      <link>https://deemoprobe.github.io/posts/post/</link>
-      <pubDate>Wed, 26 Apr 2023 12:17:50 +0800</pubDate>
-      
-      <guid>https://deemoprobe.github.io/posts/post/</guid>
-      <description>页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能</description>
-    </item>
-    
+    <lastBuildDate>Wed, 26 Apr 2023 12:50:41 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

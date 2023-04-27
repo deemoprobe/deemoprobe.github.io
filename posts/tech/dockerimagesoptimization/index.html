@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>DockerImagesOptimization | William&#39;s Blog</title>
+<meta name="keywords" content="docker">
+<meta name="description" content="Docker镜像体积优化">
+<meta name="author" content="deemoprobe">
+<link rel="canonical" href="https://deemoprobe.github.io/posts/tech/dockerimagesoptimization/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4ff503bcd1fac86ff7aae2a7670a5373c685d74bf74dc61eb3b14254f795b8f7.css" integrity="sha256-T/UDvNH6yG/3quKnZwpTc8aF10v3TcYes7FCVPeVuPc=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
+        onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="icon" type="image/png" sizes="16x16" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="icon" type="image/png" sizes="32x32" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="apple-touch-icon" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="mask-icon" href="https://deemoprobe.github.io/img/bear.gif">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script defer src="https://unpkg.com/mermaid@8.8.1/dist/mermaid.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="DockerImagesOptimization" />
+<meta property="og:description" content="Docker镜像体积优化" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://deemoprobe.github.io/posts/tech/dockerimagesoptimization/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-04-26T18:43:22+08:00" />
+<meta property="article:modified_time" content="2023-04-26T18:43:22+08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="DockerImagesOptimization"/>
+<meta name="twitter:description" content="Docker镜像体积优化"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://deemoprobe.github.io/posts/"
+        },
+
+        {
+          "@type": "ListItem",
+          "position":  2 ,
+          "name": "👨🏻‍💻 技术",
+          "item": "https://deemoprobe.github.io/posts/tech/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "DockerImagesOptimization",
+      "item": "https://deemoprobe.github.io/posts/tech/dockerimagesoptimization/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "DockerImagesOptimization",
+  "name": "DockerImagesOptimization",
+  "description": "Docker镜像体积优化",
+  "keywords": [
+    "docker"
+  ],
+  "articleBody": "优化原理 docker镜像层有以下特点（和镜像大小息息相关）：\nRUN、COPY 和 ADD 指令会在已有镜像层的基础上创建一个新的镜像层，执行指令产生的所有文件系统变更会在指令结束后作为一个镜像层整体提交 镜像层具有copy-on-write的特性，如果去更新其他镜像层中已存在的文件，会先将其复制到新的镜像层中再修改，造成双倍的文件空间占用 如果去删除其他镜像层的一个文件，只会在当前镜像层生成一个该文件的删除标记，并不会减少整个镜像的实际体积 [root@centos7 tmp]# cat Dockerfile FROM alpine COPY resource.tar / RUN touch /resource.tar RUN rm -f /resource.tar [root@centos7 tmp]# ls -lh resource.tar -rw-r--r--. 1 root root 9.9M Apr 26 15:46 resource.tar [root@centos7 tmp]# docker build -t demo:v1 . [+] Building 20.3s (9/9) FINISHED =\u003e [internal] load .dockerignore 0.0s =\u003e =\u003e transferring context: 2B 0.0s =\u003e [internal] load build definition from Dockerfile 0.0s =\u003e =\u003e transferring dockerfile: 177B 0.0s =\u003e [internal] load metadata for docker.io/library/alpine:latest 17.5s =\u003e [internal] load build context 0.2s =\u003e =\u003e transferring context: 10.30MB 0.2s =\u003e [1/4] FROM docker.io/library/alpine@sha256:21a3deaa0d32a8057914f36584b5288d2e5ecc984380bc0118285c70fa8c9300 1.6s =\u003e =\u003e resolve docker.io/library/alpine@sha256:21a3deaa0d32a8057914f36584b5288d2e5ecc984380bc0118285c70fa8c9300 0.0s =\u003e =\u003e sha256:21a3deaa0d32a8057914f36584b5288d2e5ecc984380bc0118285c70fa8c9300 1.64kB / 1.64kB 0.0s =\u003e =\u003e sha256:e7d88de73db3d3fd9b2d63aa7f447a10fd0220b7cbf39803c803f2af9ba256b3 528B / 528B 0.0s =\u003e =\u003e sha256:c059bfaa849c4d8e4aecaeb3a10c2d9b3d85f5165c66ad3a4d937758128c4d18 1.47kB / 1.47kB 0.0s =\u003e =\u003e sha256:59bf1c3509f33515622619af21ed55bbe26d24913cedbca106468a5fb37a50c3 2.82MB / 2.82MB 1.2s =\u003e =\u003e extracting sha256:59bf1c3509f33515622619af21ed55bbe26d24913cedbca106468a5fb37a50c3 0.3s =\u003e [2/4] COPY resource.tar / 0.1s =\u003e [3/4] RUN touch /resource.tar 0.4s =\u003e [4/4] RUN rm -f /resource.tar 0.5s =\u003e exporting to image 0.2s =\u003e =\u003e exporting layers 0.2s =\u003e =\u003e writing image sha256:1113b0fb22dabb56b6926960eafd2a6aaf183d1bd2373f1be10df67c73714f37 0.0s =\u003e =\u003e naming to docker.io/library/demo:v1 0.0s [root@centos7 tmp]# docker history demo:v1 IMAGE CREATED CREATED BY SIZE COMMENT 1113b0fb22da 13 seconds ago RUN /bin/sh -c rm -f /resource.tar # buildkit 0B buildkit.dockerfile.v0 13 seconds ago RUN /bin/sh -c touch /resource.tar # buildkit 10.3MB buildkit.dockerfile.v0 14 seconds ago COPY resource.tar / # buildkit 10.3MB buildkit.dockerfile.v0 17 months ago /bin/sh -c #(nop) CMD [\"/bin/sh\"] 0B 17 months ago /bin/sh -c #(nop) ADD file:9233f6f2237d79659… 5.59MB [root@centos7 tmp]# docker images REPOSITORY TAG IMAGE ID CREATED SIZE demo v1 1113b0fb22da 24 seconds ago 26.2MB 上面例子可以分析出：alpine基础镜像大小+5.59MB，resource.tar COPY解压后+10.3MB，touch命令执行时复制了一份+10.3MB，rm虽然显示文件大小为0，但实际上前几层的镜像依然存在。最终镜像大小26.2MB。\n镜像分析 docker history IMAGE：查看IMAGE构建过程，展示镜像层信息 dive IMAGE：第三方分析工具，分析镜像层结构，每层镜像所包含的文件以及体积，比history更加详细 dive安装参考官方文档\n[root@centos7 go]# dive demo:v1 ┃ ● Layers ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │ Current Layer Contents ├────────────────────────────────────────── Cmp Size Command Permission UID:GID Size Filetree 7.0 MB FROM 580fdc606fb93e5 drwxr-xr-x 0:0 841 kB ├── bin 10 MB COPY resource.tar / # buildkit -rwxrwxrwx 0:0 0 B │ ├── arch → /bin/busybox 10 MB RUN /bin/sh -c touch /resource.tar # buildkit -rwxrwxrwx 0:0 0 B │ ├── ash → /bin/busybox 0 B RUN /bin/sh -c rm -f /resource.tar # buildkit -rwxrwxrwx 0:0 0 B │ ├── base64 → /bin/busybox -rwxrwxrwx 0:0 0 B │ ├── bbconfig → /bin/busybox │ Layer Details ├─────────────────────────────────────────────────── -rwxr-xr-x 0:0 841 kB │ ├── busybox -rwxrwxrwx 0:0 0 B │ ├── cat → /bin/busybox Tags: (unavailable) -rwxrwxrwx 0:0 0 B │ ├── chattr → /bin/busybox Id: 580fdc606fb93e5fc291e8df154398e0585362a58b8e5b23bfd9d47ca369 -rwxrwxrwx 0:0 0 B │ ├── chgrp → /bin/busybox 8a79 -rwxrwxrwx 0:0 0 B │ ├── chmod → /bin/busybox Digest: sha256:f1417ff83b319fbdae6dd9cd6d8c9c88002dcd75ecf6ec201c8c6 -rwxrwxrwx 0:0 0 B │ ├── chown → /bin/busybox 894681cf2b5 -rwxrwxrwx 0:0 0 B │ ├── cp → /bin/busybox Command: -rwxrwxrwx 0:0 0 B │ ├── date → /bin/busybox #(nop) ADD file:9a4f77dfaba7fd2aa78186e4ef0e7486ad55101cefc1fabbc1b3 -rwxrwxrwx 0:0 0 B │ ├── dd → /bin/busybox 85601bb38920 in / -rwxrwxrwx 0:0 0 B │ ├── df → /bin/busybox -rwxrwxrwx 0:0 0 B │ ├── dmesg → /bin/busybox │ Image Details ├─────────────────────────────────────────────────── -rwxrwxrwx 0:0 0 B │ ├── dnsdomainname → /bin/busy -rwxrwxrwx 0:0 0 B │ ├── dumpkmap → /bin/busybox -rwxrwxrwx 0:0 0 B │ ├── echo → /bin/busybox Total Image size: 28 MB -rwxrwxrwx 0:0 0 B │ ├── ed → /bin/busybox Potential wasted space: 21 MB -rwxrwxrwx 0:0 0 B │ ├── egrep → /bin/busybox Image efficiency score: 25 % -rwxrwxrwx 0:0 0 B │ ├── false → /bin/busybox -rwxrwxrwx 0:0 0 B │ ├── fatattr → /bin/busybox Count Total Space Path -rwxrwxrwx 0:0 0 B │ ├── fdflush → /bin/busybox 3 21 MB /resource.tar -rwxrwxrwx 0:0 0 B │ ├── fgrep → /bin/busybox 2 0 B /etc -rwxrwxrwx 0:0 0 B │ ├── fsync → /bin/busybox ... 镜像优化 镜像（体积）优化最主要的目的是方便镜像更快速拉取和分发，同时节省硬盘空间，提升部署效率，优化方式可以从下面几个方式入手：\n优化基础镜像，在不影响业务维护的情况下，尽可能使用更小的基础镜像，如：alpine或image:alpine 优化Dockerfile中指令，如多条RUN指令\u0026\u0026串联写在同一行，使之仅生成一层镜像，防止分层过多 使用--squash参数压缩镜像层，官方提示已弃用（本人目前版本是23.0.4） 多阶段构建，更多信息可以查看官网介绍 根据dive分析结果优化 对于基础镜像（最底层）大于500MB的，建议选择更小的基础镜像，如基于alpine的镜像 对于分层大于10层的镜像，获取各层的命令汇总展示，建议调整指令，是否已使用串连的形式 避免产生无用的缓存，如pip应使用--no-cache-dir禁用缓存，yum makecache也会产生缓存 避免无用文件（.md .pdf .txt .doc等一些文档文件不应该出现在镜像中） 避免安装多余的软件 # 先拉取镜像到本地，加快后面的构建速度 docker pull centos:latest docker pull alpine:latest docker pull golang:latest docker pull ubuntu:latest docker pull fedora:28 优化基础镜像 [root@centos7 base]# pwd /root/dockerfile/base [root@centos7 base]# cat Dockerfile FROM centos CMD [\"echo\", \"hi\"] [root@centos7 base]# docker build -t base:v1 . # 修改基础镜像 [root@centos7 base]# cat Dockerfile FROM alpine CMD [\"echo\", \"hi\"] [root@centos7 base]# docker build -t base:v2 . [root@centos7 base]# docker images | grep base base v2 025106dd85eb 4 weeks ago 7.05MB base v1 108460ab34b0 19 months ago 231MB 串联命令 [root@centos7 multirun]# pwd /root/dockerfile/multirun [root@centos7 multirun]# cat Dockerfile FROM fedora:28 RUN dnf install -y nginx RUN dnf clean all RUN rm -rf /var/cache/yum [root@centos7 multirun]# docker build -t multirun:v1 . # 分析镜像 [root@centos7 multirun]# docker images| grep mul multirun v1 2666d7aa527a 2 minutes ago 488MB [root@centos7 multirun]# docker history multirun:v1 IMAGE CREATED CREATED BY SIZE COMMENT 2666d7aa527a 17 seconds ago RUN /bin/sh -c rm -rf /var/cache/yum # build… 0B buildkit.dockerfile.v0 18 seconds ago RUN /bin/sh -c dnf clean all # buildkit 1.79MB buildkit.dockerfile.v0 19 seconds ago RUN /bin/sh -c dnf install -y nginx # buildk… 226MB buildkit.dockerfile.v0 4 years ago /bin/sh -c #(nop) CMD [\"/bin/bash\"] 0B 4 years ago /bin/sh -c #(nop) ADD file:42ddab590052fda98… 261MB 4 years ago /bin/sh -c #(nop) ENV DISTTAG=f28container … 0B 4 years ago /bin/sh -c #(nop) LABEL maintainer=Clement … 0B [root@centos7 multirun]# dive multirun:v1 ┃ ● Layers ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │ Current Layer Contents ├────────────────────────────────────────── Cmp Size Command Permission UID:GID Size Filetree 260 MB FROM 9bfbc900bde2f55 -rwxrwxrwx 0:0 0 B ├── bin → usr/bin 226 MB RUN /bin/sh -c dnf install -y nginx # buildkit dr-xr-xr-x 0:0 0 B ├── boot 1.8 MB RUN /bin/sh -c dnf clean all # buildkit drwxr-xr-x 0:0 0 B ├── dev 0 B RUN /bin/sh -c rm -rf /var/cache/yum # buildkit drwxr-xr-x 0:0 1.8 MB ├── etc -rw------- 0:0 0 B │ ├── .pwd.lock │ Layer Details ├─────────────────────────────────────────────────── -rw-r--r-- 0:0 4.5 kB │ ├── DIR_COLORS -rw-r--r-- 0:0 5.2 kB │ ├── DIR_COLORS.256color Tags: (unavailable) -rw-r--r-- 0:0 4.6 kB │ ├── DIR_COLORS.lightbgcolor Id: 9bfbc900bde2f55fafbeeed2be52e80c9b06244dee226dc54a354f9d09ea -rw-r--r-- 0:0 94 B │ ├── GREP_COLORS 1910 drwxr-xr-x 0:0 203 B │ ├── X11 Digest: sha256:17beab58d693a5e55591675c3dcc5b575a44e476d125408102ce7 drwxr-xr-x 0:0 0 B │ │ ├── applnk 5348011f807 drwxr-xr-x 0:0 0 B │ │ ├── fontpath.d Command: drwxr-xr-x 0:0 203 B │ │ ├── xinit #(nop) ADD file:42ddab590052fda98865a9ecd9dc28c8d3ba7922a6d21b1f182a drwxr-xr-x 0:0 203 B │ │ │ └── xinitrc.d 0a3769419677 in / -rwxr-xr-x 0:0 203 B │ │ │ └── 50-systemd-us drwxr-xr-x 0:0 0 B │ │ └── xorg.conf.d │ Image Details ├─────────────────────────────────────────────────── -rw-r--r-- 0:0 16 B │ ├── adjtime -rw-r--r-- 0:0 1.5 kB │ ├── aliases drwxr-xr-x 0:0 0 B │ ├── alternatives Total Image size: 488 MB -rwxrwxrwx 0:0 0 B │ │ ├── cifs-idmap-plugin → / Potential wasted space: 234 MB -rwxrwxrwx 0:0 0 B │ │ └── libnssckbi.so.x86_64 Image efficiency score: 54 % drwxr-xr-x 0:0 0 B │ ├── bash_completion.d -rw-r--r-- 0:0 3.0 kB │ ├── bashrc Count Total Space Path drwxr-xr-x 0:0 0 B │ ├── binfmt.d 2 48 MB /var/cache/dnf/fedora-filenames.solvx drwxr-xr-x 0:0 0 B │ ├── chkconfig.d 2 47 MB /var/cache/dnf/fedora-f21308f6293b3270/repodata drwxr-xr-x 0:0 0 B │ ├── cifs-utils /a53009478e29c551710df570a5dc726ce5160300c7c1ecde852895ab8a6fcf72-fi -rwxrwxrwx 0:0 0 B │ │ └── idmap-plugin → /etc/a lelists.xml.gz drwxr-xr-x 0:0 614 B │ ├── crypto-policies 2 24 MB /var/cache/dnf/updates-filenames.solvx drwxr-xr-x 0:0 0 B │ │ ├── back-ends 2 23 MB /var/cache/dnf/updates-8bd9ef368505a5fd/repodat -rwxrwxrwx 0:0 0 B │ │ │ ├── bind.config → /us a/15dc5106b1b18f200a2f520b561e59fd8a75d921acfd7edf34e8d88db3b9220a-f -rwxrwxrwx 0:0 0 B │ │ │ ├── gnutls.config → / ilelists.xml.gz -rwxrwxrwx 0:0 0 B │ │ │ ├── java.config → /us 2 21 MB /var/cache/dnf/fedora.solv -rwxrwxrwx 0:0 0 B │ │ │ ├── krb5.config → /us 2 18 MB /var/lib/rpm/Packages -rwxrwxrwx 0:0 0 B │ │ │ ├── libreswan.config 2 16 MB /var/cache/dnf/fedora-f21308f6293b3270/repodata -rwxrwxrwx 0:0 0 B │ │ │ ├── nss.config → /usr /9659dfc44de50563682658fd41f2ab0da60e5657e1cc4f598b50d39fb3436e0c-pr -rwxrwxrwx 0:0 0 B │ │ │ ├── openssh.config → ... # 从dive分析结果可以看出不但每个RUN都产生了一层镜像，而且实际上缓存并没有清理掉，提示Potential wasted space: 234 MB，潜在浪费了234MB空间 # 优化RUN命令 [root@centos7 multirun]# cat Dockerfile FROM fedora:28 RUN dnf install -y nginx\\ \u0026\u0026 dnf clean all\\ \u0026\u0026 rm -rf /var/cache/yum [root@centos7 multirun]# docker build -t multirun:v2 . [root@centos7 multirun]# dive multirun:v2 ┃ ● Layers ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │ Current Layer Contents ├────────────────────────────────────────── Cmp Size Command Permission UID:GID Size Filetree 260 MB FROM 9bfbc900bde2f55 -rwxrwxrwx 0:0 0 B ├── bin → usr/bin 18 MB RUN /bin/sh -c dnf install -y nginx \u0026\u0026 dnf clean all \u0026\u0026 dr-xr-xr-x 0:0 0 B ├── boot drwxr-xr-x 0:0 0 B ├── dev │ Layer Details ├─────────────────────────────────────────────────── drwxr-xr-x 0:0 1.8 MB ├── etc -rw------- 0:0 0 B │ ├── .pwd.lock Tags: (unavailable) -rw-r--r-- 0:0 4.5 kB │ ├── DIR_COLORS Id: 9bfbc900bde2f55fafbeeed2be52e80c9b06244dee226dc54a354f9d09ea -rw-r--r-- 0:0 5.2 kB │ ├── DIR_COLORS.256color 1910 -rw-r--r-- 0:0 4.6 kB │ ├── DIR_COLORS.lightbgcolor Digest: sha256:17beab58d693a5e55591675c3dcc5b575a44e476d125408102ce7 -rw-r--r-- 0:0 94 B │ ├── GREP_COLORS 5348011f807 drwxr-xr-x 0:0 203 B │ ├── X11 Command: drwxr-xr-x 0:0 0 B │ │ ├── applnk #(nop) ADD file:42ddab590052fda98865a9ecd9dc28c8d3ba7922a6d21b1f182a drwxr-xr-x 0:0 0 B │ │ ├── fontpath.d 0a3769419677 in / drwxr-xr-x 0:0 203 B │ │ ├── xinit drwxr-xr-x 0:0 203 B │ │ │ └── xinitrc.d │ Image Details ├─────────────────────────────────────────────────── -rwxr-xr-x 0:0 203 B │ │ │ └── 50-systemd-us drwxr-xr-x 0:0 0 B │ │ └── xorg.conf.d -rw-r--r-- 0:0 16 B │ ├── adjtime Total Image size: 278 MB -rw-r--r-- 0:0 1.5 kB │ ├── aliases Potential wasted space: 24 MB drwxr-xr-x 0:0 0 B │ ├── alternatives Image efficiency score: 95 % -rwxrwxrwx 0:0 0 B │ │ ├── cifs-idmap-plugin → / -rwxrwxrwx 0:0 0 B │ │ └── libnssckbi.so.x86_64 Count Total Space Path drwxr-xr-x 0:0 0 B │ ├── bash_completion.d 2 18 MB /var/lib/rpm/Packages -rw-r--r-- 0:0 3.0 kB │ ├── bashr ... # 缓存已清理干净，有效空间占比95%，Image efficiency score: 95 % 压缩镜像层（弃用） docker1.13版本后可以直接使用--squash参数压缩镜像层，之前需要单独安装docker-squash工具才能实现。但目前已移除了这个参数，使用也无效。\n# 依旧以上面RUN为例 [root@centos7 squash]# pwd /root/dockerfile/squash [root@centos7 squash]# cat Dockerfile FROM fedora:28 RUN dnf install -y nginx RUN dnf clean all RUN rm -rf /var/cache/yum [root@centos7 squash]# docker build -t squash:v1 . # 压缩前488MB [root@centos7 squash]# docker images | grep squ squash v1 2666d7aa527a 45 minutes ago 488MB # 发现提示已移除该参数，提示使用多阶段构建 [root@centos7 squash]# docker build -t squash:v2 --squash . WARNING: experimental flag squash is removed with BuildKit. You should squash inside build using a multi-stage Dockerfile for efficiency. [root@centos7 squash]# docker images | grep squ squash v1 2666d7aa527a 46 minutes ago 488MB squash v2 2666d7aa527a 46 minutes ago 488MB [root@centos7 squash]# docker version Client: Docker Engine - Community Version: 23.0.4 ... 既然官方已弃用，那就不详细研究了。建议使用多阶段构建。原本镜像层压缩就会造成其他缓存层无法共用，失去了镜像的优势，在镜像较多的情况下无法公用，存储开销是很大的。\n多阶段构建 scratch是一个空镜像，不能拉取也不能运行，里面什么都没有，但可以作为基础镜像构建其他镜像。\n[root@centos7 go]# pwd /root/dockerfile/go [root@centos7 go]# cat hello.go package main import \"fmt\" func main() { fmt.Println(\"hello world.\") } [root@centos7 go]# cat Dockerfile FROM golang COPY hello.go . RUN go build hello.go CMD [\"./hello\"] [root@centos7 go]# docker run -it --rm go:v1 hello world. # 分阶段构建，这里指定WORKDIR，方便复制可执行文件 [root@centos7 go]# cat Dockerfile FROM golang AS first WORKDIR /app COPY hello.go . RUN go build hello.go FROM scratch COPY --from=first /app/hello . CMD [\"./hello\"] [root@centos7 go]# docker build -t go:v2 . [root@centos7 go]# docker run -it --rm go:v2 hello world. [root@centos7 go]# docker images | grep go go v2 d9e76072de38 29 seconds ago 1.85MB go v1 c5bb11851550 2 minutes ago 804MB # 使用非scratch镜像 [root@centos7 go]# cat Dockerfile FROM golang WORKDIR /app COPY hello.go . RUN go build hello.go FROM ubuntu COPY --from=0 /app/hello . CMD [\"./hello\"] [root@centos7 go]# docker build -t go:v3 . [root@centos7 go]# docker images | grep v3 go v3 d1429ea70f10 13 seconds ago 74.6MB 注意到分阶段构建时用了--from=first和--from=0。--from=0表示FROM按序号算（从0开始）的阶段，可以不必指定AS build_name；--from=first这里的first就是构建阶段的别名，用AS指定别名，以供调用。\n优化注意事项 scratch镜像：该镜像什么都没有，没有shell，没有程序链接库（库文件），没有调试工具（ps/top/ping等），所以如果需要这些功能，不推荐使用scratch镜像，可以选用合适的镜像构建，如：busybox、alpine、ubuntu等\nalpine镜像：该镜像标准库是musl libc而不是glibc，程序依赖glibc库时，在alpine中编译时会因为库缺失而报错。除了标准库，alpine对文件系统也进行了精简，Python程序在alpine中运行效率非常低，所以谨慎使用，可以选择其他合适镜像构建，如：busybox:glibc、ubuntu、debian-slim和openjdk:8-jre-alpine，很多镜像发布了自己得alpine版本，也可以选择使用\n生产中是否使用alpine镜像可以参考文章：alpine镜像分析\n镜像精简固然重要，但如果以提升程序复杂度为代价是不妥的。\n针对不同开发语言的镜像精简策略可以参考文章：Docker 镜像制作教程：针对不同语言的精简策略\n",
+  "wordCount" : "4464",
+  "inLanguage": "en",
+  "datePublished": "2023-04-26T18:43:22+08:00",
+  "dateModified": "2023-04-26T18:43:22+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "deemoprobe"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://deemoprobe.github.io/posts/tech/dockerimagesoptimization/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "William's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://deemoprobe.github.io/img/bear.gif"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://deemoprobe.github.io/" accesskey="h" title="William&#39;s Blog (Alt + H)">
+            <img src="https://deemoprobe.github.io/img/bear.gif" alt="logo" aria-label="logo"
+                 height="35">William&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://deemoprobe.github.io/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/archives/" title="📈 归档">
+                <span>📈 归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/tools" title="🧱 工具">
+                <span>🧱 工具</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            
+            <h1 class="post-title">
+                DockerImagesOptimization
+            </h1>
+            <div class="post-description">
+                Docker镜像体积优化
+            </div>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2023-04-26
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>4464字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>9分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>deemoprobe
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+            <span class="post-tags-meta">
+                <a href="https://deemoprobe.github.io/tags/docker/" style="color: var(--secondary)!important;">docker</a>
+            </span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    
+                </span>
+
+</div>
+        </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">文章目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e4%bc%98%e5%8c%96%e5%8e%9f%e7%90%86" aria-label="优化原理">优化原理</a></li>
+                <li>
+                    <a href="#%e9%95%9c%e5%83%8f%e5%88%86%e6%9e%90" aria-label="镜像分析">镜像分析</a></li>
+                <li>
+                    <a href="#%e9%95%9c%e5%83%8f%e4%bc%98%e5%8c%96" aria-label="镜像优化">镜像优化</a><ul>
+                        
+                <li>
+                    <a href="#%e4%bc%98%e5%8c%96%e5%9f%ba%e7%a1%80%e9%95%9c%e5%83%8f" aria-label="优化基础镜像">优化基础镜像</a></li>
+                <li>
+                    <a href="#%e4%b8%b2%e8%81%94%e5%91%bd%e4%bb%a4" aria-label="串联命令">串联命令</a></li>
+                <li>
+                    <a href="#%e5%8e%8b%e7%bc%a9%e9%95%9c%e5%83%8f%e5%b1%82%e5%bc%83%e7%94%a8" aria-label="压缩镜像层（弃用）">压缩镜像层（弃用）</a></li>
+                <li>
+                    <a href="#%e5%a4%9a%e9%98%b6%e6%ae%b5%e6%9e%84%e5%bb%ba" aria-label="多阶段构建">多阶段构建</a></li>
+                <li>
+                    <a href="#%e4%bc%98%e5%8c%96%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a1%b9" aria-label="优化注意事项">优化注意事项</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        
+        activeElement = elements[0];
+        const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+        document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+    }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+            const id = encodeURI(element.getAttribute('id')).toLowerCase();
+            if (element === activeElement){
+                document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+            } else {
+                document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+            }
+        })
+    }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+        <div class="post-content"><h2 id="优化原理">优化原理<a hidden class="anchor" aria-hidden="true" href="#优化原理">#</a></h2>
+<p>docker镜像层有以下特点（和镜像大小息息相关）：</p>
+<ul>
+<li><code>RUN</code>、<code>COPY</code> 和 <code>ADD</code> 指令会在已有镜像层的基础上创建一个新的镜像层，执行指令产生的所有文件系统变更会在指令结束后作为一个镜像层整体提交</li>
+<li>镜像层具有<code>copy-on-write</code>的特性，如果去更新其他镜像层中已存在的文件，会先将其复制到新的镜像层中再修改，造成双倍的文件空间占用</li>
+<li>如果去删除其他镜像层的一个文件，只会在当前镜像层生成一个该文件的删除标记，并不会减少整个镜像的实际体积</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 tmp<span style="color:#f92672">]</span><span style="color:#75715e"># cat Dockerfile</span>
+</span></span><span style="display:flex;"><span>FROM alpine
+</span></span><span style="display:flex;"><span>COPY resource.tar /
+</span></span><span style="display:flex;"><span>RUN touch /resource.tar
+</span></span><span style="display:flex;"><span>RUN rm -f /resource.tar
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 tmp<span style="color:#f92672">]</span><span style="color:#75715e"># ls -lh resource.tar</span>
+</span></span><span style="display:flex;"><span>-rw-r--r--. <span style="color:#ae81ff">1</span> root root 9.9M Apr <span style="color:#ae81ff">26</span> 15:46 resource.tar
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 tmp<span style="color:#f92672">]</span><span style="color:#75715e"># docker build -t demo:v1 .</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> Building 20.3s <span style="color:#f92672">(</span>9/9<span style="color:#f92672">)</span> FINISHED
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>internal<span style="color:#f92672">]</span> load .dockerignore                                                                                                   0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; transferring context: 2B                                                                                                     0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>internal<span style="color:#f92672">]</span> load build definition from Dockerfile                                                                                0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; transferring dockerfile: 177B                                                                                                0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>internal<span style="color:#f92672">]</span> load metadata <span style="color:#66d9ef">for</span> docker.io/library/alpine:latest                                                                   17.5s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>internal<span style="color:#f92672">]</span> load build context                                                                                                   0.2s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; transferring context: 10.30MB                                                                                                0.2s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>1/4<span style="color:#f92672">]</span> FROM docker.io/library/alpine@sha256:21a3deaa0d32a8057914f36584b5288d2e5ecc984380bc0118285c70fa8c9300                     1.6s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; resolve docker.io/library/alpine@sha256:21a3deaa0d32a8057914f36584b5288d2e5ecc984380bc0118285c70fa8c9300                     0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; sha256:21a3deaa0d32a8057914f36584b5288d2e5ecc984380bc0118285c70fa8c9300 1.64kB / 1.64kB                                      0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; sha256:e7d88de73db3d3fd9b2d63aa7f447a10fd0220b7cbf39803c803f2af9ba256b3 528B / 528B                                          0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; sha256:c059bfaa849c4d8e4aecaeb3a10c2d9b3d85f5165c66ad3a4d937758128c4d18 1.47kB / 1.47kB                                      0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; sha256:59bf1c3509f33515622619af21ed55bbe26d24913cedbca106468a5fb37a50c3 2.82MB / 2.82MB                                      1.2s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; extracting sha256:59bf1c3509f33515622619af21ed55bbe26d24913cedbca106468a5fb37a50c3                                           0.3s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>2/4<span style="color:#f92672">]</span> COPY resource.tar /                                                                                                       0.1s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>3/4<span style="color:#f92672">]</span> RUN touch /resource.tar                                                                                                   0.4s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">[</span>4/4<span style="color:#f92672">]</span> RUN rm -f /resource.tar                                                                                                   0.5s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; exporting to image                                                                                                              0.2s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; exporting layers                                                                                                             0.2s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; writing image sha256:1113b0fb22dabb56b6926960eafd2a6aaf183d1bd2373f1be10df67c73714f37                                        0.0s
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">=</span>&gt; <span style="color:#f92672">=</span>&gt; naming to docker.io/library/demo:v1                                                                                          0.0s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 tmp<span style="color:#f92672">]</span><span style="color:#75715e"># docker history demo:v1</span>
+</span></span><span style="display:flex;"><span>IMAGE          CREATED          CREATED BY                                      SIZE      COMMENT
+</span></span><span style="display:flex;"><span>1113b0fb22da   <span style="color:#ae81ff">13</span> seconds ago   RUN /bin/sh -c rm -f /resource.tar <span style="color:#75715e"># buildkit   0B        buildkit.dockerfile.v0</span>
+</span></span><span style="display:flex;"><span>&lt;missing&gt;      <span style="color:#ae81ff">13</span> seconds ago   RUN /bin/sh -c touch /resource.tar <span style="color:#75715e"># buildkit   10.3MB    buildkit.dockerfile.v0</span>
+</span></span><span style="display:flex;"><span>&lt;missing&gt;      <span style="color:#ae81ff">14</span> seconds ago   COPY resource.tar / <span style="color:#75715e"># buildkit                  10.3MB    buildkit.dockerfile.v0</span>
+</span></span><span style="display:flex;"><span>&lt;missing&gt;      <span style="color:#ae81ff">17</span> months ago    /bin/sh -c <span style="color:#75715e">#(nop)  CMD [&#34;/bin/sh&#34;]              0B</span>
+</span></span><span style="display:flex;"><span>&lt;missing&gt;      <span style="color:#ae81ff">17</span> months ago    /bin/sh -c <span style="color:#75715e">#(nop) ADD file:9233f6f2237d79659…   5.59MB</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 tmp<span style="color:#f92672">]</span><span style="color:#75715e"># docker images</span>
+</span></span><span style="display:flex;"><span>REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+</span></span><span style="display:flex;"><span>demo         v1        1113b0fb22da   <span style="color:#ae81ff">24</span> seconds ago   26.2MB
+</span></span></code></pre></div><p>上面例子可以分析出：alpine基础镜像大小+5.59MB，resource.tar COPY解压后+10.3MB，touch命令执行时复制了一份+10.3MB，rm虽然显示文件大小为0，但实际上前几层的镜像依然存在。最终镜像大小26.2MB。</p>
+<h2 id="镜像分析">镜像分析<a hidden class="anchor" aria-hidden="true" href="#镜像分析">#</a></h2>
+<ul>
+<li><code>docker history IMAGE</code>：查看IMAGE构建过程，展示镜像层信息</li>
+<li><code>dive IMAGE</code>：第三方分析工具，分析镜像层结构，每层镜像所包含的文件以及体积，比history更加详细</li>
+</ul>
+<p><a href="https://github.com/wagoodman/dive#installation"  target="_blank" rel="noopener" style="color:#42b983" ;>dive安装参考官方文档</a></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># dive demo:v1</span>
+</span></span><span style="display:flex;"><span>┃ ● Layers ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │ Current Layer Contents ├──────────────────────────────────────────
+</span></span><span style="display:flex;"><span>Cmp   Size  Command                                                  Permission     UID:GID       Size  Filetree
+</span></span><span style="display:flex;"><span>    7.0 MB  FROM 580fdc606fb93e5                                     drwxr-xr-x         0:0     <span style="color:#ae81ff">841</span> kB  ├── bin
+</span></span><span style="display:flex;"><span>     <span style="color:#ae81ff">10</span> MB  COPY resource.tar / <span style="color:#75715e"># buildkit                           -rwxrwxrwx         0:0        0 B  │   ├── arch → /bin/busybox</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#ae81ff">10</span> MB  RUN /bin/sh -c touch /resource.tar <span style="color:#75715e"># buildkit            -rwxrwxrwx         0:0        0 B  │   ├── ash → /bin/busybox</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#ae81ff">0</span> B  RUN /bin/sh -c rm -f /resource.tar <span style="color:#75715e"># buildkit            -rwxrwxrwx         0:0        0 B  │   ├── base64 → /bin/busybox</span>
+</span></span><span style="display:flex;"><span>                                                                     -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── bbconfig → /bin/busybox
+</span></span><span style="display:flex;"><span>│ Layer Details ├─────────────────────────────────────────────────── -rwxr-xr-x         0:0     <span style="color:#ae81ff">841</span> kB  │   ├── busybox
+</span></span><span style="display:flex;"><span>                                                                     -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── cat → /bin/busybox
+</span></span><span style="display:flex;"><span>Tags:   <span style="color:#f92672">(</span>unavailable<span style="color:#f92672">)</span>                                                -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── chattr → /bin/busybox
+</span></span><span style="display:flex;"><span>Id:     580fdc606fb93e5fc291e8df154398e0585362a58b8e5b23bfd9d47ca369 -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── chgrp → /bin/busybox
+</span></span><span style="display:flex;"><span>8a79                                                                 -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── chmod → /bin/busybox
+</span></span><span style="display:flex;"><span>Digest: sha256:f1417ff83b319fbdae6dd9cd6d8c9c88002dcd75ecf6ec201c8c6 -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── chown → /bin/busybox
+</span></span><span style="display:flex;"><span>894681cf2b5                                                          -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── cp → /bin/busybox
+</span></span><span style="display:flex;"><span>Command:                                                             -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── date → /bin/busybox
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#(nop) ADD file:9a4f77dfaba7fd2aa78186e4ef0e7486ad55101cefc1fabbc1b3 -rwxrwxrwx         0:0        0 B  │   ├── dd → /bin/busybox</span>
+</span></span><span style="display:flex;"><span>85601bb38920 in /                                                    -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── df → /bin/busybox
+</span></span><span style="display:flex;"><span>                                                                     -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── dmesg → /bin/busybox
+</span></span><span style="display:flex;"><span>│ Image Details ├─────────────────────────────────────────────────── -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── dnsdomainname → /bin/busy
+</span></span><span style="display:flex;"><span>                                                                     -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── dumpkmap → /bin/busybox
+</span></span><span style="display:flex;"><span>                                                                     -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── echo → /bin/busybox
+</span></span><span style="display:flex;"><span>Total Image size: <span style="color:#ae81ff">28</span> MB                                              -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── ed → /bin/busybox
+</span></span><span style="display:flex;"><span>Potential wasted space: <span style="color:#ae81ff">21</span> MB                                        -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── egrep → /bin/busybox
+</span></span><span style="display:flex;"><span>Image efficiency score: <span style="color:#ae81ff">25</span> %                                         -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── false → /bin/busybox
+</span></span><span style="display:flex;"><span>                                                                     -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── fatattr → /bin/busybox
+</span></span><span style="display:flex;"><span>Count   Total Space  Path                                            -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── fdflush → /bin/busybox
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">21</span> MB  /resource.tar                                   -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── fgrep → /bin/busybox
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">2</span>           <span style="color:#ae81ff">0</span> B  /etc                                            -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   ├── fsync → /bin/busybox
+</span></span><span style="display:flex;"><span>                                                                     ...
+</span></span></code></pre></div><h2 id="镜像优化">镜像优化<a hidden class="anchor" aria-hidden="true" href="#镜像优化">#</a></h2>
+<p>镜像（体积）优化最主要的目的是方便镜像更快速拉取和分发，同时节省硬盘空间，提升部署效率，优化方式可以从下面几个方式入手：</p>
+<ul>
+<li>
+<ol>
+<li>优化基础镜像，在不影响业务维护的情况下，尽可能使用更小的基础镜像，如：alpine或image:alpine</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>优化Dockerfile中指令，如多条RUN指令<code>&amp;&amp;</code>串联写在同一行，使之仅生成一层镜像，防止分层过多</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li><del>使用<code>--squash</code>参数压缩镜像层，官方提示已弃用</del>（本人目前版本是23.0.4）</li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li>多阶段构建，更多信息可以查看<a href="https://docs.docker.com/build/building/multi-stage/"  target="_blank" rel="noopener" style="color:#42b983" ;>官网介绍</a></li>
+</ol>
+</li>
+<li>
+<ol start="5">
+<li>根据dive分析结果优化</li>
+</ol>
+<ul>
+<li>对于基础镜像（最底层）大于500MB的，建议选择更小的基础镜像，如基于alpine的镜像</li>
+<li>对于分层大于10层的镜像，获取各层的命令汇总展示，建议调整指令，是否已使用串连的形式</li>
+<li>避免产生无用的缓存，如pip应使用<code>--no-cache-dir</code>禁用缓存，<code>yum makecache</code>也会产生缓存</li>
+<li>避免无用文件（.md .pdf .txt .doc等一些文档文件不应该出现在镜像中）</li>
+<li>避免安装多余的软件</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 先拉取镜像到本地，加快后面的构建速度</span>
+</span></span><span style="display:flex;"><span>docker pull centos:latest
+</span></span><span style="display:flex;"><span>docker pull alpine:latest
+</span></span><span style="display:flex;"><span>docker pull golang:latest
+</span></span><span style="display:flex;"><span>docker pull ubuntu:latest
+</span></span><span style="display:flex;"><span>docker pull fedora:28
+</span></span></code></pre></div><h3 id="优化基础镜像">优化基础镜像<a hidden class="anchor" aria-hidden="true" href="#优化基础镜像">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 base<span style="color:#f92672">]</span><span style="color:#75715e"># pwd</span>
+</span></span><span style="display:flex;"><span>/root/dockerfile/base
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 base<span style="color:#f92672">]</span><span style="color:#75715e"># cat Dockerfile</span>
+</span></span><span style="display:flex;"><span>FROM centos
+</span></span><span style="display:flex;"><span>CMD <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;echo&#34;</span>, <span style="color:#e6db74">&#34;hi&#34;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 base<span style="color:#f92672">]</span><span style="color:#75715e"># docker build -t base:v1 .</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 修改基础镜像</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 base<span style="color:#f92672">]</span><span style="color:#75715e"># cat Dockerfile</span>
+</span></span><span style="display:flex;"><span>FROM alpine
+</span></span><span style="display:flex;"><span>CMD <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;echo&#34;</span>, <span style="color:#e6db74">&#34;hi&#34;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 base<span style="color:#f92672">]</span><span style="color:#75715e"># docker build -t base:v2 .</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 base<span style="color:#f92672">]</span><span style="color:#75715e"># docker images | grep base</span>
+</span></span><span style="display:flex;"><span>base         v2        025106dd85eb   <span style="color:#ae81ff">4</span> weeks ago     7.05MB
+</span></span><span style="display:flex;"><span>base         v1        108460ab34b0   <span style="color:#ae81ff">19</span> months ago   231MB
+</span></span></code></pre></div><h3 id="串联命令">串联命令<a hidden class="anchor" aria-hidden="true" href="#串联命令">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 multirun<span style="color:#f92672">]</span><span style="color:#75715e"># pwd</span>
+</span></span><span style="display:flex;"><span>/root/dockerfile/multirun
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 multirun<span style="color:#f92672">]</span><span style="color:#75715e"># cat Dockerfile</span>
+</span></span><span style="display:flex;"><span>FROM fedora:28
+</span></span><span style="display:flex;"><span>RUN dnf install -y nginx
+</span></span><span style="display:flex;"><span>RUN dnf clean all
+</span></span><span style="display:flex;"><span>RUN rm -rf /var/cache/yum
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 multirun<span style="color:#f92672">]</span><span style="color:#75715e"># docker build -t multirun:v1 .</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 分析镜像</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 multirun<span style="color:#f92672">]</span><span style="color:#75715e"># docker images| grep mul</span>
+</span></span><span style="display:flex;"><span>multirun     v1        2666d7aa527a   <span style="color:#ae81ff">2</span> minutes ago    488MB
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 multirun<span style="color:#f92672">]</span><span style="color:#75715e"># docker history multirun:v1</span>
+</span></span><span style="display:flex;"><span>IMAGE          CREATED          CREATED BY                                      SIZE      COMMENT
+</span></span><span style="display:flex;"><span>2666d7aa527a   <span style="color:#ae81ff">17</span> seconds ago   RUN /bin/sh -c rm -rf /var/cache/yum <span style="color:#75715e"># build…   0B        buildkit.dockerfile.v0</span>
+</span></span><span style="display:flex;"><span>&lt;missing&gt;      <span style="color:#ae81ff">18</span> seconds ago   RUN /bin/sh -c dnf clean all <span style="color:#75715e"># buildkit         1.79MB    buildkit.dockerfile.v0</span>
+</span></span><span style="display:flex;"><span>&lt;missing&gt;      <span style="color:#ae81ff">19</span> seconds ago   RUN /bin/sh -c dnf install -y nginx <span style="color:#75715e"># buildk…   226MB     buildkit.dockerfile.v0</span>
+</span></span><span style="display:flex;"><span>&lt;missing&gt;      <span style="color:#ae81ff">4</span> years ago      /bin/sh -c <span style="color:#75715e">#(nop)  CMD [&#34;/bin/bash&#34;]            0B</span>
+</span></span><span style="display:flex;"><span>&lt;missing&gt;      <span style="color:#ae81ff">4</span> years ago      /bin/sh -c <span style="color:#75715e">#(nop) ADD file:42ddab590052fda98…   261MB</span>
+</span></span><span style="display:flex;"><span>&lt;missing&gt;      <span style="color:#ae81ff">4</span> years ago      /bin/sh -c <span style="color:#75715e">#(nop)  ENV DISTTAG=f28container …   0B</span>
+</span></span><span style="display:flex;"><span>&lt;missing&gt;      <span style="color:#ae81ff">4</span> years ago      /bin/sh -c <span style="color:#75715e">#(nop)  LABEL maintainer=Clement …   0B</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 multirun<span style="color:#f92672">]</span><span style="color:#75715e"># dive multirun:v1</span>
+</span></span><span style="display:flex;"><span>┃ ● Layers ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │ Current Layer Contents ├──────────────────────────────────────────
+</span></span><span style="display:flex;"><span>Cmp   Size  Command                                                  Permission     UID:GID       Size  Filetree
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">260</span> MB  FROM 9bfbc900bde2f55                                     -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  ├── bin → usr/bin
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">226</span> MB  RUN /bin/sh -c dnf install -y nginx <span style="color:#75715e"># buildkit           dr-xr-xr-x         0:0        0 B  ├── boot</span>
+</span></span><span style="display:flex;"><span>    1.8 MB  RUN /bin/sh -c dnf clean all <span style="color:#75715e"># buildkit                  drwxr-xr-x         0:0        0 B  ├── dev</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#ae81ff">0</span> B  RUN /bin/sh -c rm -rf /var/cache/yum <span style="color:#75715e"># buildkit          drwxr-xr-x         0:0     1.8 MB  ├── etc</span>
+</span></span><span style="display:flex;"><span>                                                                     -rw-------         0:0        <span style="color:#ae81ff">0</span> B  │   ├── .pwd.lock
+</span></span><span style="display:flex;"><span>│ Layer Details ├─────────────────────────────────────────────────── -rw-r--r--         0:0     4.5 kB  │   ├── DIR_COLORS
+</span></span><span style="display:flex;"><span>                                                                     -rw-r--r--         0:0     5.2 kB  │   ├── DIR_COLORS.256color
+</span></span><span style="display:flex;"><span>Tags:   <span style="color:#f92672">(</span>unavailable<span style="color:#f92672">)</span>                                                -rw-r--r--         0:0     4.6 kB  │   ├── DIR_COLORS.lightbgcolor
+</span></span><span style="display:flex;"><span>Id:     9bfbc900bde2f55fafbeeed2be52e80c9b06244dee226dc54a354f9d09ea -rw-r--r--         0:0       <span style="color:#ae81ff">94</span> B  │   ├── GREP_COLORS
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1910</span>                                                                 drwxr-xr-x         0:0      <span style="color:#ae81ff">203</span> B  │   ├── X11
+</span></span><span style="display:flex;"><span>Digest: sha256:17beab58d693a5e55591675c3dcc5b575a44e476d125408102ce7 drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   │   ├── applnk
+</span></span><span style="display:flex;"><span>5348011f807                                                          drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   │   ├── fontpath.d
+</span></span><span style="display:flex;"><span>Command:                                                             drwxr-xr-x         0:0      <span style="color:#ae81ff">203</span> B  │   │   ├── xinit
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#(nop) ADD file:42ddab590052fda98865a9ecd9dc28c8d3ba7922a6d21b1f182a drwxr-xr-x         0:0      203 B  │   │   │   └── xinitrc.d</span>
+</span></span><span style="display:flex;"><span>0a3769419677 in /                                                    -rwxr-xr-x         0:0      <span style="color:#ae81ff">203</span> B  │   │   │       └── 50-systemd-us
+</span></span><span style="display:flex;"><span>                                                                     drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   │   └── xorg.conf.d
+</span></span><span style="display:flex;"><span>│ Image Details ├─────────────────────────────────────────────────── -rw-r--r--         0:0       <span style="color:#ae81ff">16</span> B  │   ├── adjtime
+</span></span><span style="display:flex;"><span>                                                                     -rw-r--r--         0:0     1.5 kB  │   ├── aliases
+</span></span><span style="display:flex;"><span>                                                                     drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   ├── alternatives
+</span></span><span style="display:flex;"><span>Total Image size: <span style="color:#ae81ff">488</span> MB                                             -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   ├── cifs-idmap-plugin → /
+</span></span><span style="display:flex;"><span>Potential wasted space: <span style="color:#ae81ff">234</span> MB                                       -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   └── libnssckbi.so.x86_64
+</span></span><span style="display:flex;"><span>Image efficiency score: <span style="color:#ae81ff">54</span> %                                         drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   ├── bash_completion.d
+</span></span><span style="display:flex;"><span>                                                                     -rw-r--r--         0:0     3.0 kB  │   ├── bashrc
+</span></span><span style="display:flex;"><span>Count   Total Space  Path                                            drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   ├── binfmt.d
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">48</span> MB  /var/cache/dnf/fedora-filenames.solvx           drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   ├── chkconfig.d
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">47</span> MB  /var/cache/dnf/fedora-f21308f6293b3270/repodata drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   ├── cifs-utils
+</span></span><span style="display:flex;"><span>/a53009478e29c551710df570a5dc726ce5160300c7c1ecde852895ab8a6fcf72-fi -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   └── idmap-plugin → /etc/a
+</span></span><span style="display:flex;"><span>lelists.xml.gz                                                       drwxr-xr-x         0:0      <span style="color:#ae81ff">614</span> B  │   ├── crypto-policies
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">24</span> MB  /var/cache/dnf/updates-filenames.solvx          drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   │   ├── back-ends
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">23</span> MB  /var/cache/dnf/updates-8bd9ef368505a5fd/repodat -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   │   ├── bind.config → /us
+</span></span><span style="display:flex;"><span>a/15dc5106b1b18f200a2f520b561e59fd8a75d921acfd7edf34e8d88db3b9220a-f -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   │   ├── gnutls.config → /
+</span></span><span style="display:flex;"><span>ilelists.xml.gz                                                      -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   │   ├── java.config → /us
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">21</span> MB  /var/cache/dnf/fedora.solv                      -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   │   ├── krb5.config → /us
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">18</span> MB  /var/lib/rpm/Packages                           -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   │   ├── libreswan.config
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">16</span> MB  /var/cache/dnf/fedora-f21308f6293b3270/repodata -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   │   ├── nss.config → /usr
+</span></span><span style="display:flex;"><span>/9659dfc44de50563682658fd41f2ab0da60e5657e1cc4f598b50d39fb3436e0c-pr -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   │   ├── openssh.config →
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 从dive分析结果可以看出不但每个RUN都产生了一层镜像，而且实际上缓存并没有清理掉，提示Potential wasted space: 234 MB，潜在浪费了234MB空间</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 优化RUN命令</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 multirun<span style="color:#f92672">]</span><span style="color:#75715e"># cat Dockerfile</span>
+</span></span><span style="display:flex;"><span>FROM fedora:28
+</span></span><span style="display:flex;"><span>RUN dnf install -y nginx<span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span> <span style="color:#f92672">&amp;&amp;</span> dnf clean all<span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span> <span style="color:#f92672">&amp;&amp;</span> rm -rf /var/cache/yum
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 multirun<span style="color:#f92672">]</span><span style="color:#75715e"># docker build -t multirun:v2 .</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 multirun<span style="color:#f92672">]</span><span style="color:#75715e"># dive multirun:v2</span>
+</span></span><span style="display:flex;"><span>┃ ● Layers ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │ Current Layer Contents ├──────────────────────────────────────────
+</span></span><span style="display:flex;"><span>Cmp   Size  Command                                                  Permission     UID:GID       Size  Filetree
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">260</span> MB  FROM 9bfbc900bde2f55                                     -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  ├── bin → usr/bin
+</span></span><span style="display:flex;"><span>     <span style="color:#ae81ff">18</span> MB  RUN /bin/sh -c dnf install -y nginx <span style="color:#f92672">&amp;&amp;</span> dnf clean all <span style="color:#f92672">&amp;&amp;</span>  dr-xr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  ├── boot
+</span></span><span style="display:flex;"><span>                                                                     drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  ├── dev
+</span></span><span style="display:flex;"><span>│ Layer Details ├─────────────────────────────────────────────────── drwxr-xr-x         0:0     1.8 MB  ├── etc
+</span></span><span style="display:flex;"><span>                                                                     -rw-------         0:0        <span style="color:#ae81ff">0</span> B  │   ├── .pwd.lock
+</span></span><span style="display:flex;"><span>Tags:   <span style="color:#f92672">(</span>unavailable<span style="color:#f92672">)</span>                                                -rw-r--r--         0:0     4.5 kB  │   ├── DIR_COLORS
+</span></span><span style="display:flex;"><span>Id:     9bfbc900bde2f55fafbeeed2be52e80c9b06244dee226dc54a354f9d09ea -rw-r--r--         0:0     5.2 kB  │   ├── DIR_COLORS.256color
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1910</span>                                                                 -rw-r--r--         0:0     4.6 kB  │   ├── DIR_COLORS.lightbgcolor
+</span></span><span style="display:flex;"><span>Digest: sha256:17beab58d693a5e55591675c3dcc5b575a44e476d125408102ce7 -rw-r--r--         0:0       <span style="color:#ae81ff">94</span> B  │   ├── GREP_COLORS
+</span></span><span style="display:flex;"><span>5348011f807                                                          drwxr-xr-x         0:0      <span style="color:#ae81ff">203</span> B  │   ├── X11
+</span></span><span style="display:flex;"><span>Command:                                                             drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   │   ├── applnk
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#(nop) ADD file:42ddab590052fda98865a9ecd9dc28c8d3ba7922a6d21b1f182a drwxr-xr-x         0:0        0 B  │   │   ├── fontpath.d</span>
+</span></span><span style="display:flex;"><span>0a3769419677 in /                                                    drwxr-xr-x         0:0      <span style="color:#ae81ff">203</span> B  │   │   ├── xinit
+</span></span><span style="display:flex;"><span>                                                                     drwxr-xr-x         0:0      <span style="color:#ae81ff">203</span> B  │   │   │   └── xinitrc.d
+</span></span><span style="display:flex;"><span>│ Image Details ├─────────────────────────────────────────────────── -rwxr-xr-x         0:0      <span style="color:#ae81ff">203</span> B  │   │   │       └── 50-systemd-us
+</span></span><span style="display:flex;"><span>                                                                     drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   │   └── xorg.conf.d
+</span></span><span style="display:flex;"><span>                                                                     -rw-r--r--         0:0       <span style="color:#ae81ff">16</span> B  │   ├── adjtime
+</span></span><span style="display:flex;"><span>Total Image size: <span style="color:#ae81ff">278</span> MB                                             -rw-r--r--         0:0     1.5 kB  │   ├── aliases
+</span></span><span style="display:flex;"><span>Potential wasted space: <span style="color:#ae81ff">24</span> MB                                        drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   ├── alternatives
+</span></span><span style="display:flex;"><span>Image efficiency score: <span style="color:#ae81ff">95</span> %                                         -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   ├── cifs-idmap-plugin → /
+</span></span><span style="display:flex;"><span>                                                                     -rwxrwxrwx         0:0        <span style="color:#ae81ff">0</span> B  │   │   └── libnssckbi.so.x86_64
+</span></span><span style="display:flex;"><span>Count   Total Space  Path                                            drwxr-xr-x         0:0        <span style="color:#ae81ff">0</span> B  │   ├── bash_completion.d
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">18</span> MB  /var/lib/rpm/Packages                           -rw-r--r--         0:0     3.0 kB  │   ├── bashr
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 缓存已清理干净，有效空间占比95%，Image efficiency score: 95 %</span>
+</span></span></code></pre></div><h3 id="压缩镜像层弃用">压缩镜像层（弃用）<a hidden class="anchor" aria-hidden="true" href="#压缩镜像层弃用">#</a></h3>
+<p>docker1.13版本后可以直接使用<code>--squash</code>参数压缩镜像层，之前需要单独安装<code>docker-squash</code>工具才能实现。但目前已移除了这个参数，使用也无效。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 依旧以上面RUN为例</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 squash<span style="color:#f92672">]</span><span style="color:#75715e"># pwd</span>
+</span></span><span style="display:flex;"><span>/root/dockerfile/squash
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 squash<span style="color:#f92672">]</span><span style="color:#75715e"># cat Dockerfile</span>
+</span></span><span style="display:flex;"><span>FROM fedora:28
+</span></span><span style="display:flex;"><span>RUN dnf install -y nginx
+</span></span><span style="display:flex;"><span>RUN dnf clean all
+</span></span><span style="display:flex;"><span>RUN rm -rf /var/cache/yum
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 squash<span style="color:#f92672">]</span><span style="color:#75715e"># docker build -t squash:v1 .</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 压缩前488MB</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 squash<span style="color:#f92672">]</span><span style="color:#75715e"># docker images | grep squ</span>
+</span></span><span style="display:flex;"><span>squash       v1        2666d7aa527a   <span style="color:#ae81ff">45</span> minutes ago      488MB
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 发现提示已移除该参数，提示使用多阶段构建</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 squash<span style="color:#f92672">]</span><span style="color:#75715e"># docker build -t squash:v2 --squash .</span>
+</span></span><span style="display:flex;"><span>WARNING: experimental flag squash is removed with BuildKit. You should squash inside build using a multi-stage Dockerfile <span style="color:#66d9ef">for</span> efficiency.
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 squash<span style="color:#f92672">]</span><span style="color:#75715e"># docker images | grep squ</span>
+</span></span><span style="display:flex;"><span>squash       v1        2666d7aa527a   <span style="color:#ae81ff">46</span> minutes ago      488MB
+</span></span><span style="display:flex;"><span>squash       v2        2666d7aa527a   <span style="color:#ae81ff">46</span> minutes ago      488MB
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 squash<span style="color:#f92672">]</span><span style="color:#75715e"># docker version</span>
+</span></span><span style="display:flex;"><span>Client: Docker Engine - Community
+</span></span><span style="display:flex;"><span> Version:           23.0.4
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><blockquote>
+<p>既然官方已弃用，那就不详细研究了。建议使用多阶段构建。原本镜像层压缩就会造成其他缓存层无法共用，失去了镜像的优势，在镜像较多的情况下无法公用，存储开销是很大的。</p>
+</blockquote>
+<h3 id="多阶段构建">多阶段构建<a hidden class="anchor" aria-hidden="true" href="#多阶段构建">#</a></h3>
+<p>scratch是一个空镜像，不能拉取也不能运行，里面什么都没有，但可以作为基础镜像构建其他镜像。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># pwd</span>
+</span></span><span style="display:flex;"><span>/root/dockerfile/go
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># cat hello.go</span>
+</span></span><span style="display:flex;"><span>package main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>import <span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>func main<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        fmt.Println<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;hello world.&#34;</span><span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># cat Dockerfile</span>
+</span></span><span style="display:flex;"><span>FROM golang
+</span></span><span style="display:flex;"><span>COPY hello.go .
+</span></span><span style="display:flex;"><span>RUN go build hello.go
+</span></span><span style="display:flex;"><span>CMD <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;./hello&#34;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># docker run -it --rm go:v1</span>
+</span></span><span style="display:flex;"><span>hello world.
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 分阶段构建，这里指定WORKDIR，方便复制可执行文件</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># cat Dockerfile</span>
+</span></span><span style="display:flex;"><span>FROM golang AS first
+</span></span><span style="display:flex;"><span>WORKDIR /app
+</span></span><span style="display:flex;"><span>COPY hello.go .
+</span></span><span style="display:flex;"><span>RUN go build hello.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>FROM scratch
+</span></span><span style="display:flex;"><span>COPY --from<span style="color:#f92672">=</span>first /app/hello .
+</span></span><span style="display:flex;"><span>CMD <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;./hello&#34;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># docker build -t go:v2 .</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># docker run -it --rm go:v2</span>
+</span></span><span style="display:flex;"><span>hello world.
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># docker images | grep go</span>
+</span></span><span style="display:flex;"><span>go           v2        d9e76072de38   <span style="color:#ae81ff">29</span> seconds ago   1.85MB
+</span></span><span style="display:flex;"><span>go           v1        c5bb11851550   <span style="color:#ae81ff">2</span> minutes ago    804MB
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 使用非scratch镜像</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># cat Dockerfile</span>
+</span></span><span style="display:flex;"><span>FROM golang
+</span></span><span style="display:flex;"><span>WORKDIR /app
+</span></span><span style="display:flex;"><span>COPY hello.go .
+</span></span><span style="display:flex;"><span>RUN go build hello.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>FROM ubuntu
+</span></span><span style="display:flex;"><span>COPY --from<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> /app/hello .
+</span></span><span style="display:flex;"><span>CMD <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;./hello&#34;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># docker build -t go:v3 .</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@centos7 go<span style="color:#f92672">]</span><span style="color:#75715e"># docker images | grep v3</span>
+</span></span><span style="display:flex;"><span>go           v3        d1429ea70f10   <span style="color:#ae81ff">13</span> seconds ago   74.6MB
+</span></span></code></pre></div><blockquote>
+<p>注意到分阶段构建时用了<code>--from=first</code>和<code>--from=0</code>。<code>--from=0</code>表示FROM按序号算（从0开始）的阶段，可以不必指定<code>AS build_name</code>；<code>--from=first</code>这里的first就是构建阶段的别名，用AS指定别名，以供调用。</p>
+</blockquote>
+<h3 id="优化注意事项">优化注意事项<a hidden class="anchor" aria-hidden="true" href="#优化注意事项">#</a></h3>
+<p><strong>scratch镜像</strong>：该镜像什么都没有，没有shell，没有程序链接库（库文件），没有调试工具（ps/top/ping等），所以如果需要这些功能，不推荐使用scratch镜像，可以选用合适的镜像构建，如：busybox、alpine、ubuntu等</p>
+<p><strong>alpine镜像</strong>：该镜像标准库是<code>musl libc</code>而不是<code>glibc</code>，程序依赖glibc库时，在alpine中编译时会因为库缺失而报错。除了标准库，alpine对文件系统也进行了精简，Python程序在alpine中运行效率非常低，所以谨慎使用，可以选择其他合适镜像构建，如：busybox:glibc、ubuntu、debian-slim和openjdk:8-jre-alpine，很多镜像发布了自己得alpine版本，也可以选择使用</p>
+<p>生产中是否使用alpine镜像可以参考文章：<a href="https://ttys3.dev/post/do-not-use-alpine-in-production-environment/"  target="_blank" rel="noopener" style="color:#42b983" ;>alpine镜像分析</a></p>
+<blockquote>
+<p>镜像精简固然重要，但如果以提升程序复杂度为代价是不妥的。</p>
+</blockquote>
+<p>针对不同开发语言的镜像精简策略可以参考文章：<a href="https://zhuanlan.zhihu.com/p/141697080"  target="_blank" rel="noopener" style="color:#42b983" ;>Docker 镜像制作教程：针对不同语言的精简策略</a></p>
+
+
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="next" href="https://deemoprobe.github.io/posts/tech/dockerbuildcontext/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>DockerbuildContext</span>
+  </a>
+</nav>
+
+        </footer>
+    </div>
+</article>
+</main>
+
+<footer class="footer">
+    
+        <span id="runtime_span"></span>
+        <script
+            type="text/javascript">function show_runtime() { window.setTimeout("show_runtime()", 1000); X = new Date("1/1/2023 1:00:00"); Y = new Date(); T = (Y.getTime() - X.getTime()); M = 24 * 60 * 60 * 1000; a = T / M; A = Math.floor(a); b = (a - A) * 24; B = Math.floor(b); c = (b - B) * 60; C = Math.floor((b - B) * 60); D = Math.floor((c - C) * 60); runtime_span.innerHTML = "网站已运行" + A + "天" + B + "小时" + C + "分" + D + "秒" } show_runtime();</script>
+    
+    
+    <br>
+    <span>
+        Copyright
+        &copy;
+        2022-2023
+        <a href="https://deemoprobe.github.io/" style="color:#939393;">William&#39;s Blog</a>
+        All Rights Reserved
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '📄复制';
+
+        function copyingDone() {
+            copybutton.innerText = '👌🏻已复制!';
+            setTimeout(() => {
+                copybutton.innerText = '📄复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+
+<script>
+    $("code[class^=language] ").on("mouseover", function () {
+        if (this.clientWidth < this.scrollWidth) {
+            $(this).css("width", "135%")
+            $(this).css("border-top-right-radius", "var(--radius)")
+        }
+    }).on("mouseout", function () {
+        $(this).css("width", "100%")
+        $(this).css("border-top-right-radius", "unset")
+    })
+</script>
+</body>
+
+</html>

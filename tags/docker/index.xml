@@ -6,22 +6,40 @@
     <description>Recent content in docker on William&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 26 Apr 2023 14:52:37 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 26 Apr 2023 18:43:22 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Dockerfile</title>
-      <link>https://deemoprobe.github.io/posts/tech/dockerfile/</link>
+      <title>DockerImagesOptimization</title>
+      <link>https://deemoprobe.github.io/posts/tech/dockerimagesoptimization/</link>
+      <pubDate>Wed, 26 Apr 2023 18:43:22 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/dockerimagesoptimization/</guid>
+      <description>Docker镜像体积优化</description>
+    </item>
+    
+    <item>
+      <title>DockerbuildContext</title>
+      <link>https://deemoprobe.github.io/posts/tech/dockerbuildcontext/</link>
+      <pubDate>Wed, 26 Apr 2023 18:35:27 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/dockerbuildcontext/</guid>
+      <description>本文包含docker build上下文、构建方式和实例</description>
+    </item>
+    
+    <item>
+      <title>DockerfileGrammer</title>
+      <link>https://deemoprobe.github.io/posts/tech/dockerfilegrammer/</link>
       <pubDate>Wed, 26 Apr 2023 14:52:37 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/dockerfile/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/dockerfilegrammer/</guid>
       <description>Dockerfile语法，构建以及实例分析</description>
     </item>
     
     <item>
-      <title>Docker Command</title>
-      <link>https://deemoprobe.github.io/posts/tech/docker-command/</link>
+      <title>DockerCommandLineInterface</title>
+      <link>https://deemoprobe.github.io/posts/tech/dockercli/</link>
       <pubDate>Wed, 26 Apr 2023 14:52:26 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/docker-command/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/dockercli/</guid>
       <description>docker常用命令一览</description>
     </item>
     

@@ -3,24 +3,30 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://deemoprobe.github.io/posts/tech/</loc>
-    <lastmod>2023-04-26T14:52:37+08:00</lastmod>
+    <lastmod>2023-04-26T18:43:22+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/posts/</loc>
-    <lastmod>2023-04-26T14:52:37+08:00</lastmod>
+    <lastmod>2023-04-26T18:43:22+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/tags/docker/</loc>
-    <lastmod>2023-04-26T14:52:37+08:00</lastmod>
+    <lastmod>2023-04-26T18:43:22+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/dockerfile/</loc>
-    <lastmod>2023-04-26T14:52:37+08:00</lastmod>
+    <loc>https://deemoprobe.github.io/posts/tech/dockerimagesoptimization/</loc>
+    <lastmod>2023-04-26T18:43:22+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/</loc>
-    <lastmod>2023-04-26T14:52:37+08:00</lastmod>
+    <lastmod>2023-04-26T18:43:22+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/tags/</loc>
+    <lastmod>2023-04-26T18:43:22+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/posts/tech/dockerbuildcontext/</loc>
+    <lastmod>2023-04-26T18:35:27+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/posts/tech/dockerfilegrammer/</loc>
     <lastmod>2023-04-26T14:52:37+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/docker-command/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/dockercli/</loc>
     <lastmod>2023-04-26T14:52:26+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/posts/tech/docker/</loc>

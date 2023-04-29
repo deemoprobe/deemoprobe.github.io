@@ -6,14 +6,149 @@
     <description>Recent content in kubernetes on William&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 25 Apr 2023 18:56:52 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 30 Apr 2023 02:26:47 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>KubernetesInstallation Binary</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetesinstallation-binary/</link>
-      <pubDate>Tue, 25 Apr 2023 18:56:52 +0800</pubDate>
+      <title>KubernetesServiceDiscovery</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetesservicediscovery/</link>
+      <pubDate>Sun, 30 Apr 2023 02:26:47 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetesinstallation-binary/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetesservicediscovery/</guid>
+      <description>Kubernetes Service和服务发现</description>
+    </item>
+    
+    <item>
+      <title>KubernetesMetrics</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetesmetrics/</link>
+      <pubDate>Sat, 29 Apr 2023 14:32:00 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetesmetrics/</guid>
+      <description>Kubernetes Metrics</description>
+    </item>
+    
+    <item>
+      <title>KubernetesTroubleShooting</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetestroubleshooting/</link>
+      <pubDate>Sat, 29 Apr 2023 14:31:45 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetestroubleshooting/</guid>
+      <description>Kubernetes </description>
+    </item>
+    
+    <item>
+      <title>KubernetesUpgrade</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetesupgrade/</link>
+      <pubDate>Sat, 29 Apr 2023 14:31:01 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetesupgrade/</guid>
+      <description>Kubernetes </description>
+    </item>
+    
+    <item>
+      <title>KubernetesPodSchedulingStrategy</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetespodschedulingstrategy/</link>
+      <pubDate>Sat, 29 Apr 2023 14:30:42 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetespodschedulingstrategy/</guid>
+      <description>Kubernetes </description>
+    </item>
+    
+    <item>
+      <title>KubernetesSecret</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetessecret/</link>
+      <pubDate>Sat, 29 Apr 2023 14:28:09 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetessecret/</guid>
+      <description>Kubernetes </description>
+    </item>
+    
+    <item>
+      <title>KubernetesConfigMap</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetesconfigmap/</link>
+      <pubDate>Sat, 29 Apr 2023 14:28:03 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetesconfigmap/</guid>
+      <description>Kubernetes </description>
+    </item>
+    
+    <item>
+      <title>KubernetesWebDemo</title>
+      <link>https://deemoprobe.github.io/posts/tech/kuberneteswebdemo/</link>
+      <pubDate>Sat, 29 Apr 2023 14:27:46 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kuberneteswebdemo/</guid>
+      <description>Kubernetes Web实例</description>
+    </item>
+    
+    <item>
+      <title>KubernetesLabelSelector</title>
+      <link>https://deemoprobe.github.io/posts/tech/kuberneteslabelselector/</link>
+      <pubDate>Sat, 29 Apr 2023 14:27:13 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kuberneteslabelselector/</guid>
+      <description>Kubernetes Label and Selector</description>
+    </item>
+    
+    <item>
+      <title>KubernetesPodController</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetespodcontroller/</link>
+      <pubDate>Sat, 29 Apr 2023 14:23:19 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetespodcontroller/</guid>
+      <description>Kubernetes Pod控制器</description>
+    </item>
+    
+    <item>
+      <title>KubernetesPod</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetespod/</link>
+      <pubDate>Sat, 29 Apr 2023 14:23:11 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetespod/</guid>
+      <description>Kubernetes Pod</description>
+    </item>
+    
+    <item>
+      <title>KubernetesNamespace</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetesnamespace/</link>
+      <pubDate>Sat, 29 Apr 2023 14:21:17 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetesnamespace/</guid>
+      <description>Kubernetes Namespace</description>
+    </item>
+    
+    <item>
+      <title>Kuberntes CLI</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetescli/</link>
+      <pubDate>Sat, 29 Apr 2023 14:19:33 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetescli/</guid>
+      <description>kubernetes命令行工具kubectl</description>
+    </item>
+    
+    <item>
+      <title>KubernetesBinaryInstallation HA</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetesbinaryinstallation-ha/</link>
+      <pubDate>Sat, 29 Apr 2023 14:17:51 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetesbinaryinstallation-ha/</guid>
       <description>二进制方式部署kubernetes高可用集群</description>
+    </item>
+    
+    <item>
+      <title>KubernetesKubeadmInstallation HA</title>
+      <link>https://deemoprobe.github.io/posts/tech/kuberneteskubeadminstallation-ha/</link>
+      <pubDate>Sat, 29 Apr 2023 14:12:14 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kuberneteskubeadminstallation-ha/</guid>
+      <description>kubeadm方式部署kubernetes高可用集群</description>
+    </item>
+    
+    <item>
+      <title>KubernetesArchitecture HA</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetesarchitecture-ha/</link>
+      <pubDate>Fri, 28 Apr 2023 11:45:50 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetesarchitecture-ha/</guid>
+      <description>Kubernetes高可用架构介绍</description>
     </item>
     
   </channel>

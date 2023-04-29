@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>KubernetesPodSchedulingStrategy | William&#39;s Blog</title>
+<meta name="keywords" content="kubernetes">
+<meta name="description" content="Kubernetes ">
+<meta name="author" content="deemoprobe">
+<link rel="canonical" href="https://deemoprobe.github.io/posts/tech/kubernetespodschedulingstrategy/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4ff503bcd1fac86ff7aae2a7670a5373c685d74bf74dc61eb3b14254f795b8f7.css" integrity="sha256-T/UDvNH6yG/3quKnZwpTc8aF10v3TcYes7FCVPeVuPc=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
+        onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="icon" type="image/png" sizes="16x16" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="icon" type="image/png" sizes="32x32" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="apple-touch-icon" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="mask-icon" href="https://deemoprobe.github.io/img/bear.gif">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script defer src="https://unpkg.com/mermaid@8.8.1/dist/mermaid.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script src="https://cdn.staticfile.org/jquery/3.6.3/jquery.min.js"></script>
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="KubernetesPodSchedulingStrategy" />
+<meta property="og:description" content="Kubernetes " />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://deemoprobe.github.io/posts/tech/kubernetespodschedulingstrategy/" />
+<meta property="og:image" content="https://deemoprobe.github.io/img/kubernetes.png" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-04-29T14:30:42+08:00" />
+<meta property="article:modified_time" content="2023-04-29T14:30:42+08:00" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://deemoprobe.github.io/img/kubernetes.png" />
+<meta name="twitter:title" content="KubernetesPodSchedulingStrategy"/>
+<meta name="twitter:description" content="Kubernetes "/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://deemoprobe.github.io/posts/"
+        },
+
+        {
+          "@type": "ListItem",
+          "position":  2 ,
+          "name": "👨🏻‍💻 技术",
+          "item": "https://deemoprobe.github.io/posts/tech/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "KubernetesPodSchedulingStrategy",
+      "item": "https://deemoprobe.github.io/posts/tech/kubernetespodschedulingstrategy/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "KubernetesPodSchedulingStrategy",
+  "name": "KubernetesPodSchedulingStrategy",
+  "description": "Kubernetes ",
+  "keywords": [
+    "kubernetes"
+  ],
+  "articleBody": "污点和容忍 Taint在一类服务器上打上污点，让不能容忍这个污点的Pod不能部署在打了污点的服务器上。Toleration是让Pod容忍节点上配置的污点，可以让一些需要特殊配置的Pod能够调用到具有污点和特殊配置的节点上。\n节点可以设置多个污点，pod也可以通过tolerations:设置多个容忍策略，节点污点策略：\nNoSchedule：禁止调度到该节点，已经在该节点上的Pod不受影响 NoExecute：禁止调度到该节点，如果不符合这个污点，会立马被驱逐（或在一段时间后） PreferNoSchedule：尽量避免将Pod调度到指定的节点上，如果没有更合适的节点，可以部署到该节点 # 容忍方式：完全匹配 tolerations: - key: \"taintKey\" operator: \"Equal\" value: \"taintValue\" effect: \"NoSchedule\" # 不完全匹配 tolerations: - key: \"taintKey\" operator: \"Exists\" effect: \"NoSchedule\" # 配置容忍时间 tolerations: - key: \"key1\" operator: \"Equal\" value: \"value1\" effect: \"NoExecute\" tolerationSeconds: 3600 # 实例 [root@k8s-master01 ~]# mkdir -p yamls/schedule [root@k8s-master01 ~]# cd yamls/schedule/ [root@k8s-master01 schedule]# kubectl taint node k8s-node01 ssd=true:NoSchedule node/k8s-node01 tainted [root@k8s-master01 schedule]# kubectl describe nodes k8s-node01 | grep Taint -A 2 Taints: ssd=true:NoSchedule Unschedulable: false Lease: [root@k8s-master01 schedule]# kubectl label nodes k8s-node01 ssd=true [root@k8s-master01 schedule]# vim pod-toleration.yaml apiVersion: v1 kind: Pod metadata: name: nginx labels: env: test spec: containers: - name: nginx image: nginx imagePullPolicy: IfNotPresent nodeSelector: ssd: \"true\" tolerations: - key: \"ssd\" operator: \"Exists\" effect: \"NoSchedule\" [root@k8s-master01 schedule]# kubectl get po nginx --show-labels -owide NAME READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES LABELS nginx 1/1 Running 0 38s 172.17.125.48 k8s-node01 env=test [root@k8s-master01 schedule]# kubectl describe po nginx | grep -i node-selector -A 4 Node-Selectors: ssd=true Tolerations: node.kubernetes.io/not-ready:NoExecute op=Exists for 300s node.kubernetes.io/unreachable:NoExecute op=Exists for 300s ssd:NoSchedule op=Exists Events: # 删除污点 # 直接使用key匹配 [root@k8s-master01 schedule]# kubectl taint node k8s-node01 ssd- node/k8s-node01 untainted [root@k8s-master01 schedule]# kubectl taint node k8s-node01 ssd=true:NoSchedule node/k8s-node01 tainted # key=value:Taint全量匹配 [root@k8s-master01 schedule]# kubectl taint node k8s-node01 ssd=true:NoSchedule- node/k8s-node01 untainted [root@k8s-master01 schedule]# kubectl taint node k8s-node01 ssd=true:NoSchedule node/k8s-node01 tainted # key:Taint匹配 [root@k8s-master01 schedule]# kubectl taint node k8s-node01 ssd:NoSchedule- node/k8s-node01 untainted # 修改污点 [root@k8s-master01 schedule]# kubectl taint node k8s-node01 ssd=true:NoSchedule node/k8s-node01 tainted [root@k8s-master01 schedule]# kubectl taint node k8s-node01 ssd=true:PreferNoSchedule --overwrite node/k8s-node01 modified Kubernetes集群内置污点：\nnode.kubernetes.io/not-ready：节点未准备好，相当于节点状态Ready的值为False。 node.kubernetes.io/unreachable：Node Controller访问不到节点，相当于节点状态Ready的值为Unknown。 node.kubernetes.io/-out-of-disk：节点磁盘耗尽。 node.kubernetes.io/memory-pressure：节点存在内存压力。 node.kubernetes.io/disk-pressure：节点存在磁盘压力。 node.kubernetes.io/network-unavailable：节点网络不可达。 node.kubernetes.io/unschedulable：节点不可调度。 node.cloudprovider.kubernetes.io/uninitialized：如果Kubelet启动时指定了一个外部的cloudprovider，它将给当前节点添加一个Taint将其标记为不可用。在cloud-controller-manager的一个controller初始化这个节点后，Kubelet将删除这个Taint。 # 为了防止有时部分节点健康检查太慢，300s无法完成，可以修改为容忍3000秒后再驱逐（默认是300秒）： tolerations: - key: \"node.kubernetes.io/unreachable\" operator: \"Exists\" effect: \"NoExecute\" tolerationSeconds: 5000 亲和力和反亲和力 requiredDuringSchedulingIgnoredDuringExecution：强制调度 preferredDuringSchedulingIgnoredDuringExecution：优先调度 节点亲和力 # 先删除污点 [root@k8s-master01 schedule]# kubectl taint node k8s-node01 ssd=true:PreferNoSchedule- node/k8s-node01 untainted [root@k8s-master01 schedule]# kubectl taint node k8s-node01 ssd=true:NoSchedule- node/k8s-node01 untainted [root@k8s-master01 schedule]# kubectl describe nodes k8s-node01 | grep Taint Taints: # 为k8s-node01和k8s-node02打标签disktype=ssd [root@k8s-master01 schedule]# kubectl label nodes k8s-node01 k8s-node02 disktype=ssd node/k8s-node01 labeled node/k8s-node02 labeled # 确认标签 [root@k8s-master01 schedule]# kubectl get nodes --show-labels NAME STATUS ROLES AGE VERSION LABELS k8s-master01 Ready master 9d v1.23.4 beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=k8s-master01,kubernetes.io/os=linux,node-role.kubernetes.io/master=,node.kubernetes.io/node= k8s-master02 Ready master 9d v1.23.4 beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=k8s-master02,kubernetes.io/os=linux,node-role.kubernetes.io/master=,node.kubernetes.io/node= k8s-master03 Ready master 9d v1.23.4 beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=k8s-master03,kubernetes.io/os=linux,node-role.kubernetes.io/master=,node.kubernetes.io/node= k8s-node01 Ready node 9d v1.23.4 beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,disktype=ssd,kubernetes.io/arch=amd64,kubernetes.io/hostname=k8s-node01,kubernetes.io/os=linux,node-role.kubernetes.io/node=,node.kubernetes.io/node=,ssd=true k8s-node02 Ready node 9d v1.23.4 beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,disktype=ssd,kubernetes.io/arch=amd64,kubernetes.io/hostname=k8s-node02,kubernetes.io/os=linux,node-role.kubernetes.io/node=,node.kubernetes.io/node= # 创建节点硬亲和力调度pod实例 [root@k8s-master01 schedule]# vim node-hardaffinity.yaml apiVersion: v1 kind: Pod metadata: name: node-hardaffinity spec: affinity: nodeAffinity: requiredDuringSchedulingIgnoredDuringExecution: nodeSelectorTerms: - matchExpressions: - key: disktype operator: In values: - ssd containers: - name: nginx image: nginx imagePullPolicy: IfNotPresent [root@k8s-master01 schedule]# kubectl get po node-hardaffinity -owide NAME READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES node-hardaffinity 1/1 Running 0 25s 172.27.14.210 k8s-node02 # 为k8s-node01单独打上ssd:first的标签 [root@k8s-master01 schedule]# kubectl label nodes k8s-node01 ssd=first error: 'ssd' already has a value (true), and --overwrite is false # 之前用过ssd=true，覆盖掉即可 [root@k8s-master01 schedule]# kubectl label nodes k8s-node01 ssd=first --overwrite node/k8s-node01 labeled # 创建节点软亲和力调度pod实例 apiVersion: v1 kind: Pod metadata: name: node-softaffinity spec: affinity: nodeAffinity: preferredDuringSchedulingIgnoredDuringExecution: - weight: 1 preference: matchExpressions: - key: ssd operator: Exists containers: - name: nginx image: nginx imagePullPolicy: IfNotPresent [root@k8s-master01 schedule]# vim node-softaffinity.yaml [root@k8s-master01 schedule]# kubectl get po node-softaffinity -owide NAME READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES node-softaffinity 1/1 Running 0 34s 172.17.125.49 k8s-node01 affinity配置详解：\nrequiredDuringSchedulingIgnoredDuringExecution：硬亲和力配置 nodeSelectorTerms：节点选择器配置，可以配置多个matchExpressions（满足其一即可） preferredDuringSchedulingIgnoredDuringExecution：软亲和力配置 weight：软亲和力的权重，权重越高优先级越大，范围1-100 preference：软亲和力配置项，和weight同级，可以配置多个，matchExpressions和硬亲和力一致 operator：标签匹配的方式 In：相当于key = value的形式 NotIn：相当于key != value的形式 Exists：节点存在label的key为指定的值即可，无需配置values字段 DoesNotExist：节点不存在label的key为指定的值即可，无需配置values字段 Gt：大于value指定的值 Lt：小于value指定的值 Pod亲和力反亲和力 requiredDuringSchedulingIgnoredDuringExecution：硬亲和力配置，强制匹配 preferredDuringSchedulingIgnoredDuringExecution：软亲和力配置，优先匹配 podAffinity：pod亲和力配置，表示和具有匹配标签的pod部署在一起 podAntiAffinity：pod反亲和力，表示和具有匹配标签的pod分开部署 labelSelector：Pod选择器配置，可以配置多个 matchExpressions：和节点亲和力配置一致 operator：配置和节点亲和力一致，但是没有Gt和Lt topologyKey：匹配的拓扑域的key，也就是节点上label的key，key和value相同的为同一个域，可以用于标注不同的机房和地区 namespaces: 和哪个命名空间的Pod进行匹配，为空为当前命名空间 # pod全配置示例，仅是示例，实际使用按需选择即可 apiVersion: v1 kind: Pod metadata: name: pod-affinity spec: affinity: podAffinity: requiredDuringSchedulingIgnoredDuringExecution: - labelSelector: matchExpressions: - key: security operator: In values: - S1 topologyKey: failure-domain.beta.kubernetes.io/zone podAntiAffinity: preferredDuringSchedulingIgnoredDuringExecution: - weight: 100 podAffinityTerm: labelSelector: matchExpressions: - key: security operator: In values: - S2 namespaces: - default topologyKey: failure-domain.beta.kubernetes.io/zone containers: - name: pod-affinity image: nginx 综合实例 实例一同一个应用副本互斥地部署在多个节点 这种操作避免同一个应用pod副本部署在同一个节点，如果节点故障，造成应用的不可用。即避免单点故障。\n# 先查看污点，有4个节点可以使用，不影响后续操作，可以不删污点 [root@k8s-master01 schedule]# kubectl describe nodes | grep taint -i Taints: role/k8s-master01:NoSchedule Taints: role/k8s-master02:PreferNoSchedule Taints: Taints: Taints: # 创建3副本的应用myapp [root@k8s-master01 schedule]# vim myapp.yaml apiVersion: apps/v1 kind: Deployment metadata: labels: app: myapp-podantiaffinity # deployment标签和pod标签可以不一致 name: myapp-podantiaffinity namespace: kube-public spec: replicas: 3 selector: matchLabels: app: myapp # deployment匹配标签和要和下面template里pod标签一致 template: metadata: labels: app: myapp spec: affinity: podAntiAffinity: requiredDuringSchedulingIgnoredDuringExecution: - labelSelector: matchExpressions: # 匹配pod标签 - key: app operator: In values: - myapp topologyKey: kubernetes.io/hostname # 拓扑域，匹配主机名key containers: - image: nginx imagePullPolicy: IfNotPresent name: myapp [root@k8s-master01 schedule]# kubectl apply -f myapp.yaml deployment.apps/myapp-podantiaffinity created [root@k8s-master01 schedule]# kubectl get deployments.apps -n kube-public myapp-podantiaffinity NAME READY UP-TO-DATE AVAILABLE AGE myapp-podantiaffinity 3/3 3 3 105s [root@k8s-master01 schedule]# kubectl get rs,pod -n kube-public -owide --show-labels | grep myapp replicaset.apps/myapp-podantiaffinity-6f8dc8f64f 3 3 3 2m35s myapp nginx app=myapp,pod-template-hash=6f8dc8f64f app=myapp,pod-template-hash=6f8dc8f64f pod/myapp-podantiaffinity-6f8dc8f64f-772m6 1/1 Running 0 2m35s 172.27.14.211 k8s-node02 app=myapp,pod-template-hash=6f8dc8f64f pod/myapp-podantiaffinity-6f8dc8f64f-7hxd4 1/1 Running 0 2m35s 172.17.125.50 k8s-node01 app=myapp,pod-template-hash=6f8dc8f64f pod/myapp-podantiaffinity-6f8dc8f64f-rk7rf 1/1 Running 0 2m35s 172.18.195.21 k8s-master03 app=myapp,pod-template-hash=6f8dc8f64f # 可用的调度节点为4，修改副本数为5，会发现有一个无法调度，一直处于pending状态 [root@k8s-master01 schedule]# kubectl scale deployment -n kube-public myapp-podantiaffinity --replicas=5 deployment.apps/myapp-podantiaffinity scaled [root@k8s-master01 schedule]# kubectl get po -n kube-public -owide | grep myapp myapp-podantiaffinity-6f8dc8f64f-772m6 1/1 Running 0 16m 172.27.14.211 k8s-node02 myapp-podantiaffinity-6f8dc8f64f-7hxd4 1/1 Running 0 16m 172.17.125.50 k8s-node01 myapp-podantiaffinity-6f8dc8f64f-rk7rf 1/1 Running 0 16m 172.18.195.21 k8s-master03 myapp-podantiaffinity-6f8dc8f64f-sqxjm 0/1 Pending 0 10m myapp-podantiaffinity-6f8dc8f64f-zrtkr 1/1 Running 0 10m 172.25.92.77 k8s-master02 # 查看处于pending状态的pod事件，提示不匹配pod anti-affinity rules [root@k8s-master01 schedule]# kubectl describe po -n kube-public myapp-podantiaffinity-6f8dc8f64f-sqxjm | grep -i events -A 10 Events: Type Reason Age From Message ---- ------ ---- ---- ------- Warning FailedScheduling 12s (x9 over 9m13s) default-scheduler 0/5 nodes are available: 1 node(s) had taint {role/k8s-master01: }, that the pod didn't tolerate, 4 node(s) didn't match pod anti-affinity rules. 实例二同一个应用副本互斥地部署在指定标签的节点 # 之前配置过只有k8s-node01和k8s-node02有disktype=ssd标签 [root@k8s-master01 schedule]# vim myapp.yaml apiVersion: apps/v1 kind: Deployment metadata: labels: app: myapp-podantiaffinity # deployment标签和pod标签可以不一致 name: myapp-podantiaffinity namespace: kube-public spec: replicas: 2 # 副本数改为2 selector: matchLabels: app: myapp # deployment匹配标签和要和下面template里pod标签一致 template: metadata: labels: app: myapp spec: nodeSelector: # 增加nodeSelector标签选择器，节点标签需要已存在 disktype: ssd affinity: podAntiAffinity: requiredDuringSchedulingIgnoredDuringExecution: - labelSelector: matchExpressions: # 匹配pod标签 - key: app operator: In values: - myapp topologyKey: kubernetes.io/hostname # 拓扑域，匹配主机名key containers: - image: nginx imagePullPolicy: IfNotPresent name: myapp [root@k8s-master01 schedule]# kubectl apply -f myapp.yaml deployment.apps/myapp-podantiaffinity created [root@k8s-master01 schedule]# kubectl get po -n kube-public -owide | grep myapp myapp-podantiaffinity-65b6c697b7-gtqzc 1/1 Running 0 48s 172.27.14.212 k8s-node02 myapp-podantiaffinity-65b6c697b7-mcv6j 1/1 Running 0 48s 172.17.125.51 k8s-node01 # 副本数改为3，由于没有多余disktype=ssd节点互斥调度，会处于pending状态 [root@k8s-master01 schedule]# kubectl scale deployment -n kube-public myapp-podantiaffinity --replicas=3 deployment.apps/myapp-podantiaffinity scaled [root@k8s-master01 schedule]# kubectl get po -n kube-public -owide | grep myapp myapp-podantiaffinity-65b6c697b7-gtqzc 1/1 Running 0 2m17s 172.27.14.212 k8s-node02 myapp-podantiaffinity-65b6c697b7-mcv6j 1/1 Running 0 2m17s 172.17.125.51 k8s-node01 myapp-podantiaffinity-65b6c697b7-t7v7h 0/1 Pending 0 4s # 情况和实例一一致 [root@k8s-master01 schedule]# kubectl describe po -n kube-public myapp-podantiaffinity-65b6c697b7-t7v7h | grep -i event -A 10 Events: Type Reason Age From Message ---- ------ ---- ---- ------- Warning FailedScheduling 18s (x2 over 83s) default-scheduler 0/5 nodes are available: 1 node(s) had taint {role/k8s-master01: }, that the pod didn't tolerate, 2 node(s) didn't match Pod's node affinity/selector, 2 node(s) didn't match pod anti-affinity rules. 实例三尽量将应用调度到ssd高性能节点 这种情况是部分应用侧重高性能服务器部署服务，但不在乎是否是部署到同一节点\n# k8s-node01和k8s-node02已有disktype=ssd高性能标签，假设这两台服务器就是高性能的 # k8s-master03是传统一般性能的服务器，打上标签 [root@k8s-master01 schedule]# kubectl label nodes k8s-master03 disktype=physical node/k8s-master03 labeled [root@k8s-master01 schedule]# vim myapp.yaml apiVersion: apps/v1 kind: Deployment metadata: labels: app: myapp-podantiaffinity # deployment标签和pod标签可以不一致 name: myapp-podantiaffinity namespace: kube-public spec: replicas: 2 # 副本数改为2 selector: matchLabels: app: myapp # deployment匹配标签和要和下面template里pod标签一致 template: metadata: labels: app: myapp spec: nodeSelector: # 增加nodeSelector标签选择器，节点标签需要已存在 disktype: ssd affinity: nodeAffinity: preferredDuringSchedulingIgnoredDuringExecution: - preference: matchExpressions: - key: disktype operator: In values: - ssd weight: 100 # 高性能服务器权重 - preference: matchExpressions: - key: disktype operator: In values: - physical weight: 10 # 传统服务器权重 containers: - image: nginx imagePullPolicy: IfNotPresent name: myapp [root@k8s-master01 schedule]# kubectl apply -f myapp.yaml deployment.apps/myapp-podantiaffinity created [root@k8s-master01 schedule]# kubectl get po -n kube-public -owide | grep myapp myapp-podantiaffinity-7b655bd4fc-mw7g8 1/1 Running 0 34s 172.27.14.213 k8s-node02 myapp-podantiaffinity-7b655bd4fc-sqg5f 1/1 Running 0 34s 172.17.125.52 k8s-node01 实例四同一个应用调度在不同拓扑域 这种情况是应用更侧重的是不同地域服务的访问速度，就近部署是最好的，同时也避免了单点故障。前提是为所有机器划分拓扑域，否则未划分的机器也会被正常调度。\n# 假设k8s-node01和k8s-node02分别属于上海和北京数据中心，打上标签 [root@k8s-master01 schedule]# kubectl label nodes k8s-node01 k8s-master03 region=ShangHai node/k8s-node01 labeled node/k8s-master03 labeled [root@k8s-master01 schedule]# kubectl label nodes k8s-node02 region=BeiJing node/k8s-node02 labeled [root@k8s-master01 schedule]# vim myapp.yaml apiVersion: apps/v1 kind: Deployment metadata: labels: app: myapp-pod-region-antiaffinity # deployment标签和pod标签可以不一致 name: myapp-pod-region-antiaffinity namespace: kube-public spec: replicas: 2 selector: matchLabels: region: different # deployment匹配标签和要和下面template里pod标签一致 template: metadata: labels: region: different spec: affinity: podAntiAffinity: requiredDuringSchedulingIgnoredDuringExecution: - labelSelector: matchExpressions: # 匹配pod标签 - key: region operator: In values: - different topologyKey: region # 拓扑域，匹配region containers: - image: nginx imagePullPolicy: IfNotPresent name: myapp [root@k8s-master01 schedule]# kubectl apply -f myapp.yaml deployment.apps/myapp-pod-region-antiaffinity created [root@k8s-master01 schedule]# kubectl get po -n kube-public -owide | grep myapp myapp-pod-region-antiaffinity-6675849bf9-577j2 1/1 Running 0 16s 172.18.195.27 k8s-master03 myapp-pod-region-antiaffinity-6675849bf9-5rmww 1/1 Running 0 16s 172.27.14.218 k8s-node02 # 修改副本数为3 [root@k8s-master01 schedule]# kubectl scale deployment -n kube-public myapp-pod-region-antiaffinity --replicas=3 deployment.apps/myapp-pod-region-antiaffinity scaled [root@k8s-master01 schedule]# kubectl get po -n kube-public -owide | grep myapp myapp-pod-region-antiaffinity-6675849bf9-577j2 1/1 Running 0 91s 172.18.195.27 k8s-master03 myapp-pod-region-antiaffinity-6675849bf9-5rmww 1/1 Running 0 91s 172.27.14.218 k8s-node02 myapp-pod-region-antiaffinity-6675849bf9-7s9pc 1/1 Running 0 2s 172.25.92.78 k8s-master02 [root@k8s-master01 schedule]# kubectl get nodes k8s-master02 --show-labels NAME STATUS ROLES AGE VERSION LABELS k8s-master02 Ready master 9d v1.23.4 beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=k8s-master02,kubernetes.io/os=linux,node-role.kubernetes.io/master=,node.kubernetes.io/node= # k8s-master02并没有设置region，也被调度了，可见如果存在没有标记拓扑域的服务器，当拓扑域副本数溢出时，也会被正常调度 # 先调回正常副本数 [root@k8s-master01 schedule]# kubectl scale deployment -n kube-public myapp-pod-region-antiaffinity --replicas=2 deployment.apps/myapp-pod-region-antiaffinity scaled [root@k8s-master01 schedule]# kubectl get po -n kube-public -owide | grep myapp myapp-pod-region-antiaffinity-6675849bf9-577j2 1/1 Running 0 5m45s 172.18.195.27 k8s-master03 myapp-pod-region-antiaffinity-6675849bf9-5rmww 1/1 Running 0 5m45s 172.27.14.218 k8s-node02 # 为k8s-master02设置不可调度污点，扩充副本测试之 [root@k8s-master01 schedule]# kubectl taint node k8s-master02 region:NoSchedule node/k8s-master02 tainted # 此时只存在三个节点可以调度（master01是之前就设置的污点），而且都在region拓扑域中 [root@k8s-master01 schedule]# kubectl describe nodes | grep -i taint -A 1 Taints: role/k8s-master01:NoSchedule Unschedulable: false -- Taints: region:NoSchedule # 不可调度污点会覆盖掉PreferNoSchedule污点，不删除也可以 role/k8s-master02:PreferNoSchedule -- Taints: Unschedulable: false -- Taints: Unschedulable: false -- Taints: Unschedulable: false # 扩充副本测试 [root@k8s-master01 schedule]# kubectl scale deployment -n kube-public myapp-pod-region-antiaffinity --replicas=3 deployment.apps/myapp-pod-region-antiaffinity scaled [root@k8s-master01 schedule]# kubectl get po -n kube-public -owide | grep myapp myapp-pod-region-antiaffinity-6675849bf9-577j2 1/1 Running 0 9m41s 172.18.195.27 k8s-master03 myapp-pod-region-antiaffinity-6675849bf9-5rmww 1/1 Running 0 9m41s 172.27.14.218 k8s-node02 myapp-pod-region-antiaffinity-6675849bf9-djkgc 0/1 Pending 0 5s [root@k8s-master01 schedule]# kubectl describe po -n kube-public myapp-pod-region-antiaffinity-6675849bf9-djkgc | grep -i event -A 5 Events: Type Reason Age From Message ---- ------ ---- ---- ------- Warning FailedScheduling 43s default-scheduler 0/5 nodes are available: 1 node(s) had taint {region: }, that the pod didn't tolerate, 1 node(s) had taint {role/k8s-master01: }, that the pod didn't tolerate, 3 node(s) didn't match pod anti-affinity rules. 需要注意的是标签的唯一性，不要和其他项目应用冲突。\n",
+  "wordCount" : "4736",
+  "inLanguage": "en",
+  "image":"https://deemoprobe.github.io/img/kubernetes.png","datePublished": "2023-04-29T14:30:42+08:00",
+  "dateModified": "2023-04-29T14:30:42+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "deemoprobe"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://deemoprobe.github.io/posts/tech/kubernetespodschedulingstrategy/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "William's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://deemoprobe.github.io/img/bear.gif"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://deemoprobe.github.io/" accesskey="h" title="William&#39;s Blog (Alt + H)">
+            <img src="https://deemoprobe.github.io/img/bear.gif" alt="logo" aria-label="logo"
+                 height="35">William&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://deemoprobe.github.io/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/archives/" title="📈 归档">
+                <span>📈 归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/tools" title="🧱 工具">
+                <span>🧱 工具</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            
+            <h1 class="post-title">
+                KubernetesPodSchedulingStrategy
+            </h1>
+            <div class="post-description">
+                Kubernetes 
+            </div>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2023-04-29
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>4736字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>10分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>deemoprobe
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+            <span class="post-tags-meta">
+                <a href="https://deemoprobe.github.io/tags/kubernetes/" style="color: var(--secondary)!important;">kubernetes</a>
+            </span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    
+                </span>
+
+</div>
+        </header> 
+<figure class="entry-cover1"><img style="zoom:50%;" loading="lazy" src="https://deemoprobe.github.io/img/kubernetes.png" alt="">
+    
+</figure><aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">文章目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e6%b1%a1%e7%82%b9%e5%92%8c%e5%ae%b9%e5%bf%8d" aria-label="污点和容忍">污点和容忍</a></li>
+                <li>
+                    <a href="#%e4%ba%b2%e5%92%8c%e5%8a%9b%e5%92%8c%e5%8f%8d%e4%ba%b2%e5%92%8c%e5%8a%9b" aria-label="亲和力和反亲和力">亲和力和反亲和力</a><ul>
+                        
+                <li>
+                    <a href="#%e8%8a%82%e7%82%b9%e4%ba%b2%e5%92%8c%e5%8a%9b" aria-label="节点亲和力">节点亲和力</a></li>
+                <li>
+                    <a href="#pod%e4%ba%b2%e5%92%8c%e5%8a%9b%e5%8f%8d%e4%ba%b2%e5%92%8c%e5%8a%9b" aria-label="Pod亲和力反亲和力">Pod亲和力反亲和力</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e7%bb%bc%e5%90%88%e5%ae%9e%e4%be%8b" aria-label="综合实例">综合实例</a><ul>
+                        
+                <li>
+                    <a href="#%e5%ae%9e%e4%be%8b%e4%b8%80%e5%90%8c%e4%b8%80%e4%b8%aa%e5%ba%94%e7%94%a8%e5%89%af%e6%9c%ac%e4%ba%92%e6%96%a5%e5%9c%b0%e9%83%a8%e7%bd%b2%e5%9c%a8%e5%a4%9a%e4%b8%aa%e8%8a%82%e7%82%b9" aria-label="实例一同一个应用副本互斥地部署在多个节点">实例一同一个应用副本互斥地部署在多个节点</a></li>
+                <li>
+                    <a href="#%e5%ae%9e%e4%be%8b%e4%ba%8c%e5%90%8c%e4%b8%80%e4%b8%aa%e5%ba%94%e7%94%a8%e5%89%af%e6%9c%ac%e4%ba%92%e6%96%a5%e5%9c%b0%e9%83%a8%e7%bd%b2%e5%9c%a8%e6%8c%87%e5%ae%9a%e6%a0%87%e7%ad%be%e7%9a%84%e8%8a%82%e7%82%b9" aria-label="实例二同一个应用副本互斥地部署在指定标签的节点">实例二同一个应用副本互斥地部署在指定标签的节点</a></li>
+                <li>
+                    <a href="#%e5%ae%9e%e4%be%8b%e4%b8%89%e5%b0%bd%e9%87%8f%e5%b0%86%e5%ba%94%e7%94%a8%e8%b0%83%e5%ba%a6%e5%88%b0ssd%e9%ab%98%e6%80%a7%e8%83%bd%e8%8a%82%e7%82%b9" aria-label="实例三尽量将应用调度到ssd高性能节点">实例三尽量将应用调度到ssd高性能节点</a></li>
+                <li>
+                    <a href="#%e5%ae%9e%e4%be%8b%e5%9b%9b%e5%90%8c%e4%b8%80%e4%b8%aa%e5%ba%94%e7%94%a8%e8%b0%83%e5%ba%a6%e5%9c%a8%e4%b8%8d%e5%90%8c%e6%8b%93%e6%89%91%e5%9f%9f" aria-label="实例四同一个应用调度在不同拓扑域">实例四同一个应用调度在不同拓扑域</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        
+        activeElement = elements[0];
+        const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+        document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+    }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+            const id = encodeURI(element.getAttribute('id')).toLowerCase();
+            if (element === activeElement){
+                document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+            } else {
+                document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+            }
+        })
+    }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+        <div class="post-content"><h2 id="污点和容忍">污点和容忍<a hidden class="anchor" aria-hidden="true" href="#污点和容忍">#</a></h2>
+<p>Taint在一类服务器上打上污点，让不能容忍这个污点的Pod不能部署在打了污点的服务器上。Toleration是让Pod容忍节点上配置的污点，可以让一些需要特殊配置的Pod能够调用到具有污点和特殊配置的节点上。</p>
+<p>节点可以设置多个污点，pod也可以通过<code>tolerations:</code>设置多个容忍策略，节点污点策略：</p>
+<ul>
+<li>NoSchedule：禁止调度到该节点，已经在该节点上的Pod不受影响</li>
+<li>NoExecute：禁止调度到该节点，如果不符合这个污点，会立马被驱逐（或在一段时间后）</li>
+<li>PreferNoSchedule：尽量避免将Pod调度到指定的节点上，如果没有更合适的节点，可以部署到该节点</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 容忍方式：完全匹配</span>
+</span></span><span style="display:flex;"><span>tolerations:
+</span></span><span style="display:flex;"><span>- key: <span style="color:#e6db74">&#34;taintKey&#34;</span>
+</span></span><span style="display:flex;"><span>  operator: <span style="color:#e6db74">&#34;Equal&#34;</span>
+</span></span><span style="display:flex;"><span>  value: <span style="color:#e6db74">&#34;taintValue&#34;</span>
+</span></span><span style="display:flex;"><span>  effect: <span style="color:#e6db74">&#34;NoSchedule&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 不完全匹配</span>
+</span></span><span style="display:flex;"><span>tolerations:
+</span></span><span style="display:flex;"><span>- key: <span style="color:#e6db74">&#34;taintKey&#34;</span>
+</span></span><span style="display:flex;"><span>  operator: <span style="color:#e6db74">&#34;Exists&#34;</span>
+</span></span><span style="display:flex;"><span>  effect: <span style="color:#e6db74">&#34;NoSchedule&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 配置容忍时间</span>
+</span></span><span style="display:flex;"><span>tolerations:
+</span></span><span style="display:flex;"><span>- key: <span style="color:#e6db74">&#34;key1&#34;</span>
+</span></span><span style="display:flex;"><span>  operator: <span style="color:#e6db74">&#34;Equal&#34;</span>
+</span></span><span style="display:flex;"><span>  value: <span style="color:#e6db74">&#34;value1&#34;</span>
+</span></span><span style="display:flex;"><span>  effect: <span style="color:#e6db74">&#34;NoExecute&#34;</span>
+</span></span><span style="display:flex;"><span>  tolerationSeconds: <span style="color:#ae81ff">3600</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 实例</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># mkdir -p yamls/schedule</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cd yamls/schedule/</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl taint node k8s-node01 ssd=true:NoSchedule</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 tainted
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe nodes k8s-node01 | grep Taint -A 2</span>
+</span></span><span style="display:flex;"><span>Taints:             ssd<span style="color:#f92672">=</span>true:NoSchedule
+</span></span><span style="display:flex;"><span>Unschedulable:      false
+</span></span><span style="display:flex;"><span>Lease:
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl label nodes k8s-node01 ssd=true</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># vim pod-toleration.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: nginx
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    env: test
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: nginx
+</span></span><span style="display:flex;"><span>    image: nginx
+</span></span><span style="display:flex;"><span>    imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>  nodeSelector:
+</span></span><span style="display:flex;"><span>    ssd: <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>  tolerations:
+</span></span><span style="display:flex;"><span>  - key: <span style="color:#e6db74">&#34;ssd&#34;</span>
+</span></span><span style="display:flex;"><span>    operator: <span style="color:#e6db74">&#34;Exists&#34;</span>
+</span></span><span style="display:flex;"><span>    effect: <span style="color:#e6db74">&#34;NoSchedule&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po nginx --show-labels -owide</span>
+</span></span><span style="display:flex;"><span>NAME    READY   STATUS    RESTARTS   AGE   IP              NODE         NOMINATED NODE   READINESS GATES   LABELS
+</span></span><span style="display:flex;"><span>nginx   1/1     Running   <span style="color:#ae81ff">0</span>          38s   172.17.125.48   k8s-node01   &lt;none&gt;           &lt;none&gt;            env<span style="color:#f92672">=</span>test
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe po nginx | grep -i node-selector -A 4</span>
+</span></span><span style="display:flex;"><span>Node-Selectors:              ssd<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>Tolerations:                 node.kubernetes.io/not-ready:NoExecute op<span style="color:#f92672">=</span>Exists <span style="color:#66d9ef">for</span> 300s
+</span></span><span style="display:flex;"><span>                             node.kubernetes.io/unreachable:NoExecute op<span style="color:#f92672">=</span>Exists <span style="color:#66d9ef">for</span> 300s
+</span></span><span style="display:flex;"><span>                             ssd:NoSchedule op<span style="color:#f92672">=</span>Exists
+</span></span><span style="display:flex;"><span>Events:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 删除污点</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 直接使用key匹配</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl taint node k8s-node01 ssd-</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 untainted
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl taint node k8s-node01 ssd=true:NoSchedule</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 tainted
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># key=value:Taint全量匹配</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl taint node k8s-node01 ssd=true:NoSchedule-</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 untainted
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl taint node k8s-node01 ssd=true:NoSchedule</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 tainted
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># key:Taint匹配</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl taint node k8s-node01 ssd:NoSchedule-</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 untainted
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 修改污点</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl taint node k8s-node01 ssd=true:NoSchedule</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 tainted
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl taint node k8s-node01 ssd=true:PreferNoSchedule --overwrite</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 modified
+</span></span></code></pre></div><p>Kubernetes集群内置污点：</p>
+<ul>
+<li><code>node.kubernetes.io/not-ready</code>：节点未准备好，相当于节点状态Ready的值为False。</li>
+<li><code>node.kubernetes.io/unreachable</code>：Node Controller访问不到节点，相当于节点状态Ready的值为Unknown。</li>
+<li><code>node.kubernetes.io/-out-of-disk</code>：节点磁盘耗尽。</li>
+<li><code>node.kubernetes.io/memory-pressure</code>：节点存在内存压力。</li>
+<li><code>node.kubernetes.io/disk-pressure</code>：节点存在磁盘压力。</li>
+<li><code>node.kubernetes.io/network-unavailable</code>：节点网络不可达。</li>
+<li><code>node.kubernetes.io/unschedulable</code>：节点不可调度。</li>
+<li><code>node.cloudprovider.kubernetes.io/uninitialized</code>：如果Kubelet启动时指定了一个外部的cloudprovider，它将给当前节点添加一个Taint将其标记为不可用。在cloud-controller-manager的一个controller初始化这个节点后，Kubelet将删除这个Taint。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 为了防止有时部分节点健康检查太慢，300s无法完成，可以修改为容忍3000秒后再驱逐（默认是300秒）：</span>
+</span></span><span style="display:flex;"><span>tolerations:
+</span></span><span style="display:flex;"><span>- key: <span style="color:#e6db74">&#34;node.kubernetes.io/unreachable&#34;</span>
+</span></span><span style="display:flex;"><span>  operator: <span style="color:#e6db74">&#34;Exists&#34;</span>
+</span></span><span style="display:flex;"><span>  effect: <span style="color:#e6db74">&#34;NoExecute&#34;</span>
+</span></span><span style="display:flex;"><span>  tolerationSeconds: <span style="color:#ae81ff">5000</span>
+</span></span></code></pre></div><h2 id="亲和力和反亲和力">亲和力和反亲和力<a hidden class="anchor" aria-hidden="true" href="#亲和力和反亲和力">#</a></h2>
+<p><img loading="lazy" src="https://deemoprobe.oss-cn-shanghai.aliyuncs.com/images/20220315223242.png" alt="20220315223242"  />
+</p>
+<ul>
+<li>requiredDuringSchedulingIgnoredDuringExecution：强制调度</li>
+<li>preferredDuringSchedulingIgnoredDuringExecution：优先调度</li>
+</ul>
+<h3 id="节点亲和力">节点亲和力<a hidden class="anchor" aria-hidden="true" href="#节点亲和力">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 先删除污点</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl taint node k8s-node01 ssd=true:PreferNoSchedule-</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 untainted
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl taint node k8s-node01 ssd=true:NoSchedule-</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 untainted
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe nodes k8s-node01 | grep Taint</span>
+</span></span><span style="display:flex;"><span>Taints:             &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 为k8s-node01和k8s-node02打标签disktype=ssd</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl label nodes k8s-node01 k8s-node02 disktype=ssd</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 labeled
+</span></span><span style="display:flex;"><span>node/k8s-node02 labeled
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 确认标签</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get nodes --show-labels </span>
+</span></span><span style="display:flex;"><span>NAME           STATUS   ROLES    AGE   VERSION   LABELS
+</span></span><span style="display:flex;"><span>k8s-master01   Ready    master   9d    v1.23.4   beta.kubernetes.io/arch<span style="color:#f92672">=</span>amd64,beta.kubernetes.io/os<span style="color:#f92672">=</span>linux,kubernetes.io/arch<span style="color:#f92672">=</span>amd64,kubernetes.io/hostname<span style="color:#f92672">=</span>k8s-master01,kubernetes.io/os<span style="color:#f92672">=</span>linux,node-role.kubernetes.io/master<span style="color:#f92672">=</span>,node.kubernetes.io/node<span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>k8s-master02   Ready    master   9d    v1.23.4   beta.kubernetes.io/arch<span style="color:#f92672">=</span>amd64,beta.kubernetes.io/os<span style="color:#f92672">=</span>linux,kubernetes.io/arch<span style="color:#f92672">=</span>amd64,kubernetes.io/hostname<span style="color:#f92672">=</span>k8s-master02,kubernetes.io/os<span style="color:#f92672">=</span>linux,node-role.kubernetes.io/master<span style="color:#f92672">=</span>,node.kubernetes.io/node<span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>k8s-master03   Ready    master   9d    v1.23.4   beta.kubernetes.io/arch<span style="color:#f92672">=</span>amd64,beta.kubernetes.io/os<span style="color:#f92672">=</span>linux,kubernetes.io/arch<span style="color:#f92672">=</span>amd64,kubernetes.io/hostname<span style="color:#f92672">=</span>k8s-master03,kubernetes.io/os<span style="color:#f92672">=</span>linux,node-role.kubernetes.io/master<span style="color:#f92672">=</span>,node.kubernetes.io/node<span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>k8s-node01     Ready    node     9d    v1.23.4   beta.kubernetes.io/arch<span style="color:#f92672">=</span>amd64,beta.kubernetes.io/os<span style="color:#f92672">=</span>linux,disktype<span style="color:#f92672">=</span>ssd,kubernetes.io/arch<span style="color:#f92672">=</span>amd64,kubernetes.io/hostname<span style="color:#f92672">=</span>k8s-node01,kubernetes.io/os<span style="color:#f92672">=</span>linux,node-role.kubernetes.io/node<span style="color:#f92672">=</span>,node.kubernetes.io/node<span style="color:#f92672">=</span>,ssd<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>k8s-node02     Ready    node     9d    v1.23.4   beta.kubernetes.io/arch<span style="color:#f92672">=</span>amd64,beta.kubernetes.io/os<span style="color:#f92672">=</span>linux,disktype<span style="color:#f92672">=</span>ssd,kubernetes.io/arch<span style="color:#f92672">=</span>amd64,kubernetes.io/hostname<span style="color:#f92672">=</span>k8s-node02,kubernetes.io/os<span style="color:#f92672">=</span>linux,node-role.kubernetes.io/node<span style="color:#f92672">=</span>,node.kubernetes.io/node<span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建节点硬亲和力调度pod实例</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># vim node-hardaffinity.yaml </span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: node-hardaffinity
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  affinity:
+</span></span><span style="display:flex;"><span>    nodeAffinity:
+</span></span><span style="display:flex;"><span>      requiredDuringSchedulingIgnoredDuringExecution:
+</span></span><span style="display:flex;"><span>        nodeSelectorTerms:
+</span></span><span style="display:flex;"><span>        - matchExpressions:
+</span></span><span style="display:flex;"><span>          - key: disktype
+</span></span><span style="display:flex;"><span>            operator: In
+</span></span><span style="display:flex;"><span>            values:
+</span></span><span style="display:flex;"><span>            - ssd
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: nginx
+</span></span><span style="display:flex;"><span>    image: nginx
+</span></span><span style="display:flex;"><span>    imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po node-hardaffinity -owide</span>
+</span></span><span style="display:flex;"><span>NAME                READY   STATUS    RESTARTS   AGE   IP              NODE         NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>node-hardaffinity   1/1     Running   <span style="color:#ae81ff">0</span>          25s   172.27.14.210   k8s-node02   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 为k8s-node01单独打上ssd:first的标签</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl label nodes k8s-node01 ssd=first</span>
+</span></span><span style="display:flex;"><span>error: <span style="color:#e6db74">&#39;ssd&#39;</span> already has a value <span style="color:#f92672">(</span>true<span style="color:#f92672">)</span>, and --overwrite is false
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 之前用过ssd=true，覆盖掉即可</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl label nodes k8s-node01 ssd=first --overwrite </span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 labeled
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建节点软亲和力调度pod实例</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: node-softaffinity
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  affinity:
+</span></span><span style="display:flex;"><span>    nodeAffinity:
+</span></span><span style="display:flex;"><span>      preferredDuringSchedulingIgnoredDuringExecution:
+</span></span><span style="display:flex;"><span>      - weight: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        preference:
+</span></span><span style="display:flex;"><span>          matchExpressions:
+</span></span><span style="display:flex;"><span>          - key: ssd
+</span></span><span style="display:flex;"><span>            operator: Exists
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: nginx
+</span></span><span style="display:flex;"><span>    image: nginx
+</span></span><span style="display:flex;"><span>    imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># vim node-softaffinity.yaml </span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po node-softaffinity -owide</span>
+</span></span><span style="display:flex;"><span>NAME                READY   STATUS    RESTARTS   AGE   IP              NODE         NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>node-softaffinity   1/1     Running   <span style="color:#ae81ff">0</span>          34s   172.17.125.49   k8s-node01   &lt;none&gt;           &lt;none&gt;
+</span></span></code></pre></div><p>affinity配置详解：</p>
+<ul>
+<li>requiredDuringSchedulingIgnoredDuringExecution：硬亲和力配置
+<ul>
+<li>nodeSelectorTerms：节点选择器配置，可以配置多个matchExpressions（满足其一即可）</li>
+</ul>
+</li>
+<li>preferredDuringSchedulingIgnoredDuringExecution：软亲和力配置
+<ul>
+<li>weight：软亲和力的权重，权重越高优先级越大，范围1-100</li>
+<li>preference：软亲和力配置项，和weight同级，可以配置多个，matchExpressions和硬亲和力一致</li>
+</ul>
+</li>
+<li>operator：标签匹配的方式
+<ul>
+<li>In：相当于key = value的形式</li>
+<li>NotIn：相当于key != value的形式</li>
+<li>Exists：节点存在label的key为指定的值即可，无需配置values字段</li>
+<li>DoesNotExist：节点不存在label的key为指定的值即可，无需配置values字段</li>
+<li>Gt：大于value指定的值</li>
+<li>Lt：小于value指定的值</li>
+</ul>
+</li>
+</ul>
+<h3 id="pod亲和力反亲和力">Pod亲和力反亲和力<a hidden class="anchor" aria-hidden="true" href="#pod亲和力反亲和力">#</a></h3>
+<ul>
+<li>requiredDuringSchedulingIgnoredDuringExecution：硬亲和力配置，强制匹配</li>
+<li>preferredDuringSchedulingIgnoredDuringExecution：软亲和力配置，优先匹配</li>
+<li>podAffinity：pod亲和力配置，表示和具有匹配标签的pod部署在一起</li>
+<li>podAntiAffinity：pod反亲和力，表示和具有匹配标签的pod分开部署</li>
+<li>labelSelector：Pod选择器配置，可以配置多个</li>
+<li>matchExpressions：和节点亲和力配置一致</li>
+<li>operator：配置和节点亲和力一致，但是没有Gt和Lt</li>
+<li>topologyKey：匹配的拓扑域的key，也就是节点上label的key，key和value相同的为同一个域，可以用于标注不同的机房和地区</li>
+<li>namespaces: 和哪个命名空间的Pod进行匹配，为空为当前命名空间</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># pod全配置示例，仅是示例，实际使用按需选择即可</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: pod-affinity
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  affinity:
+</span></span><span style="display:flex;"><span>    podAffinity:
+</span></span><span style="display:flex;"><span>      requiredDuringSchedulingIgnoredDuringExecution:
+</span></span><span style="display:flex;"><span>      - labelSelector:
+</span></span><span style="display:flex;"><span>          matchExpressions:
+</span></span><span style="display:flex;"><span>          - key: security
+</span></span><span style="display:flex;"><span>            operator: In
+</span></span><span style="display:flex;"><span>            values:
+</span></span><span style="display:flex;"><span>            - S1
+</span></span><span style="display:flex;"><span>        topologyKey: failure-domain.beta.kubernetes.io/zone
+</span></span><span style="display:flex;"><span>    podAntiAffinity:
+</span></span><span style="display:flex;"><span>      preferredDuringSchedulingIgnoredDuringExecution:
+</span></span><span style="display:flex;"><span>      - weight: <span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>        podAffinityTerm:
+</span></span><span style="display:flex;"><span>          labelSelector:
+</span></span><span style="display:flex;"><span>            matchExpressions:
+</span></span><span style="display:flex;"><span>            - key: security
+</span></span><span style="display:flex;"><span>              operator: In
+</span></span><span style="display:flex;"><span>              values:
+</span></span><span style="display:flex;"><span>              - S2
+</span></span><span style="display:flex;"><span>          namespaces:
+</span></span><span style="display:flex;"><span>          - default
+</span></span><span style="display:flex;"><span>          topologyKey: failure-domain.beta.kubernetes.io/zone
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: pod-affinity
+</span></span><span style="display:flex;"><span>    image: nginx
+</span></span></code></pre></div><h2 id="综合实例">综合实例<a hidden class="anchor" aria-hidden="true" href="#综合实例">#</a></h2>
+<h3 id="实例一同一个应用副本互斥地部署在多个节点">实例一同一个应用副本互斥地部署在多个节点<a hidden class="anchor" aria-hidden="true" href="#实例一同一个应用副本互斥地部署在多个节点">#</a></h3>
+<p>这种操作避免同一个应用pod副本部署在同一个节点，如果节点故障，造成应用的不可用。即避免单点故障。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 先查看污点，有4个节点可以使用，不影响后续操作，可以不删污点</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe nodes | grep taint -i</span>
+</span></span><span style="display:flex;"><span>Taints:             role/k8s-master01:NoSchedule
+</span></span><span style="display:flex;"><span>Taints:             role/k8s-master02:PreferNoSchedule
+</span></span><span style="display:flex;"><span>Taints:             &lt;none&gt;
+</span></span><span style="display:flex;"><span>Taints:             &lt;none&gt;
+</span></span><span style="display:flex;"><span>Taints:             &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建3副本的应用myapp</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># vim myapp.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: myapp-podantiaffinity <span style="color:#75715e"># deployment标签和pod标签可以不一致</span>
+</span></span><span style="display:flex;"><span>  name: myapp-podantiaffinity
+</span></span><span style="display:flex;"><span>  namespace: kube-public
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: myapp <span style="color:#75715e"># deployment匹配标签和要和下面template里pod标签一致</span>
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: myapp
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      affinity:
+</span></span><span style="display:flex;"><span>        podAntiAffinity:
+</span></span><span style="display:flex;"><span>          requiredDuringSchedulingIgnoredDuringExecution:
+</span></span><span style="display:flex;"><span>          - labelSelector:
+</span></span><span style="display:flex;"><span>              matchExpressions: <span style="color:#75715e"># 匹配pod标签</span>
+</span></span><span style="display:flex;"><span>              - key: app
+</span></span><span style="display:flex;"><span>                operator: In
+</span></span><span style="display:flex;"><span>                values:
+</span></span><span style="display:flex;"><span>                - myapp
+</span></span><span style="display:flex;"><span>            topologyKey: kubernetes.io/hostname <span style="color:#75715e"># 拓扑域，匹配主机名key</span>
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - image: nginx
+</span></span><span style="display:flex;"><span>        imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>        name: myapp
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f myapp.yaml </span>
+</span></span><span style="display:flex;"><span>deployment.apps/myapp-podantiaffinity created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deployments.apps -n kube-public myapp-podantiaffinity </span>
+</span></span><span style="display:flex;"><span>NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity   3/3     <span style="color:#ae81ff">3</span>            <span style="color:#ae81ff">3</span>           105s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get rs,pod -n kube-public -owide --show-labels | grep myapp</span>
+</span></span><span style="display:flex;"><span>replicaset.apps/myapp-podantiaffinity-6f8dc8f64f   <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>       2m35s   myapp        nginx    app<span style="color:#f92672">=</span>myapp,pod-template-hash<span style="color:#f92672">=</span>6f8dc8f64f       app<span style="color:#f92672">=</span>myapp,pod-template-hash<span style="color:#f92672">=</span>6f8dc8f64f
+</span></span><span style="display:flex;"><span>pod/myapp-podantiaffinity-6f8dc8f64f-772m6   1/1     Running   <span style="color:#ae81ff">0</span>             2m35s   172.27.14.211    k8s-node02     &lt;none&gt;           &lt;none&gt;            app<span style="color:#f92672">=</span>myapp,pod-template-hash<span style="color:#f92672">=</span>6f8dc8f64f
+</span></span><span style="display:flex;"><span>pod/myapp-podantiaffinity-6f8dc8f64f-7hxd4   1/1     Running   <span style="color:#ae81ff">0</span>             2m35s   172.17.125.50    k8s-node01     &lt;none&gt;           &lt;none&gt;            app<span style="color:#f92672">=</span>myapp,pod-template-hash<span style="color:#f92672">=</span>6f8dc8f64f
+</span></span><span style="display:flex;"><span>pod/myapp-podantiaffinity-6f8dc8f64f-rk7rf   1/1     Running   <span style="color:#ae81ff">0</span>             2m35s   172.18.195.21    k8s-master03   &lt;none&gt;           &lt;none&gt;            app<span style="color:#f92672">=</span>myapp,pod-template-hash<span style="color:#f92672">=</span>6f8dc8f64f
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 可用的调度节点为4，修改副本数为5，会发现有一个无法调度，一直处于pending状态</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl scale deployment -n kube-public myapp-podantiaffinity --replicas=5</span>
+</span></span><span style="display:flex;"><span>deployment.apps/myapp-podantiaffinity scaled
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -n kube-public -owide | grep myapp</span>
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-6f8dc8f64f-772m6   1/1     Running   <span style="color:#ae81ff">0</span>              16m    172.27.14.211    k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-6f8dc8f64f-7hxd4   1/1     Running   <span style="color:#ae81ff">0</span>              16m    172.17.125.50    k8s-node01     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-6f8dc8f64f-rk7rf   1/1     Running   <span style="color:#ae81ff">0</span>              16m    172.18.195.21    k8s-master03   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-6f8dc8f64f-sqxjm   0/1     Pending   <span style="color:#ae81ff">0</span>              10m    &lt;none&gt;           &lt;none&gt;         &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-6f8dc8f64f-zrtkr   1/1     Running   <span style="color:#ae81ff">0</span>              10m    172.25.92.77     k8s-master02   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看处于pending状态的pod事件，提示不匹配pod anti-affinity rules</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe po -n kube-public myapp-podantiaffinity-6f8dc8f64f-sqxjm | grep -i events -A 10 </span>
+</span></span><span style="display:flex;"><span>Events:
+</span></span><span style="display:flex;"><span>  Type     Reason            Age                  From               Message
+</span></span><span style="display:flex;"><span>  ----     ------            ----                 ----               -------
+</span></span><span style="display:flex;"><span>  Warning  FailedScheduling  12s <span style="color:#f92672">(</span>x9 over 9m13s<span style="color:#f92672">)</span>  default-scheduler  0/5 nodes are available: <span style="color:#ae81ff">1</span> node<span style="color:#f92672">(</span>s<span style="color:#f92672">)</span> had taint <span style="color:#f92672">{</span>role/k8s-master01: <span style="color:#f92672">}</span>, that the pod didn<span style="color:#e6db74">&#39;t tolerate, 4 node(s) didn&#39;</span>t match pod anti-affinity rules.
+</span></span></code></pre></div><h3 id="实例二同一个应用副本互斥地部署在指定标签的节点">实例二同一个应用副本互斥地部署在指定标签的节点<a hidden class="anchor" aria-hidden="true" href="#实例二同一个应用副本互斥地部署在指定标签的节点">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 之前配置过只有k8s-node01和k8s-node02有disktype=ssd标签</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># vim myapp.yaml </span>
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: myapp-podantiaffinity <span style="color:#75715e"># deployment标签和pod标签可以不一致</span>
+</span></span><span style="display:flex;"><span>  name: myapp-podantiaffinity
+</span></span><span style="display:flex;"><span>  namespace: kube-public
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">2</span> <span style="color:#75715e"># 副本数改为2</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: myapp <span style="color:#75715e"># deployment匹配标签和要和下面template里pod标签一致</span>
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: myapp
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      nodeSelector: <span style="color:#75715e"># 增加nodeSelector标签选择器，节点标签需要已存在</span>
+</span></span><span style="display:flex;"><span>        disktype: ssd
+</span></span><span style="display:flex;"><span>      affinity:
+</span></span><span style="display:flex;"><span>        podAntiAffinity:
+</span></span><span style="display:flex;"><span>          requiredDuringSchedulingIgnoredDuringExecution:
+</span></span><span style="display:flex;"><span>          - labelSelector:
+</span></span><span style="display:flex;"><span>              matchExpressions: <span style="color:#75715e"># 匹配pod标签</span>
+</span></span><span style="display:flex;"><span>              - key: app
+</span></span><span style="display:flex;"><span>                operator: In
+</span></span><span style="display:flex;"><span>                values:
+</span></span><span style="display:flex;"><span>                - myapp
+</span></span><span style="display:flex;"><span>            topologyKey: kubernetes.io/hostname <span style="color:#75715e"># 拓扑域，匹配主机名key</span>
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - image: nginx
+</span></span><span style="display:flex;"><span>        imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>        name: myapp
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f myapp.yaml </span>
+</span></span><span style="display:flex;"><span>deployment.apps/myapp-podantiaffinity created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -n kube-public -owide | grep myapp</span>
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-65b6c697b7-gtqzc   1/1     Running   <span style="color:#ae81ff">0</span>              48s    172.27.14.212    k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-65b6c697b7-mcv6j   1/1     Running   <span style="color:#ae81ff">0</span>              48s    172.17.125.51    k8s-node01     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 副本数改为3，由于没有多余disktype=ssd节点互斥调度，会处于pending状态</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl scale deployment -n kube-public myapp-podantiaffinity --replicas=3</span>
+</span></span><span style="display:flex;"><span>deployment.apps/myapp-podantiaffinity scaled
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -n kube-public -owide | grep myapp</span>
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-65b6c697b7-gtqzc   1/1     Running   <span style="color:#ae81ff">0</span>              2m17s   172.27.14.212    k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-65b6c697b7-mcv6j   1/1     Running   <span style="color:#ae81ff">0</span>              2m17s   172.17.125.51    k8s-node01     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-65b6c697b7-t7v7h   0/1     Pending   <span style="color:#ae81ff">0</span>              4s      &lt;none&gt;           &lt;none&gt;         &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 情况和实例一一致</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe po -n kube-public myapp-podantiaffinity-65b6c697b7-t7v7h | grep -i event -A 10</span>
+</span></span><span style="display:flex;"><span>Events:
+</span></span><span style="display:flex;"><span>  Type     Reason            Age                From               Message
+</span></span><span style="display:flex;"><span>  ----     ------            ----               ----               -------
+</span></span><span style="display:flex;"><span>  Warning  FailedScheduling  18s <span style="color:#f92672">(</span>x2 over 83s<span style="color:#f92672">)</span>  default-scheduler  0/5 nodes are available: <span style="color:#ae81ff">1</span> node<span style="color:#f92672">(</span>s<span style="color:#f92672">)</span> had taint <span style="color:#f92672">{</span>role/k8s-master01: <span style="color:#f92672">}</span>, that the pod didn<span style="color:#e6db74">&#39;t tolerate, 2 node(s) didn&#39;</span>t match Pod<span style="color:#e6db74">&#39;s node affinity/selector, 2 node(s) didn&#39;</span>t match pod anti-affinity rules.
+</span></span></code></pre></div><h3 id="实例三尽量将应用调度到ssd高性能节点">实例三尽量将应用调度到ssd高性能节点<a hidden class="anchor" aria-hidden="true" href="#实例三尽量将应用调度到ssd高性能节点">#</a></h3>
+<p>这种情况是部分应用侧重高性能服务器部署服务，但不在乎是否是部署到同一节点</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># k8s-node01和k8s-node02已有disktype=ssd高性能标签，假设这两台服务器就是高性能的</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># k8s-master03是传统一般性能的服务器，打上标签</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl label nodes k8s-master03 disktype=physical</span>
+</span></span><span style="display:flex;"><span>node/k8s-master03 labeled
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># vim myapp.yaml </span>
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: myapp-podantiaffinity <span style="color:#75715e"># deployment标签和pod标签可以不一致</span>
+</span></span><span style="display:flex;"><span>  name: myapp-podantiaffinity
+</span></span><span style="display:flex;"><span>  namespace: kube-public
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">2</span> <span style="color:#75715e"># 副本数改为2</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: myapp <span style="color:#75715e"># deployment匹配标签和要和下面template里pod标签一致</span>
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: myapp
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      nodeSelector: <span style="color:#75715e"># 增加nodeSelector标签选择器，节点标签需要已存在</span>
+</span></span><span style="display:flex;"><span>        disktype: ssd
+</span></span><span style="display:flex;"><span>      affinity:
+</span></span><span style="display:flex;"><span>        nodeAffinity:
+</span></span><span style="display:flex;"><span>          preferredDuringSchedulingIgnoredDuringExecution:
+</span></span><span style="display:flex;"><span>          - preference:
+</span></span><span style="display:flex;"><span>              matchExpressions:
+</span></span><span style="display:flex;"><span>              - key: disktype
+</span></span><span style="display:flex;"><span>                operator: In
+</span></span><span style="display:flex;"><span>                values:
+</span></span><span style="display:flex;"><span>                - ssd
+</span></span><span style="display:flex;"><span>            weight: <span style="color:#ae81ff">100</span> <span style="color:#75715e"># 高性能服务器权重</span>
+</span></span><span style="display:flex;"><span>          - preference:
+</span></span><span style="display:flex;"><span>              matchExpressions:
+</span></span><span style="display:flex;"><span>              - key: disktype
+</span></span><span style="display:flex;"><span>                operator: In
+</span></span><span style="display:flex;"><span>                values:
+</span></span><span style="display:flex;"><span>                - physical
+</span></span><span style="display:flex;"><span>            weight: <span style="color:#ae81ff">10</span> <span style="color:#75715e"># 传统服务器权重</span>
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - image: nginx
+</span></span><span style="display:flex;"><span>        imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>        name: myapp
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f myapp.yaml </span>
+</span></span><span style="display:flex;"><span>deployment.apps/myapp-podantiaffinity created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -n kube-public -owide | grep myapp</span>
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-7b655bd4fc-mw7g8   1/1     Running   <span style="color:#ae81ff">0</span>              34s    172.27.14.213    k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-podantiaffinity-7b655bd4fc-sqg5f   1/1     Running   <span style="color:#ae81ff">0</span>              34s    172.17.125.52    k8s-node01     &lt;none&gt;           &lt;none&gt;
+</span></span></code></pre></div><h3 id="实例四同一个应用调度在不同拓扑域">实例四同一个应用调度在不同拓扑域<a hidden class="anchor" aria-hidden="true" href="#实例四同一个应用调度在不同拓扑域">#</a></h3>
+<p>这种情况是应用更侧重的是不同地域服务的访问速度，就近部署是最好的，同时也避免了单点故障。前提是为所有机器划分拓扑域，否则未划分的机器也会被正常调度。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 假设k8s-node01和k8s-node02分别属于上海和北京数据中心，打上标签</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl label nodes k8s-node01 k8s-master03 region=ShangHai</span>
+</span></span><span style="display:flex;"><span>node/k8s-node01 labeled
+</span></span><span style="display:flex;"><span>node/k8s-master03 labeled
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl label nodes k8s-node02 region=BeiJing</span>
+</span></span><span style="display:flex;"><span>node/k8s-node02 labeled
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># vim myapp.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: myapp-pod-region-antiaffinity <span style="color:#75715e"># deployment标签和pod标签可以不一致</span>
+</span></span><span style="display:flex;"><span>  name: myapp-pod-region-antiaffinity
+</span></span><span style="display:flex;"><span>  namespace: kube-public
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      region: different <span style="color:#75715e"># deployment匹配标签和要和下面template里pod标签一致</span>
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        region: different
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      affinity:
+</span></span><span style="display:flex;"><span>        podAntiAffinity:
+</span></span><span style="display:flex;"><span>          requiredDuringSchedulingIgnoredDuringExecution:
+</span></span><span style="display:flex;"><span>          - labelSelector:
+</span></span><span style="display:flex;"><span>              matchExpressions: <span style="color:#75715e"># 匹配pod标签</span>
+</span></span><span style="display:flex;"><span>              - key: region
+</span></span><span style="display:flex;"><span>                operator: In
+</span></span><span style="display:flex;"><span>                values:
+</span></span><span style="display:flex;"><span>                - different
+</span></span><span style="display:flex;"><span>            topologyKey: region <span style="color:#75715e"># 拓扑域，匹配region</span>
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - image: nginx
+</span></span><span style="display:flex;"><span>        imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>        name: myapp
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f myapp.yaml </span>
+</span></span><span style="display:flex;"><span>deployment.apps/myapp-pod-region-antiaffinity created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -n kube-public -owide | grep myapp</span>
+</span></span><span style="display:flex;"><span>myapp-pod-region-antiaffinity-6675849bf9-577j2   1/1     Running   <span style="color:#ae81ff">0</span>              16s    172.18.195.27    k8s-master03   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-pod-region-antiaffinity-6675849bf9-5rmww   1/1     Running   <span style="color:#ae81ff">0</span>              16s    172.27.14.218    k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 修改副本数为3</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl scale deployment -n kube-public myapp-pod-region-antiaffinity --replicas=3</span>
+</span></span><span style="display:flex;"><span>deployment.apps/myapp-pod-region-antiaffinity scaled
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -n kube-public -owide | grep myapp</span>
+</span></span><span style="display:flex;"><span>myapp-pod-region-antiaffinity-6675849bf9-577j2   1/1     Running   <span style="color:#ae81ff">0</span>              91s    172.18.195.27    k8s-master03   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-pod-region-antiaffinity-6675849bf9-5rmww   1/1     Running   <span style="color:#ae81ff">0</span>              91s    172.27.14.218    k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-pod-region-antiaffinity-6675849bf9-7s9pc   1/1     Running   <span style="color:#ae81ff">0</span>              2s     172.25.92.78     k8s-master02   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get nodes k8s-master02 --show-labels </span>
+</span></span><span style="display:flex;"><span>NAME           STATUS   ROLES    AGE   VERSION   LABELS
+</span></span><span style="display:flex;"><span>k8s-master02   Ready    master   9d    v1.23.4   beta.kubernetes.io/arch<span style="color:#f92672">=</span>amd64,beta.kubernetes.io/os<span style="color:#f92672">=</span>linux,kubernetes.io/arch<span style="color:#f92672">=</span>amd64,kubernetes.io/hostname<span style="color:#f92672">=</span>k8s-master02,kubernetes.io/os<span style="color:#f92672">=</span>linux,node-role.kubernetes.io/master<span style="color:#f92672">=</span>,node.kubernetes.io/node<span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># k8s-master02并没有设置region，也被调度了，可见如果存在没有标记拓扑域的服务器，当拓扑域副本数溢出时，也会被正常调度</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 先调回正常副本数</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl scale deployment -n kube-public myapp-pod-region-antiaffinity --replicas=2</span>
+</span></span><span style="display:flex;"><span>deployment.apps/myapp-pod-region-antiaffinity scaled
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -n kube-public -owide | grep myapp</span>
+</span></span><span style="display:flex;"><span>myapp-pod-region-antiaffinity-6675849bf9-577j2   1/1     Running   <span style="color:#ae81ff">0</span>              5m45s   172.18.195.27    k8s-master03   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-pod-region-antiaffinity-6675849bf9-5rmww   1/1     Running   <span style="color:#ae81ff">0</span>              5m45s   172.27.14.218    k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 为k8s-master02设置不可调度污点，扩充副本测试之</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl taint node k8s-master02 region:NoSchedule</span>
+</span></span><span style="display:flex;"><span>node/k8s-master02 tainted
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 此时只存在三个节点可以调度（master01是之前就设置的污点），而且都在region拓扑域中</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe nodes | grep -i taint -A 1</span>
+</span></span><span style="display:flex;"><span>Taints:             role/k8s-master01:NoSchedule
+</span></span><span style="display:flex;"><span>Unschedulable:      false
+</span></span><span style="display:flex;"><span>--
+</span></span><span style="display:flex;"><span>Taints:             region:NoSchedule <span style="color:#75715e"># 不可调度污点会覆盖掉PreferNoSchedule污点，不删除也可以</span>
+</span></span><span style="display:flex;"><span>                    role/k8s-master02:PreferNoSchedule
+</span></span><span style="display:flex;"><span>--
+</span></span><span style="display:flex;"><span>Taints:             &lt;none&gt;
+</span></span><span style="display:flex;"><span>Unschedulable:      false
+</span></span><span style="display:flex;"><span>--
+</span></span><span style="display:flex;"><span>Taints:             &lt;none&gt;
+</span></span><span style="display:flex;"><span>Unschedulable:      false
+</span></span><span style="display:flex;"><span>--
+</span></span><span style="display:flex;"><span>Taints:             &lt;none&gt;
+</span></span><span style="display:flex;"><span>Unschedulable:      false
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 扩充副本测试</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl scale deployment -n kube-public myapp-pod-region-antiaffinity --replicas=3</span>
+</span></span><span style="display:flex;"><span>deployment.apps/myapp-pod-region-antiaffinity scaled
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -n kube-public -owide | grep myapp</span>
+</span></span><span style="display:flex;"><span>myapp-pod-region-antiaffinity-6675849bf9-577j2   1/1     Running   <span style="color:#ae81ff">0</span>              9m41s   172.18.195.27    k8s-master03   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-pod-region-antiaffinity-6675849bf9-5rmww   1/1     Running   <span style="color:#ae81ff">0</span>              9m41s   172.27.14.218    k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>myapp-pod-region-antiaffinity-6675849bf9-djkgc   0/1     Pending   <span style="color:#ae81ff">0</span>              5s      &lt;none&gt;           &lt;none&gt;         &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 schedule<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe po -n kube-public myapp-pod-region-antiaffinity-6675849bf9-djkgc | grep -i event -A 5</span>
+</span></span><span style="display:flex;"><span>Events:
+</span></span><span style="display:flex;"><span>  Type     Reason            Age   From               Message
+</span></span><span style="display:flex;"><span>  ----     ------            ----  ----               -------
+</span></span><span style="display:flex;"><span>  Warning  FailedScheduling  43s   default-scheduler  0/5 nodes are available: <span style="color:#ae81ff">1</span> node<span style="color:#f92672">(</span>s<span style="color:#f92672">)</span> had taint <span style="color:#f92672">{</span>region: <span style="color:#f92672">}</span>, that the pod didn<span style="color:#e6db74">&#39;t tolerate, 1 node(s) had taint {role/k8s-master01: }, that the pod didn&#39;</span>t tolerate, <span style="color:#ae81ff">3</span> node<span style="color:#f92672">(</span>s<span style="color:#f92672">)</span> didn<span style="color:#960050;background-color:#1e0010">&#39;</span>t match pod anti-affinity rules.
+</span></span></code></pre></div><blockquote>
+<p>需要注意的是标签的唯一性，不要和其他项目应用冲突。</p>
+</blockquote>
+
+
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="prev" href="https://deemoprobe.github.io/posts/tech/kubernetesupgrade/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>KubernetesUpgrade</span>
+  </a>
+  <a class="next" href="https://deemoprobe.github.io/posts/tech/kubernetessecret/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>KubernetesSecret</span>
+  </a>
+</nav>
+
+        </footer>
+    </div>
+</article>
+</main>
+
+<footer class="footer">
+    
+        <span id="runtime_span"></span>
+        <script
+            type="text/javascript">function show_runtime() { window.setTimeout("show_runtime()", 1000); X = new Date("1/1/2023 1:00:00"); Y = new Date(); T = (Y.getTime() - X.getTime()); M = 24 * 60 * 60 * 1000; a = T / M; A = Math.floor(a); b = (a - A) * 24; B = Math.floor(b); c = (b - B) * 60; C = Math.floor((b - B) * 60); D = Math.floor((c - C) * 60); runtime_span.innerHTML = "网站已运行" + A + "天" + B + "小时" + C + "分" + D + "秒" } show_runtime();</script>
+    
+    
+    <br>
+    <span>
+        Copyright
+        &copy;
+        2022-2023
+        <a href="https://deemoprobe.github.io/" style="color:#939393;">William&#39;s Blog</a>
+        All Rights Reserved
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '📄复制';
+
+        function copyingDone() {
+            copybutton.innerText = '👌🏻已复制!';
+            setTimeout(() => {
+                copybutton.innerText = '📄复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+
+<script>
+    $("code[class^=language] ").on("mouseover", function () {
+        if (this.clientWidth < this.scrollWidth) {
+            $(this).css("width", "135%")
+            $(this).css("border-top-right-radius", "var(--radius)")
+        }
+    }).on("mouseout", function () {
+        $(this).css("width", "100%")
+        $(this).css("border-top-right-radius", "unset")
+    })
+</script>
+</body>
+
+</html>

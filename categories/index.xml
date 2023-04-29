@@ -5,16 +5,6 @@
     <link>https://deemoprobe.github.io/categories/</link>
     <description>Recent content in Categories on William&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    <lastBuildDate>Tue, 25 Apr 2023 18:56:52 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>tech</title>
-      <link>https://deemoprobe.github.io/categories/tech/</link>
-      <pubDate>Tue, 25 Apr 2023 18:56:52 +0800</pubDate>
-      
-      <guid>https://deemoprobe.github.io/categories/tech/</guid>
-      <description></description>
-    </item>
-    
+    <language>zh-cn</language><atom:link href="https://deemoprobe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

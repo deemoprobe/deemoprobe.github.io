@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>KubernetesPodController | William&#39;s Blog</title>
+<meta name="keywords" content="kubernetes">
+<meta name="description" content="Kubernetes Pod控制器">
+<meta name="author" content="deemoprobe">
+<link rel="canonical" href="https://deemoprobe.github.io/posts/tech/kubernetespodcontroller/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4ff503bcd1fac86ff7aae2a7670a5373c685d74bf74dc61eb3b14254f795b8f7.css" integrity="sha256-T/UDvNH6yG/3quKnZwpTc8aF10v3TcYes7FCVPeVuPc=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
+        onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="icon" type="image/png" sizes="16x16" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="icon" type="image/png" sizes="32x32" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="apple-touch-icon" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="mask-icon" href="https://deemoprobe.github.io/img/bear.gif">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script defer src="https://unpkg.com/mermaid@8.8.1/dist/mermaid.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script src="https://cdn.staticfile.org/jquery/3.6.3/jquery.min.js"></script>
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="KubernetesPodController" />
+<meta property="og:description" content="Kubernetes Pod控制器" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://deemoprobe.github.io/posts/tech/kubernetespodcontroller/" />
+<meta property="og:image" content="https://deemoprobe.github.io/img/kubernetes.png" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-04-29T14:23:19+08:00" />
+<meta property="article:modified_time" content="2023-04-29T14:23:19+08:00" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://deemoprobe.github.io/img/kubernetes.png" />
+<meta name="twitter:title" content="KubernetesPodController"/>
+<meta name="twitter:description" content="Kubernetes Pod控制器"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://deemoprobe.github.io/posts/"
+        },
+
+        {
+          "@type": "ListItem",
+          "position":  2 ,
+          "name": "👨🏻‍💻 技术",
+          "item": "https://deemoprobe.github.io/posts/tech/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "KubernetesPodController",
+      "item": "https://deemoprobe.github.io/posts/tech/kubernetespodcontroller/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "KubernetesPodController",
+  "name": "KubernetesPodController",
+  "description": "Kubernetes Pod控制器",
+  "keywords": [
+    "kubernetes"
+  ],
+  "articleBody": "Kubernetes 中内建了很多 Controller(控制器)，用来确保pod资源符合预期的状态，控制 Pod 的状态和行为。\n控制器类型 ReplicationController(rc) ReplicaSet(rs) Deployment(deploy) DaemonSet(ds) StatefulSet(sts) Job/CronJob(cj) Horizontal Pod Autoscaling(hpa) # 可以使用kubectl explain命令查看k8s API资源对象描述信息 kubectl explain | egrep -v \"^$|^\\s*http\" | sed s/\"More info:\"// # 查看API资源列表 kubectl api-resources RS和RC ReplicationController(RC)用来确保容器应用的副本数始终保持在用户定义的副本数，即如果有容器异常退出，会自动创建新的 Pod 来替代；而如果异常多出来的容器也会自动回收。\n在新版本的Kubernetes中建议使用ReplicaSet来取代ReplicationController，ReplicaSet规则跟ReplicationController没有本质的不同，唯一区别是ReplicaSet支持selector选择器。\nReplicaSet也很少单独被使用，都是使用更高级的资源Deployment、DaemonSet、StatefulSet进行管理Pod，ReplicaSet主要用作Deployment协调创建、删除和更新Pod。\n# RC实例，也是后面的rc-demo.yaml中的内容 apiVersion: v1 kind: ReplicationController metadata: name: nginx spec: replicas: 2 selector: app: nginx template: metadata: name: nginx labels: app: nginx spec: containers: - name: nginx image: nginx imagePullPolicy: IfNotPresent ports: - containerPort: 80 # RS实例，和RC配置的主要区别是多了个selector apiVersion: apps/v1 kind: ReplicaSet metadata: name: frontend labels: app: guestbook tier: frontend spec: replicas: 2 selector: matchLabels: tier: frontend template: metadata: labels: tier: frontend spec: containers: - name: php-redis image: gcr.io/google_samples/gb-frontend:v3 # 以上面RC实例配置为例 [root@k8s-master01 ~]# kubectl apply -f rc-demo.yaml replicationcontroller/nginx created [root@k8s-master01 ~]# kubectl get po,rc NAME READY STATUS RESTARTS AGE pod/nginx-5w6v6 1/1 Running 0 6s pod/nginx-8265c 1/1 Running 0 6s NAME DESIRED CURRENT READY AGE replicationcontroller/nginx 2 2 2 6s # RC的Pod动态缩放 [root@k8s-master01 ~]# kubectl scale rc nginx --replicas=3 replicationcontroller/nginx scaled # 可以看到正在扩容 [root@k8s-master01 ~]# kubectl get po,rc NAME READY STATUS RESTARTS AGE pod/nginx-5w6v6 1/1 Running 0 97s pod/nginx-8265c 1/1 Running 0 97s pod/nginx-jhsjr 0/1 ContainerCreating 0 3s NAME DESIRED CURRENT READY AGE replicationcontroller/nginx 3 3 2 97s # 扩容成功 [root@k8s-master01 ~]# kubectl get po,rc NAME READY STATUS RESTARTS AGE pod/nginx-5w6v6 1/1 Running 0 2m17s pod/nginx-8265c 1/1 Running 0 2m17s pod/nginx-jhsjr 1/1 Running 0 43s # 缩容测试 [root@k8s-master01 ~]# kubectl scale rc nginx --replicas=1 replicationcontroller/nginx scaled [root@k8s-master01 ~]# kubectl get po,rc NAME READY STATUS RESTARTS AGE pod/nginx-5w6v6 1/1 Running 0 4m26s NAME DESIRED CURRENT READY AGE replicationcontroller/nginx 1 1 1 4m26s Deployment 用于部署无状态的服务，最常用的控制器。一般用于管理维护企业内部无状态的微服务，比如configserver、zuul、springboot。可以管理多个副本的Pod实现无缝迁移、自动扩容缩容、自动灾难恢复、一键回滚等功能。\nDeployment是一种更高级别的 API 资源对象，为 Pods 和 ReplicaSets 提供声明式的更新能力。它以类似于 kubectl rolling-update 的方式更新其底层 ReplicaSet 及其 Pod。\nDeployments 的典型用例：\n创建Deployment将ReplicaSet上线。ReplicaSet 在后台创建 Pods.检查 ReplicaSet 的上线状态，查看其是否成功 通过更新 Deployment 的 PodTemplateSpec，声明 Pod 的新状态。新的 ReplicaSet 会被创建，Deployment 将 Pod 从旧 ReplicaSet 迁移到新 ReplicaSet。 每个新的 ReplicaSet 都会更新 Deployment 的修订版本 如果 Deployment 的当前状态不稳定，回滚到较早的 Deployment 版本。每次回滚都会更新 Deployment 的修订版本 扩大 Deployment 规模以承担更多负载 暂停 Deployment 以应用对 PodTemplateSpec 所作的多项修改，然后恢复其执行以启动新的上线版本 使用 Deployment 状态来判定上线过程是否出现停滞 清理较旧的不再需要的 ReplicaSet 创建Deployment Deployment创建一个ReplicaSet，该RS负责启动管理三个Pod。\n# 创建yaml文件 [root@k8s-master01 ~]# vim nginx-deploy.yaml apiVersion: apps/v1 kind: Deployment metadata: name: nginx-deploy labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx:1.16.1 imagePullPolicy: IfNotPresent ports: - containerPort: 80 [root@k8s-master01 ~]# kubectl apply -f nginx-deploy.yaml deployment.apps/nginx-deploy created [root@k8s-master01 ~]# kubectl get deploy,rs,po NAME READY UP-TO-DATE AVAILABLE AGE deployment.apps/nginx-deploy 3/3 3 3 58s NAME DESIRED CURRENT READY AGE replicaset.apps/nginx-deploy-ff6655784 3 3 3 58s NAME READY STATUS RESTARTS AGE pod/nginx-deploy-ff6655784-2jxbv 1/1 Running 0 58s pod/nginx-deploy-ff6655784-b8gq8 1/1 Running 0 58s pod/nginx-deploy-ff6655784-qj2k2 1/1 Running 0 58s # 查看标签 [root@k8s-master01 ~]# kubectl get po --show-labels NAME READY STATUS RESTARTS AGE LABELS nginx-deploy-ff6655784-2jxbv 1/1 Running 0 98s app=nginx,pod-template-hash=ff6655784 nginx-deploy-ff6655784-b8gq8 1/1 Running 0 98s app=nginx,pod-template-hash=ff6655784 nginx-deploy-ff6655784-qj2k2 1/1 Running 0 98s app=nginx,pod-template-hash=ff6655784 # 扩缩容 [root@k8s-master01 ~]# kubectl scale deployment nginx-deploy --replicas=2 deployment.apps/nginx-deploy scaled [root@k8s-master01 ~]# kubectl get deploy,rs,po NAME READY UP-TO-DATE AVAILABLE AGE deployment.apps/nginx-deploy 2/2 2 2 2m18s NAME DESIRED CURRENT READY AGE replicaset.apps/nginx-deploy-ff6655784 2 2 2 2m18s NAME READY STATUS RESTARTS AGE pod/nginx-deploy-ff6655784-b8gq8 1/1 Running 0 2m18s pod/nginx-deploy-ff6655784-qj2k2 1/1 Running 0 2m18s # 查看pod详情 [root@k8s-master01 ~]# kubectl get po -owide NAME READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES nginx-deploy-ff6655784-b8gq8 1/1 Running 0 2m40s 172.25.92.66 k8s-master02 nginx-deploy-ff6655784-qj2k2 1/1 Running 0 2m40s 172.17.125.18 k8s-node01 # 访问nginx [root@k8s-master01 ~]# curl 172.25.92.66 \u003c!DOCTYPE html\u003e Welcome to nginx! ... [root@k8s-master01 ~]# curl 172.17.125.18 \u003c!DOCTYPE html\u003e Welcome to nginx! ... 说明:\nReplicaSet 的名称始终被格式化为[DEPLOYMENT-NAME]-[RANDOM-STRING]。RANDOM-STRING随机生成。并使用pod-template-hash=[RANDOM-STRING]作为选择器和标签 Deployment 控制器将pod-template-hash=[RANDOM-STRING]标签添加到 Deployment 创建或使用的ReplicaSet和Pod。此标签可确保 Deployment的子ReplicaSets不重叠，因此不可修改 注意Deployment、ReplicaSet和Pod三者的名称关系 [root@k8s-master01 ~]# kubectl get rs --show-labels NAME DESIRED CURRENT READY AGE LABELS nginx-deploy-ff6655784 2 2 2 6m49s app=nginx,pod-template-hash=ff6655784 [root@k8s-master01 ~]# kubectl get deploy,rs,po --show-labels NAME READY UP-TO-DATE AVAILABLE AGE LABELS deployment.apps/nginx-deploy 2/2 2 2 8m2s app=nginx NAME DESIRED CURRENT READY AGE LABELS replicaset.apps/nginx-deploy-ff6655784 2 2 2 8m2s app=nginx,pod-template-hash=ff6655784 NAME READY STATUS RESTARTS AGE LABELS pod/nginx-deploy-ff6655784-b8gq8 1/1 Running 0 8m2s app=nginx,pod-template-hash=ff6655784 pod/nginx-deploy-ff6655784-qj2k2 1/1 Running 0 8m2s app=nginx,pod-template-hash=ff6655784 更新Deployment Deployment 可确保在更新时仅关闭一定数量的 Pods.默认情况下，它确保至少 75% 所需 Pods 在运行(25%为容忍的最大不可用量)。更新时不会先删除旧的pod，而是先新建一个pod.新pod运行时，才会删除对应老的pod。一切的前提都是为了满足上述的条件。\n备注: 如果需要更新Deployment，最好通过yaml文件更新，这样回滚到任何版本都非常便捷，而且更容易追溯。\n# 方式一: 直接修改镜像[不推荐] # 执行下面命令后修改对于镜像版本即可, 该方法不会记录命令,通过kubectl rollout history deployment/nginx-deploy 无法查询 [root@k8s-master01 ~]# kubectl edit deploy/nginx-deploy # 方式二: 命令行更新image[可使用]，但也提示--record即将废弃 [root@k8s-master01 ~]# kubectl set image deploy/nginx-deploy nginx=nginx:1.18.0 --record Flag --record has been deprecated, --record will be removed in the future deployment.apps/nginx-deploy image updated [root@k8s-master01 ~]# kubectl rollout history deployment nginx-deploy deployment.apps/nginx-deploy REVISION CHANGE-CAUSE 1 2 kubectl set image deploy/nginx-deploy nginx=nginx:1.18.0 --record=true [root@k8s-master01 ~]# kubectl get deployments.apps -owide NAME READY UP-TO-DATE AVAILABLE AGE CONTAINERS IMAGES SELECTOR nginx-deploy 2/2 2 2 16m nginx nginx:1.18.0 app=nginx # 方式三: 使用yaml文件更新版本 # 当前nginx 版本是1.16.1, 更新到1.18.0 # 先删除之前更新的deploy，在重新启动 [root@k8s-master01 ~]# kubectl delete -f nginx-deploy.yaml deployment.apps \"nginx-deploy\" deleted [root@k8s-master01 ~]# kubectl apply -f nginx-deploy.yaml deployment.apps/nginx-deploy created [root@k8s-master01 ~]# kubectl get deployments.apps -owide NAME READY UP-TO-DATE AVAILABLE AGE CONTAINERS IMAGES SELECTOR nginx-deploy 3/3 3 3 35s nginx nginx:1.16.1 app=nginx # 拷贝一份yaml文件，二者重命名（老版保留以便有问题时回退），编辑新文件镜像为1.18.0 [root@k8s-master01 ~]# ll total 8 -rw-r--r-- 1 root root 337 Dec 21 09:59 nginx-deploy-1161.yaml -rw-r--r-- 1 root root 337 Dec 21 11:01 nginx-deploy-1180.yaml [root@k8s-master01 ~]# cat nginx-deploy-1161.yaml apiVersion: apps/v1 kind: Deployment metadata: name: nginx-deploy labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx:1.16.1 ports: - containerPort: 80 [root@k8s-master01 ~]# cat nginx-deploy-1180.yaml apiVersion: apps/v1 kind: Deployment metadata: name: nginx-deploy labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx:1.18.0 ports: - containerPort: 80 # 应用镜像为1180的同样的配置文件 # --record 参数可以记录命令,通过 kubectl rollout history deployment/nginx-deployment 可查询 [root@k8s-master01 ~]# kubectl apply -f nginx-deploy-1180.yaml --record deployment.apps/nginx-deploy configured # 如果正在更新, 可看到下面日志 [root@k8s-master01 ~]# kubectl rollout status deploy/nginx-deploy Waiting for deployment \"nginx-deploy\" rollout to finish: 1 out of 3 new replicas have been updated... Waiting for deployment \"nginx-deploy\" rollout to finish: 1 out of 3 new replicas have been updated... Waiting for deployment \"nginx-deploy\" rollout to finish: 2 out of 3 new replicas have been updated... Waiting for deployment \"nginx-deploy\" rollout to finish: 2 out of 3 new replicas have been updated... Waiting for deployment \"nginx-deploy\" rollout to finish: 2 out of 3 new replicas have been updated... Waiting for deployment \"nginx-deploy\" rollout to finish: 2 old replicas are pending termination... Waiting for deployment \"nginx-deploy\" rollout to finish: 1 old replicas are pending termination... Waiting for deployment \"nginx-deploy\" rollout to finish: 1 old replicas are pending termination... deployment \"nginx-deploy\" successfully rolled out # 更新结束后, 可看到下面日志 [root@k8s-master01 ~]# kubectl rollout status deploy/nginx-deploy deployment \"nginx-deploy\" successfully rolled out 回滚Deployment # 回滚到上一个版本 [root@k8s-master01 ~]# kubectl rollout undo deployment nginx-deploy deployment.apps/nginx-deploy rolled back [root@k8s-master01 ~]# kubectl get deploy,rs,po -owide NAME READY UP-TO-DATE AVAILABLE AGE CONTAINERS IMAGES SELECTOR deployment.apps/nginx-deploy 3/3 3 3 11m nginx nginx:1.16.1 app=nginx NAME DESIRED CURRENT READY AGE CONTAINERS IMAGES SELECTOR replicaset.apps/nginx-deploy-79fccc485 0 0 0 7m46s nginx nginx:1.18.0 app=nginx,pod-template-hash=79fccc485 replicaset.apps/nginx-deploy-ff6655784 3 3 3 11m nginx nginx:1.16.1 app=nginx,pod-template-hash=ff6655784 NAME READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES pod/nginx-deploy-ff6655784-c9gf9 1/1 Running 0 2m7s 172.25.92.69 k8s-master02 pod/nginx-deploy-ff6655784-xl4rx 1/1 Running 0 2m12s 172.27.14.228 k8s-node02 pod/nginx-deploy-ff6655784-zzpvm 1/1 Running 0 2m9s 172.17.125.22 k8s-node01 # 直接用Yaml文件回退[更新]为对应镜像, 比如 1180--\u003e1161 [root@k8s-master01 ~]# kubectl apply -f nginx-deploy-1161.yaml --record 回退历史版本 # 查看历史版本 [root@k8s-master01 ~]# kubectl rollout history deployment nginx-deploy deployment.apps/nginx-deploy REVISION CHANGE-CAUSE 2 kubectl apply --filename=nginx-deploy.yaml --record=true 3 # 查看历史版本信息 [root@k8s-master01 ~]# kubectl rollout history deployment nginx-deploy --revision=2 deployment.apps/nginx-deploy with revision #2 Pod Template: Labels: app=nginx pod-template-hash=79fccc485 Annotations: kubernetes.io/change-cause: kubectl apply --filename=nginx-deploy.yaml --record=true Containers: nginx: Image: nginx:1.18.0 Port: 80/TCP Host Port: 0/TCP Environment: Mounts: Volumes: # 可以使用--to-revision参数指定回退到某个历史版本 [root@k8s-master01 ~]# kubectl rollout undo deployment nginx-deploy --to-revision=2 deployment.apps/nginx-deploy rolled back [root@k8s-master01 ~]# kubectl get deploy,rs,po -owide NAME READY UP-TO-DATE AVAILABLE AGE CONTAINERS IMAGES SELECTOR deployment.apps/nginx-deploy 3/3 3 3 14m nginx nginx:1.18.0 app=nginx NAME DESIRED CURRENT READY AGE CONTAINERS IMAGES SELECTOR replicaset.apps/nginx-deploy-79fccc485 3 3 3 10m nginx nginx:1.18.0 app=nginx,pod-template-hash=79fccc485 replicaset.apps/nginx-deploy-ff6655784 0 0 0 14m nginx nginx:1.16.1 app=nginx,pod-template-hash=ff6655784 NAME READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES pod/nginx-deploy-79fccc485-dwhhr 1/1 Running 0 49s 172.25.92.70 k8s-master02 pod/nginx-deploy-79fccc485-kp2pd 1/1 Running 0 51s 172.17.125.23 k8s-node01 pod/nginx-deploy-79fccc485-z425l 1/1 Running 0 53s 172.27.14.229 k8s-node02 更新详情 [root@k8s-master01 ~]# kubectl describe deployments.apps nginx-deploy Name: nginx-deploy Namespace: default CreationTimestamp: Wed, 12 Jan 2022 13:17:12 +0800 Labels: app=nginx Annotations: deployment.kubernetes.io/revision: 4 kubernetes.io/change-cause: kubectl apply --filename=nginx-deploy.yaml --record=true Selector: app=nginx Replicas: 3 desired | 3 updated | 3 total | 3 available | 0 unavailable StrategyType: RollingUpdate MinReadySeconds: 0 RollingUpdateStrategy: 25% max unavailable, 25% max surge # 更新策略 Pod Template: Labels: app=nginx Containers: nginx: Image: nginx:1.18.0 Port: 80/TCP Host Port: 0/TCP Environment: Mounts: Volumes: Conditions: Type Status Reason ---- ------ ------ Available True MinimumReplicasAvailable Progressing True NewReplicaSetAvailable OldReplicaSets: NewReplicaSet: nginx-deploy-79fccc485 (3/3 replicas created) Events: # 可以看到之前的操作记录和更新记录 Type Reason Age From Message ---- ------ ---- ---- ------- Normal ScalingReplicaSet 7m30s deployment-controller Scaled up replica set nginx-deploy-ff6655784 to 1 Normal ScalingReplicaSet 7m27s deployment-controller Scaled down replica set nginx-deploy-79fccc485 to 2 Normal ScalingReplicaSet 7m25s (x2 over 17m) deployment-controller Scaled up replica set nginx-deploy-ff6655784 to 3 Normal ScalingReplicaSet 7m23s (x3 over 7m27s) deployment-controller (combined from similar events): Scaled down replica set nginx-deploy-79fccc485 to 0 Normal ScalingReplicaSet 3m16s (x2 over 13m) deployment-controller Scaled up replica set nginx-deploy-79fccc485 to 1 Normal ScalingReplicaSet 3m14s (x2 over 13m) deployment-controller Scaled down replica set nginx-deploy-ff6655784 to 2 Normal ScalingReplicaSet 3m14s (x2 over 13m) deployment-controller Scaled up replica set nginx-deploy-79fccc485 to 2 Normal ScalingReplicaSet 3m12s (x2 over 13m) deployment-controller Scaled down replica set nginx-deploy-ff6655784 to 1 Normal ScalingReplicaSet 3m12s (x2 over 13m) deployment-controller Scaled up replica set nginx-deploy-79fccc485 to 3 Normal ScalingReplicaSet 3m10s (x2 over 10m) deployment-controller Scaled down replica set nginx-deploy-ff6655784 to 0 # 查看回滚状态 [root@k8s-master01 ~]# kubectl rollout status deploy nginx-deploy deployment \"nginx-deploy\" successfully rolled out # 历史记录 [root@k8s-master01 ~]# kubectl rollout history deploy nginx-deploy deployment.apps/nginx-deploy REVISION CHANGE-CAUSE 3 4 kubectl set image deployment/nginx-deploy nginx=nginx:1.18.0 --record=true 暂停与恢复 # 暂停 deployment 的更新，暂停后除非恢复更新，否则操作不会生效，当需要多项更新时可以使用 [root@k8s-master01 ~]# kubectl rollout pause deployment nginx-deploy deployment.apps/nginx-deploy paused [root@k8s-master01 ~]# kubectl set image deploy/nginx-deploy nginx=nginx:1.16.1 --record Flag --record has been deprecated, --record will be removed in the future deployment.apps/nginx-deploy image updated [root@k8s-master01 ~]# kubectl get deployments.apps -owide NAME READY UP-TO-DATE AVAILABLE AGE CONTAINERS IMAGES SELECTOR nginx-deploy 3/3 0 3 25m nginx nginx:1.16.1 app=nginx # 可以看到镜像确实是更新了，但RS和Pod在用的还是老版本的，也就是并未生效 [root@k8s-master01 ~]# kubectl get rs,pod -owide NAME DESIRED CURRENT READY AGE CONTAINERS IMAGES SELECTOR replicaset.apps/nginx-deploy-79fccc485 3 3 3 22m nginx nginx:1.18.0 app=nginx,pod-template-hash=79fccc485 replicaset.apps/nginx-deploy-ff6655784 0 0 0 26m nginx nginx:1.16.1 app=nginx,pod-template-hash=ff6655784 NAME READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES pod/nginx-deploy-79fccc485-dwhhr 1/1 Running 0 12m 172.25.92.70 k8s-master02 pod/nginx-deploy-79fccc485-kp2pd 1/1 Running 0 12m 172.17.125.23 k8s-node01 pod/nginx-deploy-79fccc485-z425l 1/1 Running 0 12m 172.27.14.229 k8s-node02 # 接着进行下一项更新，配置CPU和内存资源 [root@k8s-master01 ~]# kubectl set resources deploy nginx-deploy -c nginx --limits=cpu=100m,memory=128Mi --requests=cpu=10m,memory=16Mi deployment.apps/nginx-deploy resource requirements updated # 恢复deployment的更新 [root@k8s-master01 ~]# kubectl rollout resume deployment nginx-deploy deployment.apps/nginx-deploy resumed # 正在更新 [root@k8s-master01 ~]# kubectl get rs NAME DESIRED CURRENT READY AGE nginx-deploy-79fccc485 1 1 1 28m nginx-deploy-975d4fc74 3 3 2 5s nginx-deploy-ff6655784 0 0 0 32m # 更新完成后 [root@k8s-master01 ~]# kubectl get deploy,rs,po -owide NAME READY UP-TO-DATE AVAILABLE AGE CONTAINERS IMAGES SELECTOR deployment.apps/nginx-deploy 3/3 3 3 32m nginx nginx:1.16.1 app=nginx NAME DESIRED CURRENT READY AGE CONTAINERS IMAGES SELECTOR replicaset.apps/nginx-deploy-79fccc485 0 0 0 28m nginx nginx:1.18.0 app=nginx,pod-template-hash=79fccc485 replicaset.apps/nginx-deploy-975d4fc74 3 3 3 25s nginx nginx:1.16.1 app=nginx,pod-template-hash=975d4fc74 replicaset.apps/nginx-deploy-ff6655784 0 0 0 32m nginx nginx:1.16.1 app=nginx,pod-template-hash=ff6655784 NAME READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES pod/nginx-deploy-975d4fc74-6d92q 1/1 Running 0 25s 172.27.14.230 k8s-node02 pod/nginx-deploy-975d4fc74-7c7f2 1/1 Running 0 22s 172.17.125.24 k8s-node01 pod/nginx-deploy-975d4fc74-snpkb 1/1 Running 0 20s 172.25.92.71 k8s-master02 # 可以看到资源配额和镜像版本均已更新 [root@k8s-master01 ~]# kubectl describe deployments.apps nginx-deploy ... Pod Template: Labels: app=nginx Containers: nginx: Image: nginx:1.16.1 Port: 80/TCP Host Port: 0/TCP Limits: cpu: 100m memory: 128Mi Requests: cpu: 10m memory: 16Mi Environment: Mounts: Volumes: ... 其他配置 .spec.revisionHistoryLimit：设置保留RS旧的revision的个数，设置为0的话，不保留历史数据 .spec.minReadySeconds：可选参数，指定新创建的Pod在没有任何容器崩溃的情况下视为Ready最小的秒数，默认为0，即一旦被创建就视为可用。 滚动更新的策略： .spec.strategy.type：更新deployment的方式，默认是RollingUpdate RollingUpdate：滚动更新，可以指定maxSurge和maxUnavailable maxUnavailable：指定在回滚或更新时最大不可用的Pod的数量，可选字段，默认25%，可以设置成数字或百分比，如果该值为0，那么maxSurge就不能0 maxSurge：可以超过期望值的最大Pod数，可选字段，默认为25%，可以设置成数字或百分比，如果该值为0，那么maxUnavailable不能为0 Recreate：重建，先删除旧的Pod，在创建新的Pod # spec中的配置实例 spec: progressDeadlineSeconds: 600 replicas: 2 revisionHistoryLimit: 10 selector: matchLabels: app: nginx strategy: rollingUpdate: maxSurge: 25% maxUnavailable: 25% type: RollingUpdate template: metadata: ... StatefulSet StatefulSet常用于部署有状态的且需要有序启动的应用程序，比如在生产环境中，可以部署ElasticSearch集群、MongoDB集群或者需要持久化的RabbitMQ集群、Redis集群、Kafka集群和ZooKeeper集群等。\nStatefulSet 中的 Pod 拥有独一无二的身份标识。这个标识基于 StatefulSet 控制器分配给每个 Pod 的唯一顺序索引。Pod 的名称的形式为- 。例如: web的StatefulSet 拥有两个副本，所以它创建了两个 Pod: web-0和web-1。\n和 Deployment 相同的是，StatefulSet 管理了基于相同容器定义的一组 Pod；但和 Deployment 不同的是，StatefulSet 为它们的每个 Pod 维护了一个固定的ID标识。这些 Pod 是基于相同的声明来创建的，但是不能相互替换: 无论怎么调度，每个 Pod 都有一个永久不变的ID标识。\nStatefulSet创建的Pod一般使用Headless Service（无头服务）进行通信，和普通的Service的区别在于Headless Service没有ClusterIP，它使用的是Endpoint进行互相通信，Headless一般的格式为：statefulSetName-{0..N-1}.serviceName.namespace.svc.cluster.local。\nserviceName为Headless Service的名字，创建StatefulSet时，必须指定Headless Service名称 0..N-1为Pod所在的序号，从0开始到N-1 statefulSetName为StatefulSet的名字 namespace为服务所在的命名空间 .cluster.local为Cluster Domain（集群域） 使用场景 稳定的、唯一的网络标识符,即Pod重新调度后其PodName和HostName不变(当然IP是会变的) 稳定的、持久的存储,即Pod重新调度后还是能访问到相同的持久化数据,基于PVC实现 有序的、优雅的部署和缩放 有序的、自动的滚动更新 如上面,稳定意味着 Pod 调度或重新调度的整个过程是有持久性的。\n如果应用程序不需要任何稳定的标识符或有序的部署、删除或伸缩，则应该使用由一组无状态的副本控制器提供的工作负载来部署应用程序，比如使用 Deployment 或者 ReplicaSet 可能更适用于无状态应用部署需要。\n限制 给定 Pod 的存储必须由 PersistentVolume(PV) 驱动基于所请求的 storage class 来提供,或者由管理员预先提供 删除或者收缩 StatefulSet 并不会删除它关联的存储卷.这样做是为了保证数据安全 StatefulSet 当前需要 headless 服务来负责 Pod 的网络标识。需要先创建此服务。 删除StatefulSet时，StatefulSet 不提供任何终止 Pod 的保证。为了实现 StatefulSet 中的 Pod 可以有序和优雅的终止，可以在删除之前将 StatefulSet缩放为0。 在默认Pod管理策略(OrderedReady) 时使用滚动更新，可能进入需要人工干预才能修复的损坏状态 部署 对于包含 N 个 副本的 StatefulSet，当部署 Pod 时，它们是依次创建的，顺序为 0~(N-1) 当删除 Pod 时，它们是逆序终止的,顺序为 (N-1)~0 在将缩放操作应用到 Pod 之前，它前面的所有 Pod 必须是 Running 和 Ready 状态 在Pod 终止之前，所有的继任者必须完全关闭 StatefulSet 不应将 pod.Spec.TerminationGracePeriodSeconds 设置为 0。这种做法是不安全的，要强烈阻止。\n部署顺序 在下面的 nginx 示例被创建后，会按照 web-0、web-1、web-2 的顺序部署三个 Pod。在 web-0 进入 Running 和 Ready 状态前不会部署 web-1。在 web-1 进入 Running 和 Ready 状态前不会部署 web-2。\n如果 web-1 已经处于 Running 和 Ready 状态，而 web-2 尚未部署，在此期间发生了 web-0 运行失败，那么 web-2 将不会被部署，要等到 web-0 部署完成并进入 Running 和 Ready 状态后，才会部署 web-2。\n收缩顺序 如果想将示例中的 StatefulSet 收缩为 replicas=1，首先被终止的是 web-2。在 web-2 没有被完全停止和删除前，web-1 不会被终止。当 web-2 已被终止和删除；但web-1 尚未被终止，如果在此期间发生 web-0 运行失败，那么就不会终止 web-1，必须等到 web-0 进入 Running 和 Ready 状态后才会终止 web-1\nSTS实例 [root@k8s-master01 ~]# cat \u003c\u003c \"EOF\" \u003e statefulset.yaml apiVersion: v1 kind: Service metadata: name: nginx labels: app: nginx spec: ports: - port: 80 name: http type: ClusterIP clusterIP: None selector: app: nginx --- apiVersion: apps/v1 kind: StatefulSet metadata: name: web spec: selector: matchLabels: app: nginx # has to match .spec.template.metadata.labels serviceName: nginx replicas: 3 # by default is 1 template: metadata: labels: app: nginx # has to match .spec.selector.matchLabels spec: terminationGracePeriodSeconds: 10 # 默认30秒 containers: - name: nginx image: nginx:1.18.0 imagePullPolicy: IfNotPresent ports: - containerPort: 80 name: http EOF [root@k8s-master01 ~]# kubectl apply -f statefulset.yaml service/nginx created statefulset.apps/web created [root@k8s-master01 ~]# kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes ClusterIP 10.96.0.1 443/TCP 30d nginx ClusterIP None 80/TCP 27s [root@k8s-master01 ~]# kubectl get sts -owide NAME READY AGE CONTAINERS IMAGES web 3/3 63s nginx nginx:1.18.0 [root@k8s-master01 ~]# kubectl get po -owide NAME READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES web-0 1/1 Running 0 83s 172.27.14.233 k8s-node02 web-1 1/1 Running 0 81s 172.17.125.28 k8s-node01 web-2 1/1 Running 0 79s 172.25.92.73 k8s-master02 # 创建busybox Pod进去查看三个web-Pod的域名信息 [root@k8s-master01 ~]# cat \u003c\u003c \"EOF\" \u003e busybox.yaml apiVersion: v1 kind: Pod metadata: name: busybox namespace: default spec: containers: - name: busybox image: busybox:1.28 command: - sleep - \"3600\" imagePullPolicy: IfNotPresent restartPolicy: Always EOF [root@k8s-master01 ~]# kubectl apply -f busybox.yaml pod/busybox created # 进入busybox解析域名 [root@k8s-master01 ~]# kubectl exec busybox -it -- sh / # nslookup web-0.nginx Server: 10.96.0.10 Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local Name: web-0.nginx Address 1: 172.27.14.233 web-0.nginx.default.svc.cluster.local / # nslookup web-1.nginx Server: 10.96.0.10 Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local Name: web-1.nginx Address 1: 172.17.125.28 web-1.nginx.default.svc.cluster.local / # nslookup web-2.nginx Server: 10.96.0.10 Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local Name: web-2.nginx Address 1: 172.25.92.73 web-2.nginx.default.svc.cluster.local / # exit 删除STS 删除STS有两种方式：级联删除和非级联删除。非级联删除时，STS被删除后Pod依旧存活，变成了Orphan Pod（即孤儿Pod），孤儿Pod可以被单独操作。\n# 使用--cascade=orphan参数实现非级联删除 [root@k8s-master01 yamls]# kubectl delete sts web --cascade=orphan [root@k8s-master01 yamls]# kubectl get sts web Error from server (NotFound): statefulsets.apps \"web\" not found [root@k8s-master01 yamls]# kubectl get pod | grep web web-0 1/1 Running 0 30m web-1 1/1 Running 0 29m web-2 1/1 Running 0 28m # 删除Pod web-1 [root@k8s-master01 yamls]# kubectl delete po web-1 pod \"web-1\" deleted [root@k8s-master01 yamls]# kubectl get pod | grep web web-0 1/1 Running 0 30m web-2 1/1 Running 0 29m # 重建STS，并把副本数量修改为2 [root@k8s-master01 yamls]# cat statefulset.yaml | grep repli replicas: 2 # by default is 1 [root@k8s-master01 yamls]# kubectl apply -f statefulset.yaml service/nginx unchanged statefulset.apps/web created [root@k8s-master01 yamls]# kubectl get po | grep web web-0 1/1 Running 0 32m web-1 1/1 Running 0 13s # 级联删除 [root@k8s-master01 yamls]# kubectl delete sts web statefulset.apps \"web\" deleted [root@k8s-master01 yamls]# kubectl get po | grep web # 此时STS和Pod都删掉了 非级联删除时，由于web-1被删了，而且副本数变成了2，所以重建STS（用原来的配置文件）后，会先删除web-2，然后重新创建Pod web-1，web-0已存在，不发生变化。\nDaemonSet DaemonSet守护进程确保全部（或匹配的一部分）节点上部署一个Pod。当有新的节点加入集群时，也会为它们新增一个Pod，当有节点从集群移除时，这些Pod也会被回收。\nDaemonSet典型用法:\n在每个节点上运行集群守护进程，例如 glusterd、ceph 在每个节点上运行日志守护进程，例如 fluentd、logstash 在每个节点上运行监控守护进程，例如 Prometheus Node Exporter、Flowmill、Sysdig 代理、collectd、Dynatrace OneAgent、AppDynamics 代理、Datadog 代理、New Relic 代理、Ganglia gmond 或者 Instana 代理 DaemonSet实例 # 创建yaml [root@k8s-master01 ~]# cat \u003c\u003c \"EOF\" \u003e daemonset.yaml apiVersion: apps/v1 kind: DaemonSet metadata: name: fluentd-elasticsearch namespace: default labels: k8s-app: fluentd-logging spec: selector: matchLabels: name: fluentd-elasticsearch template: metadata: labels: name: fluentd-elasticsearch spec: tolerations: # 容忍在master节点运行 - key: node-role.kubernetes.io/master effect: NoSchedule containers: - name: fluentd-elasticsearch image: registry.cn-beijing.aliyuncs.com/google_registry/fluentd:v2.5.2 resources: limits: cpu: 1 memory: 200Mi requests: cpu: 100m memory: 200Mi volumeMounts: - name: varlog mountPath: /var/log - name: varlibdockercontainers mountPath: /var/lib/docker/containers readOnly: true # 优雅关闭应用,时间设置.超过该时间会强制关闭,默认30秒 terminationGracePeriodSeconds: 30 volumes: - name: varlog hostPath: path: /var/log - name: varlibdockercontainers hostPath: path: /var/lib/docker/containers EOF [root@k8s-master01 ~]# kubectl apply -f daemonset.yaml daemonset.apps/fluentd-elasticsearch created [root@k8s-master01 ~]# kubectl get ds -owide NAME DESIRED CURRENT READY UP-TO-DATE AVAILABLE NODE SELECTOR AGE CONTAINERS IMAGES SELECTOR fluentd-elasticsearch 5 5 0 5 0 11s fluentd-elasticsearch registry.cn-beijing.aliyuncs.com/google_registry/fluentd:v2.5.2 name=fluentd-elasticsearch # 可见DaemonSet在每个节点上都有相应的pod [root@k8s-master01 ~]# kubectl get po -owide NAME READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES fluentd-elasticsearch-blmjp 1/1 Running 0 2m9s 172.18.195.19 k8s-master03 fluentd-elasticsearch-t8bpk 1/1 Running 0 2m9s 172.17.125.29 k8s-node01 fluentd-elasticsearch-v8dwj 1/1 Running 0 2m9s 172.27.14.236 k8s-node02 fluentd-elasticsearch-w9wpb 1/1 Running 0 2m9s 172.25.92.74 k8s-master02 fluentd-elasticsearch-xrphv 1/1 Running 0 2m9s 172.25.244.193 k8s-master01 DaemonSet更新与回滚和Deployment一致\nJob Job 负责仅执行一次的任务，它保证批处理任务的一个或多个 Pod 成功结束。\n[root@k8s-master01 ~]# kubectl explain job KIND: Job VERSION: batch/v1 DESCRIPTION: Job represents the configuration of a single job. FIELDS: ... # 创建yaml [root@k8s-master01 ~]# cat \u003c\u003c \"EOF\" \u003e job-example.yaml apiVersion: batch/v1 kind: Job metadata: name: pi spec: template: metadata: name: pi spec: containers: - name: pi image: perl command: [\"perl\", \"-Mbignum=bpi\", \"-wle\", \"print bpi(1000)\"] restartPolicy: Never EOF [root@k8s-master01 ~]# kubectl get po NAME READY STATUS RESTARTS AGE daemonset-example-f57kg 1/1 Running 0 13m pi-2nlj5 0/1 Completed 0 4m [root@k8s-master01 ~]# kubectl get job NAME COMPLETIONS DURATION AGE pi 1/1 3m19s 4m15s [root@k8s-master01 ~]# kubectl get po pi-2nlj5 -o wide NAME READY STATUS RESTARTS AGE IP NODE NOMINATED NODE READINESS GATES pi-2nlj5 0/1 Completed 0 4m54s 172.16.36.119 k8s-node1 # 查看日志可以看到job执行的结果 # 计算出了圆周率后1000位 CronJob Cron Job 管理基于时间的 Job，即:\n在给定时间点只运行一次 周期性地在设定时间点运行 典型的用法示例:\n在给你写的时间点调度 Job 运行 创建周期性运行的 Job，例如: 数据库备份、发送邮件 [root@k8s-master01 ~]# kubectl explain cj KIND: CronJob VERSION: batch/v1 DESCRIPTION: CronJob represents the configuration of a single cron job. FIELDS: ... # 创建cronjob yaml文件 [root@k8s-master01 ~]# cat \u003c\u003c \"EOF\" \u003e cronjob-example.yaml apiVersion: batch/v1 kind: CronJob metadata: name: hello spec: schedule: \"*/1 * * * *\" # 分 时 日 月 星期 successfulJobsHistoryLimit: 3 # 保留成功的记录数 failedJobHistoryLimit: 1 # 保留失败的记录数 concurrencyPolicy: Allow # 并发调度策略 suspend: false # 是否暂停后续任务，默认false jobTemplate: spec: template: metadata: labels: run: hello spec: containers: - name: hello image: busybox args: - /bin/sh - -c - date; echo Hello CronJob imagePolicy: Always restartPolicy: OnFailure EOF [root@k8s-master01 ~]# kubectl apply -f cronjob-example.yaml cronjob.batch/hello created [root@k8s-master01 ~]# kubectl get cj NAME SCHEDULE SUSPEND ACTIVE LAST SCHEDULE AGE hello */1 * * * * False 0 44s 69s [root@k8s-master01 ~]# kubectl get po NAME READY STATUS RESTARTS AGE hello-27366655-8mm5c 0/1 Completed 0 84s hello-27366656-pjbv6 0/1 Completed 0 24s # 查看输出日志 [root@k8s-master01 ~]# kubectl logs hello-27366655-8mm5c Wed Jan 12 14:55:17 UTC 2022 Hello CronJob [root@k8s-master01 ~]# kubectl logs hello-27366656-pjbv6 Wed Jan 12 14:56:15 UTC 2022 Hello CronJob [root@k8s-master01 ~]# kubectl get job NAME COMPLETIONS DURATION AGE hello-27366655 1/1 17s 2m29s hello-27366656 1/1 16s 89s hello-27366657 0/1 29s 29s # 删除cronjob [root@k8s-master01 ~]# kubectl delete cronjob hello cronjob.batch \"hello\" deleted [root@k8s-master01 ~]# kubectl get job No resources found in default namespace. 并发调度策略concurrencyPolicy:\nAllow：允许多个任务同时进行 Forbid：不允许并发，当前任务未完成，新任务不会创建 Replace：如果之前的任务尚未完成，则创建新的代替之 HPA 顾名思义，Horizontal Pod Autoscaling（Pod 水平自动缩放），可以基于 CPU 利用率自动伸缩 ReplicationController、Deployment、ReplicaSet 和 StatefulSet 中的 Pod 数量。除了 CPU 利用率，也可以基于其他应程序提供的自定义度量指标来执行自动扩缩。 Pod 自动扩缩不适用于无法扩缩的对象，比如 DaemonSet。\nPod 水平自动扩缩特性由 Kubernetes API 资源和控制器实现。资源决定了控制器的行为。控制器会周期性地调整副本控制器或 Deployment 中的副本数量，以使得类似 Pod 平均 CPU 利用率、平均内存利用率这类观测到的度量值与用户所设定的目标值匹配。\n下面是HPA工作机制模型图:\nHPA两个版本区别:\nautoscaling/v1：稳定版本，只支持 cpu autoscaling/v2beta：测试阶段 v2beta1(支持CPU、内存和自定义指标) v2beta2(支持CPU、内存、自定义指标Custom和额外指标ExternalMetrics) Kubernetes目前（v1.23.0后）autoscaling/v2版本已进入稳定版，支持CPU、内存、自定义指标Custom和额外指标ExternalMetrics\n指标 Pod 水平自动伸缩器的实现是一个控制回路，由控制器管理器的--horizontal-pod-autoscaler-sync-period参数指定周期（默认值为 15 秒）。\n每个周期内，控制器管理器根据每个HorizontalPodAutoscaler定义中指定的指标查询资源利用率。控制器管理器可以从资源度量指标 API（按 Pod 统计的资源用量）和自定义度量指标 API（其他指标）获取度量值。\n对于按 Pod 统计的资源指标（如 CPU），控制器从资源指标 API 中获取每一个HorizontalPodAutoscaler指定的 Pod 的度量值，如果设置了目标使用率，控制器获取每个 Pod 中的容器资源使用情况，并计算资源使用率。 如果设置了 target 值，将直接使用原始数据（不再计算百分比）。 接下来，控制器根据平均的资源使用率或原始值计算出扩缩的比例，进而计算出目标副本数。 如果 Pod 使用自定义指标，控制器机制与资源指标类似，区别在于自定义指标只使用原始值，而不是使用率。 如果 Pod 使用对象指标和外部指标（每个指标描述一个对象信息）。这个指标将直接根据目标设定值相比较，并生成一个上面提到的扩缩比例。在autoscaling/v2beta2版本 API 中，这个指标也可以根据 Pod 数量平分后再计算。 通常情况下，控制器将从一系列的聚合API（metrics.k8s.io、custom.metrics.k8s.io 和 external.metrics.k8s.io）中获取度量值。metrics.k8s.io API 通常由 Metrics 服务器（需要提前启动）提供。\nHPA使用 1.使用kubectl\n# 自动伸缩deploy/php-apache，目标CPU使用率50%，deploy副本数在1~10之间 kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10 2.使用yaml创建\n# 作用同上 apiVersion: autoscaling/v2 kind: HorizontalPodAutoscaler metadata: name: php-apache namespace: default spec: scaleTargetRef: apiVersion: apps/v1 kind: Deployment name: php-apache minReplicas: 1 maxReplicas: 10 targetCPUUtilizationPercentage: 50 示例 下载国内示例镜像\n# 集群所有可调度Pod的节点先获取要使用的hpa示例镜像 docker pull registry.cn-beijing.aliyuncs.com/google_registry/hpa-example # yaml [root@k8s-master01 ~]# cat \u003c\u003c \"EOF\" \u003e php-apache.yaml apiVersion: apps/v1 kind: Deployment metadata: name: php-apache spec: selector: matchLabels: hpa: php-apache replicas: 1 template: metadata: labels: hpa: php-apache spec: containers: - name: php-apache image: registry.cn-beijing.aliyuncs.com/google_registry/hpa-example imagePullPolicy: IfNotPresent ports: - containerPort: 80 resources: limits: cpu: 500m requests: cpu: 200m --- apiVersion: v1 kind: Service metadata: name: php-apache labels: hpa: php-apache spec: ports: - port: 80 selector: hpa: php-apache EOF [root@k8s-master01 ~]# kubectl apply -f php-apache.yaml deployment.apps/php-apache created service/php-apache created [root@k8s-master01 ~]# kubectl get deployments.apps NAME READY UP-TO-DATE AVAILABLE AGE php-apache 1/1 1 1 9s # 创建HPA # 当pod中CPU使用率达50%就扩容.最小1个,最大10个 [root@k8s-master01 ~]# kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10 horizontalpodautoscaler.autoscaling/php-apache autoscaled [root@k8s-master01 ~]# kubectl get hpa NAME REFERENCE TARGETS MINPODS MAXPODS REPLICAS AGE php-apache Deployment/php-apache 0%/50% 1 10 1 18s 压测php-apache # 创建压测Pod并进入, 先不要退出 [root@k8s-master01 ~]# kubectl run -it load-test --image=busybox /bin/sh / # # 另起一窗口可查看到pod在运行 [root@k8s-master01 ~]# kubectl get po | grep load load-test 1/1 Running 0 26s # 在load-test继续中操作，连续访问php-apache的Service / # while true; do wget -q -O- http://php-apache.default.svc.cluster.local; done OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK! # 一分钟左右，在另外一个窗口可看到，负载飙升, 副本数增多 [root@k8s-master01 ~]# kubectl get hpa NAME REFERENCE TARGETS MINPODS MAXPODS REPLICAS AGE php-apache Deployment/php-apache 254%/50% 1 10 3 21m # 自动扩容 [root@k8s-master01 ~]# kubectl get deploy,rs,po NAME READY UP-TO-DATE AVAILABLE AGE deployment.apps/php-apache 6/6 6 6 23m NAME DESIRED CURRENT READY AGE replicaset.apps/php-apache-7db9c95858 6 6 6 23m NAME READY STATUS RESTARTS AGE pod/php-apache-7db9c95858-6wrp2 1/1 Running 0 32s pod/php-apache-7db9c95858-7dbjv 1/1 Running 0 10m pod/php-apache-7db9c95858-cfwrk 1/1 Running 0 32s pod/php-apache-7db9c95858-ksbgh 1/1 Running 0 47s pod/php-apache-7db9c95858-m9mtn 1/1 Running 0 47s pod/php-apache-7db9c95858-znczt 1/1 Running 0 32s # 停止压测 # Ctrl+C停止在跑的循环 / # while true; do wget -q -O- http://php-apache.default.svc.cluster.local; done OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!.\u003c省略很多输出\u003e..!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!^C # 停止压测后负载降下来 [root@k8s-master01 ~]# kubectl get hpa NAME REFERENCE TARGETS MINPODS MAXPODS REPLICAS AGE php-apache Deployment/php-apache 0%/50% 1 10 6 24m # 再过几分钟副本数也降了 [root@k8s-master01 ~]# kubectl get hpa NAME REFERENCE TARGETS MINPODS MAXPODS REPLICAS AGE php-apache Deployment/php-apache 0%/50% 1 10 1 29m [root@k8s-master01 ~]# kubectl get deploy,rs,po NAME READY UP-TO-DATE AVAILABLE AGE deployment.apps/php-apache 1/1 1 1 31m NAME DESIRED CURRENT READY AGE replicaset.apps/php-apache-7db9c95858 1 1 1 31m NAME READY STATUS RESTARTS AGE pod/php-apache-7db9c95858-7dbjv 1/1 Running 0 18m 说明:停止压测，pod数量也不会立即降下来.而是过段时间后才会慢慢降下来.这是为了防止由于网络原因或者间歇性流量突增、突降，导致pod回收太快后面流量上来后Pod数量不够\n",
+  "wordCount" : "9926",
+  "inLanguage": "en",
+  "image":"https://deemoprobe.github.io/img/kubernetes.png","datePublished": "2023-04-29T14:23:19+08:00",
+  "dateModified": "2023-04-29T14:23:19+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "deemoprobe"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://deemoprobe.github.io/posts/tech/kubernetespodcontroller/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "William's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://deemoprobe.github.io/img/bear.gif"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://deemoprobe.github.io/" accesskey="h" title="William&#39;s Blog (Alt + H)">
+            <img src="https://deemoprobe.github.io/img/bear.gif" alt="logo" aria-label="logo"
+                 height="35">William&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://deemoprobe.github.io/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/archives/" title="📈 归档">
+                <span>📈 归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/tools" title="🧱 工具">
+                <span>🧱 工具</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            
+            <h1 class="post-title">
+                KubernetesPodController
+            </h1>
+            <div class="post-description">
+                Kubernetes Pod控制器
+            </div>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2023-04-29
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>9926字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>20分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>deemoprobe
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+            <span class="post-tags-meta">
+                <a href="https://deemoprobe.github.io/tags/kubernetes/" style="color: var(--secondary)!important;">kubernetes</a>
+            </span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    
+                </span>
+
+</div>
+        </header> 
+<figure class="entry-cover1"><img style="zoom:50%;" loading="lazy" src="https://deemoprobe.github.io/img/kubernetes.png" alt="">
+    
+</figure><aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">文章目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e6%8e%a7%e5%88%b6%e5%99%a8%e7%b1%bb%e5%9e%8b" aria-label="控制器类型">控制器类型</a><ul>
+                        
+                <li>
+                    <a href="#rs%e5%92%8crc" aria-label="RS和RC">RS和RC</a></li>
+                <li>
+                    <a href="#deployment" aria-label="Deployment">Deployment</a><ul>
+                        
+                <li>
+                    <a href="#%e5%88%9b%e5%bb%badeployment" aria-label="创建Deployment">创建Deployment</a></li>
+                <li>
+                    <a href="#%e6%9b%b4%e6%96%b0deployment" aria-label="更新Deployment">更新Deployment</a></li>
+                <li>
+                    <a href="#%e5%9b%9e%e6%bb%9adeployment" aria-label="回滚Deployment">回滚Deployment</a></li>
+                <li>
+                    <a href="#%e5%9b%9e%e9%80%80%e5%8e%86%e5%8f%b2%e7%89%88%e6%9c%ac" aria-label="回退历史版本">回退历史版本</a></li>
+                <li>
+                    <a href="#%e6%9b%b4%e6%96%b0%e8%af%a6%e6%83%85" aria-label="更新详情">更新详情</a></li>
+                <li>
+                    <a href="#%e6%9a%82%e5%81%9c%e4%b8%8e%e6%81%a2%e5%a4%8d" aria-label="暂停与恢复">暂停与恢复</a></li>
+                <li>
+                    <a href="#%e5%85%b6%e4%bb%96%e9%85%8d%e7%bd%ae" aria-label="其他配置">其他配置</a></li></ul>
+                </li>
+                <li>
+                    <a href="#statefulset" aria-label="StatefulSet">StatefulSet</a><ul>
+                        
+                <li>
+                    <a href="#%e4%bd%bf%e7%94%a8%e5%9c%ba%e6%99%af" aria-label="使用场景">使用场景</a></li>
+                <li>
+                    <a href="#%e9%99%90%e5%88%b6" aria-label="限制">限制</a></li>
+                <li>
+                    <a href="#%e9%83%a8%e7%bd%b2" aria-label="部署">部署</a></li>
+                <li>
+                    <a href="#sts%e5%ae%9e%e4%be%8b" aria-label="STS实例">STS实例</a></li>
+                <li>
+                    <a href="#%e5%88%a0%e9%99%a4sts" aria-label="删除STS">删除STS</a></li></ul>
+                </li>
+                <li>
+                    <a href="#daemonset" aria-label="DaemonSet">DaemonSet</a><ul>
+                        
+                <li>
+                    <a href="#daemonset%e5%ae%9e%e4%be%8b" aria-label="DaemonSet实例">DaemonSet实例</a></li></ul>
+                </li>
+                <li>
+                    <a href="#job" aria-label="Job">Job</a></li>
+                <li>
+                    <a href="#cronjob" aria-label="CronJob">CronJob</a></li>
+                <li>
+                    <a href="#hpa" aria-label="HPA">HPA</a><ul>
+                        
+                <li>
+                    <a href="#%e6%8c%87%e6%a0%87" aria-label="指标">指标</a></li>
+                <li>
+                    <a href="#hpa%e4%bd%bf%e7%94%a8" aria-label="HPA使用">HPA使用</a></li>
+                <li>
+                    <a href="#%e7%a4%ba%e4%be%8b" aria-label="示例">示例</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        
+        activeElement = elements[0];
+        const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+        document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+    }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+            const id = encodeURI(element.getAttribute('id')).toLowerCase();
+            if (element === activeElement){
+                document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+            } else {
+                document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+            }
+        })
+    }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+        <div class="post-content"><p>Kubernetes 中内建了很多 Controller(控制器)，用来确保pod资源符合预期的状态，控制 Pod 的状态和行为。</p>
+<h2 id="控制器类型">控制器类型<a hidden class="anchor" aria-hidden="true" href="#控制器类型">#</a></h2>
+<ul>
+<li>ReplicationController(rc)</li>
+<li>ReplicaSet(rs)</li>
+<li>Deployment(deploy)</li>
+<li>DaemonSet(ds)</li>
+<li>StatefulSet(sts)</li>
+<li>Job/CronJob(cj)</li>
+<li>Horizontal Pod Autoscaling(hpa)</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 可以使用kubectl explain命令查看k8s API资源对象描述信息</span>
+</span></span><span style="display:flex;"><span>kubectl explain &lt;apiresource-name&gt; | egrep -v <span style="color:#e6db74">&#34;^</span>$<span style="color:#e6db74">|^\s*http&#34;</span> | sed s/<span style="color:#e6db74">&#34;More info:&#34;</span>//
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看API资源列表</span>
+</span></span><span style="display:flex;"><span>kubectl api-resources
+</span></span></code></pre></div><h3 id="rs和rc">RS和RC<a hidden class="anchor" aria-hidden="true" href="#rs和rc">#</a></h3>
+<p>ReplicationController(RC)用来确保容器应用的副本数始终保持在用户定义的副本数，即如果有容器异常退出，会自动创建新的 Pod 来替代；而如果异常多出来的容器也会自动回收。</p>
+<p>在新版本的Kubernetes中建议使用ReplicaSet来取代ReplicationController，ReplicaSet规则跟ReplicationController没有本质的不同，唯一区别是ReplicaSet支持<code>selector</code>选择器。</p>
+<p>ReplicaSet也很少单独被使用，都是使用更高级的资源Deployment、DaemonSet、StatefulSet进行管理Pod，ReplicaSet主要用作Deployment协调创建、删除和更新Pod。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># RC实例，也是后面的rc-demo.yaml中的内容</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: ReplicationController
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: nginx
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    app: nginx
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      name: nginx
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: nginx
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: nginx
+</span></span><span style="display:flex;"><span>        image: nginx
+</span></span><span style="display:flex;"><span>        imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>        ports:
+</span></span><span style="display:flex;"><span>        - containerPort: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># RS实例，和RC配置的主要区别是多了个selector</span>
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: ReplicaSet
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: frontend
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: guestbook
+</span></span><span style="display:flex;"><span>    tier: frontend
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      tier: frontend
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        tier: frontend
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: php-redis
+</span></span><span style="display:flex;"><span>        image: gcr.io/google_samples/gb-frontend:v3
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 以上面RC实例配置为例</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f rc-demo.yaml </span>
+</span></span><span style="display:flex;"><span>replicationcontroller/nginx created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po,rc</span>
+</span></span><span style="display:flex;"><span>NAME                           READY   STATUS    RESTARTS        AGE
+</span></span><span style="display:flex;"><span>pod/nginx-5w6v6                1/1     Running   <span style="color:#ae81ff">0</span>               6s
+</span></span><span style="display:flex;"><span>pod/nginx-8265c                1/1     Running   <span style="color:#ae81ff">0</span>               6s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                          DESIRED   CURRENT   READY   AGE
+</span></span><span style="display:flex;"><span>replicationcontroller/nginx   <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">2</span>       6s
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># RC的Pod动态缩放</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl scale rc nginx --replicas=3</span>
+</span></span><span style="display:flex;"><span>replicationcontroller/nginx scaled
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 可以看到正在扩容</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po,rc</span>
+</span></span><span style="display:flex;"><span>NAME              READY   STATUS              RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/nginx-5w6v6   1/1     Running             <span style="color:#ae81ff">0</span>          97s
+</span></span><span style="display:flex;"><span>pod/nginx-8265c   1/1     Running             <span style="color:#ae81ff">0</span>          97s
+</span></span><span style="display:flex;"><span>pod/nginx-jhsjr   0/1     ContainerCreating   <span style="color:#ae81ff">0</span>          3s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                          DESIRED   CURRENT   READY   AGE
+</span></span><span style="display:flex;"><span>replicationcontroller/nginx   <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">2</span>       97s
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 扩容成功</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po,rc</span>
+</span></span><span style="display:flex;"><span>NAME              READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/nginx-5w6v6   1/1     Running   <span style="color:#ae81ff">0</span>          2m17s
+</span></span><span style="display:flex;"><span>pod/nginx-8265c   1/1     Running   <span style="color:#ae81ff">0</span>          2m17s
+</span></span><span style="display:flex;"><span>pod/nginx-jhsjr   1/1     Running   <span style="color:#ae81ff">0</span>          43s
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 缩容测试</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl scale rc nginx --replicas=1</span>
+</span></span><span style="display:flex;"><span>replicationcontroller/nginx scaled
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po,rc</span>
+</span></span><span style="display:flex;"><span>NAME              READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/nginx-5w6v6   1/1     Running   <span style="color:#ae81ff">0</span>          4m26s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                          DESIRED   CURRENT   READY   AGE
+</span></span><span style="display:flex;"><span>replicationcontroller/nginx   <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">1</span>       4m26s
+</span></span></code></pre></div><h3 id="deployment">Deployment<a hidden class="anchor" aria-hidden="true" href="#deployment">#</a></h3>
+<p>用于部署无状态的服务，最常用的控制器。一般用于管理维护企业内部无状态的微服务，比如configserver、zuul、springboot。可以管理多个副本的Pod实现无缝迁移、自动扩容缩容、自动灾难恢复、一键回滚等功能。</p>
+<p>Deployment是一种更高级别的 API 资源对象，为 Pods 和 ReplicaSets 提供声明式的更新能力。它以类似于 <code>kubectl rolling-update</code> 的方式更新其底层 ReplicaSet 及其 Pod。</p>
+<p>Deployments 的典型用例：</p>
+<ul>
+<li>创建Deployment将ReplicaSet上线。ReplicaSet 在后台创建 Pods.检查 ReplicaSet 的上线状态，查看其是否成功</li>
+<li>通过更新 Deployment 的 PodTemplateSpec，声明 Pod 的新状态。新的 ReplicaSet 会被创建，Deployment 将 Pod 从旧 ReplicaSet 迁移到新 ReplicaSet。 每个新的 ReplicaSet 都会更新 Deployment 的修订版本</li>
+<li>如果 Deployment 的当前状态不稳定，回滚到较早的 Deployment 版本。每次回滚都会更新 Deployment 的修订版本</li>
+<li>扩大 Deployment 规模以承担更多负载</li>
+<li>暂停 Deployment 以应用对 PodTemplateSpec 所作的多项修改，然后恢复其执行以启动新的上线版本</li>
+<li>使用 Deployment 状态来判定上线过程是否出现停滞</li>
+<li>清理较旧的不再需要的 ReplicaSet</li>
+</ul>
+<h4 id="创建deployment">创建Deployment<a hidden class="anchor" aria-hidden="true" href="#创建deployment">#</a></h4>
+<p>Deployment创建一个ReplicaSet，该RS负责启动管理三个Pod。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 创建yaml文件</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># vim nginx-deploy.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: nginx-deploy
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: nginx
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: nginx
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: nginx
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: nginx
+</span></span><span style="display:flex;"><span>        image: nginx:1.16.1
+</span></span><span style="display:flex;"><span>        imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>        ports:
+</span></span><span style="display:flex;"><span>        - containerPort: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f nginx-deploy.yaml </span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deploy,rs,po</span>
+</span></span><span style="display:flex;"><span>NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy   3/3     <span style="color:#ae81ff">3</span>            <span style="color:#ae81ff">3</span>           58s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                     DESIRED   CURRENT   READY   AGE
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-ff6655784   <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>       58s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                               READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-ff6655784-2jxbv   1/1     Running   <span style="color:#ae81ff">0</span>          58s
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-ff6655784-b8gq8   1/1     Running   <span style="color:#ae81ff">0</span>          58s
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-ff6655784-qj2k2   1/1     Running   <span style="color:#ae81ff">0</span>          58s
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看标签</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po --show-labels </span>
+</span></span><span style="display:flex;"><span>NAME                           READY   STATUS    RESTARTS   AGE   LABELS
+</span></span><span style="display:flex;"><span>nginx-deploy-ff6655784-2jxbv   1/1     Running   <span style="color:#ae81ff">0</span>          98s   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>ff6655784
+</span></span><span style="display:flex;"><span>nginx-deploy-ff6655784-b8gq8   1/1     Running   <span style="color:#ae81ff">0</span>          98s   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>ff6655784
+</span></span><span style="display:flex;"><span>nginx-deploy-ff6655784-qj2k2   1/1     Running   <span style="color:#ae81ff">0</span>          98s   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>ff6655784
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 扩缩容</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl scale deployment nginx-deploy --replicas=2</span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy scaled
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deploy,rs,po</span>
+</span></span><span style="display:flex;"><span>NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy   2/2     <span style="color:#ae81ff">2</span>            <span style="color:#ae81ff">2</span>           2m18s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                     DESIRED   CURRENT   READY   AGE
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-ff6655784   <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">2</span>       2m18s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                               READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-ff6655784-b8gq8   1/1     Running   <span style="color:#ae81ff">0</span>          2m18s
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-ff6655784-qj2k2   1/1     Running   <span style="color:#ae81ff">0</span>          2m18s
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看pod详情</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -owide</span>
+</span></span><span style="display:flex;"><span>NAME                           READY   STATUS    RESTARTS   AGE     IP              NODE           NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>nginx-deploy-ff6655784-b8gq8   1/1     Running   <span style="color:#ae81ff">0</span>          2m40s   172.25.92.66    k8s-master02   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-deploy-ff6655784-qj2k2   1/1     Running   <span style="color:#ae81ff">0</span>          2m40s   172.17.125.18   k8s-node01     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 访问nginx</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># curl 172.25.92.66</span>
+</span></span><span style="display:flex;"><span>&lt;!DOCTYPE html&gt;
+</span></span><span style="display:flex;"><span>&lt;html&gt;
+</span></span><span style="display:flex;"><span>&lt;head&gt;
+</span></span><span style="display:flex;"><span>&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>&lt;/html&gt;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># curl 172.17.125.18</span>
+</span></span><span style="display:flex;"><span>&lt;!DOCTYPE html&gt;
+</span></span><span style="display:flex;"><span>&lt;html&gt;
+</span></span><span style="display:flex;"><span>&lt;head&gt;
+</span></span><span style="display:flex;"><span>&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>&lt;/html&gt;
+</span></span></code></pre></div><p>说明:</p>
+<ul>
+<li>ReplicaSet 的名称始终被格式化为[DEPLOYMENT-NAME]-[RANDOM-STRING]。<code>RANDOM-STRING</code>随机生成。并使用<code>pod-template-hash=[RANDOM-STRING]</code>作为选择器和标签</li>
+<li>Deployment 控制器将<code>pod-template-hash=[RANDOM-STRING]</code>标签添加到 Deployment 创建或使用的ReplicaSet和Pod。此标签可确保 Deployment的子ReplicaSets不重叠，因此不可修改</li>
+<li>注意Deployment、ReplicaSet和Pod三者的名称关系</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get rs --show-labels </span>
+</span></span><span style="display:flex;"><span>NAME                     DESIRED   CURRENT   READY   AGE     LABELS
+</span></span><span style="display:flex;"><span>nginx-deploy-ff6655784   <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">2</span>       6m49s   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>ff6655784
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deploy,rs,po --show-labels </span>
+</span></span><span style="display:flex;"><span>NAME                           READY   UP-TO-DATE   AVAILABLE   AGE    LABELS
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy   2/2     <span style="color:#ae81ff">2</span>            <span style="color:#ae81ff">2</span>           8m2s   app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                     DESIRED   CURRENT   READY   AGE    LABELS
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-ff6655784   <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">2</span>         <span style="color:#ae81ff">2</span>       8m2s   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>ff6655784
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                               READY   STATUS    RESTARTS   AGE    LABELS
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-ff6655784-b8gq8   1/1     Running   <span style="color:#ae81ff">0</span>          8m2s   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>ff6655784
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-ff6655784-qj2k2   1/1     Running   <span style="color:#ae81ff">0</span>          8m2s   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>ff6655784
+</span></span></code></pre></div><h4 id="更新deployment">更新Deployment<a hidden class="anchor" aria-hidden="true" href="#更新deployment">#</a></h4>
+<p>Deployment 可确保在更新时仅关闭一定数量的 Pods.默认情况下，它确保至少 75% 所需 Pods 在运行(25%为容忍的最大不可用量)。更新时不会先删除旧的pod，而是先新建一个pod.新pod运行时，才会删除对应老的pod。一切的前提都是为了满足上述的条件。</p>
+<p>备注: 如果需要更新Deployment，最好通过yaml文件更新，这样回滚到任何版本都非常便捷，而且更容易追溯。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 方式一: 直接修改镜像[不推荐]</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 执行下面命令后修改对于镜像版本即可, 该方法不会记录命令,通过kubectl rollout history deployment/nginx-deploy 无法查询</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl edit deploy/nginx-deploy</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 方式二: 命令行更新image[可使用]，但也提示--record即将废弃</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl set image deploy/nginx-deploy nginx=nginx:1.18.0 --record</span>
+</span></span><span style="display:flex;"><span>Flag --record has been deprecated, --record will be removed in the future
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy image updated
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl rollout history deployment nginx-deploy </span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy 
+</span></span><span style="display:flex;"><span>REVISION  CHANGE-CAUSE
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span>         &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span>         kubectl set image deploy/nginx-deploy nginx<span style="color:#f92672">=</span>nginx:1.18.0 --record<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deployments.apps -owide</span>
+</span></span><span style="display:flex;"><span>NAME           READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES         SELECTOR
+</span></span><span style="display:flex;"><span>nginx-deploy   2/2     <span style="color:#ae81ff">2</span>            <span style="color:#ae81ff">2</span>           16m   nginx        nginx:1.18.0   app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 方式三: 使用yaml文件更新版本</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 当前nginx 版本是1.16.1, 更新到1.18.0</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 先删除之前更新的deploy，在重新启动</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl delete -f nginx-deploy.yaml </span>
+</span></span><span style="display:flex;"><span>deployment.apps <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> deleted
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f nginx-deploy.yaml </span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deployments.apps -owide</span>
+</span></span><span style="display:flex;"><span>NAME           READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES         SELECTOR
+</span></span><span style="display:flex;"><span>nginx-deploy   3/3     <span style="color:#ae81ff">3</span>            <span style="color:#ae81ff">3</span>           35s   nginx        nginx:1.16.1   app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 拷贝一份yaml文件，二者重命名（老版保留以便有问题时回退），编辑新文件镜像为1.18.0</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># ll</span>
+</span></span><span style="display:flex;"><span>total <span style="color:#ae81ff">8</span>
+</span></span><span style="display:flex;"><span>-rw-r--r-- <span style="color:#ae81ff">1</span> root root <span style="color:#ae81ff">337</span> Dec <span style="color:#ae81ff">21</span> 09:59 nginx-deploy-1161.yaml
+</span></span><span style="display:flex;"><span>-rw-r--r-- <span style="color:#ae81ff">1</span> root root <span style="color:#ae81ff">337</span> Dec <span style="color:#ae81ff">21</span> 11:01 nginx-deploy-1180.yaml
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cat nginx-deploy-1161.yaml </span>
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: nginx-deploy
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: nginx
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: nginx
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: nginx
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: nginx
+</span></span><span style="display:flex;"><span>        image: nginx:1.16.1
+</span></span><span style="display:flex;"><span>        ports:
+</span></span><span style="display:flex;"><span>        - containerPort: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cat nginx-deploy-1180.yaml </span>
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: nginx-deploy
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: nginx
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: nginx
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: nginx
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: nginx
+</span></span><span style="display:flex;"><span>        image: nginx:1.18.0
+</span></span><span style="display:flex;"><span>        ports:
+</span></span><span style="display:flex;"><span>        - containerPort: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 应用镜像为1180的同样的配置文件</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># --record 参数可以记录命令,通过 kubectl rollout history deployment/nginx-deployment 可查询</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f nginx-deploy-1180.yaml --record</span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy configured
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 如果正在更新, 可看到下面日志</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl rollout status deploy/nginx-deploy</span>
+</span></span><span style="display:flex;"><span>Waiting <span style="color:#66d9ef">for</span> deployment <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> rollout to finish: <span style="color:#ae81ff">1</span> out of <span style="color:#ae81ff">3</span> new replicas have been updated...
+</span></span><span style="display:flex;"><span>Waiting <span style="color:#66d9ef">for</span> deployment <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> rollout to finish: <span style="color:#ae81ff">1</span> out of <span style="color:#ae81ff">3</span> new replicas have been updated...
+</span></span><span style="display:flex;"><span>Waiting <span style="color:#66d9ef">for</span> deployment <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> rollout to finish: <span style="color:#ae81ff">2</span> out of <span style="color:#ae81ff">3</span> new replicas have been updated...
+</span></span><span style="display:flex;"><span>Waiting <span style="color:#66d9ef">for</span> deployment <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> rollout to finish: <span style="color:#ae81ff">2</span> out of <span style="color:#ae81ff">3</span> new replicas have been updated...
+</span></span><span style="display:flex;"><span>Waiting <span style="color:#66d9ef">for</span> deployment <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> rollout to finish: <span style="color:#ae81ff">2</span> out of <span style="color:#ae81ff">3</span> new replicas have been updated...
+</span></span><span style="display:flex;"><span>Waiting <span style="color:#66d9ef">for</span> deployment <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> rollout to finish: <span style="color:#ae81ff">2</span> old replicas are pending termination...
+</span></span><span style="display:flex;"><span>Waiting <span style="color:#66d9ef">for</span> deployment <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> rollout to finish: <span style="color:#ae81ff">1</span> old replicas are pending termination...
+</span></span><span style="display:flex;"><span>Waiting <span style="color:#66d9ef">for</span> deployment <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> rollout to finish: <span style="color:#ae81ff">1</span> old replicas are pending termination...
+</span></span><span style="display:flex;"><span>deployment <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> successfully rolled out
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 更新结束后, 可看到下面日志</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl rollout status deploy/nginx-deploy</span>
+</span></span><span style="display:flex;"><span>deployment <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> successfully rolled out
+</span></span></code></pre></div><h4 id="回滚deployment">回滚Deployment<a hidden class="anchor" aria-hidden="true" href="#回滚deployment">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 回滚到上一个版本</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl rollout undo deployment nginx-deploy</span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy rolled back
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deploy,rs,po -owide</span>
+</span></span><span style="display:flex;"><span>NAME                           READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES         SELECTOR
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy   3/3     <span style="color:#ae81ff">3</span>            <span style="color:#ae81ff">3</span>           11m   nginx        nginx:1.16.1   app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                     DESIRED   CURRENT   READY   AGE     CONTAINERS   IMAGES         SELECTOR
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-79fccc485   <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>       7m46s   nginx        nginx:1.18.0   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>79fccc485
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-ff6655784   <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>       11m     nginx        nginx:1.16.1   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>ff6655784
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                               READY   STATUS    RESTARTS   AGE     IP              NODE           NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-ff6655784-c9gf9   1/1     Running   <span style="color:#ae81ff">0</span>          2m7s    172.25.92.69    k8s-master02   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-ff6655784-xl4rx   1/1     Running   <span style="color:#ae81ff">0</span>          2m12s   172.27.14.228   k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-ff6655784-zzpvm   1/1     Running   <span style="color:#ae81ff">0</span>          2m9s    172.17.125.22   k8s-node01     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 直接用Yaml文件回退[更新]为对应镜像, 比如 1180--&gt;1161</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f nginx-deploy-1161.yaml --record</span>
+</span></span></code></pre></div><h4 id="回退历史版本">回退历史版本<a hidden class="anchor" aria-hidden="true" href="#回退历史版本">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看历史版本</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl rollout history deployment nginx-deploy </span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy 
+</span></span><span style="display:flex;"><span>REVISION  CHANGE-CAUSE
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2</span>         kubectl apply --filename<span style="color:#f92672">=</span>nginx-deploy.yaml --record<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3</span>         &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看历史版本信息</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl rollout history deployment nginx-deploy --revision=2</span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy with revision <span style="color:#75715e">#2</span>
+</span></span><span style="display:flex;"><span>Pod Template:
+</span></span><span style="display:flex;"><span>  Labels:       app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span>        pod-template-hash<span style="color:#f92672">=</span>79fccc485
+</span></span><span style="display:flex;"><span>  Annotations:  kubernetes.io/change-cause: kubectl apply --filename<span style="color:#f92672">=</span>nginx-deploy.yaml --record<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>  Containers:
+</span></span><span style="display:flex;"><span>   nginx:
+</span></span><span style="display:flex;"><span>    Image:      nginx:1.18.0
+</span></span><span style="display:flex;"><span>    Port:       80/TCP
+</span></span><span style="display:flex;"><span>    Host Port:  0/TCP
+</span></span><span style="display:flex;"><span>    Environment:        &lt;none&gt;
+</span></span><span style="display:flex;"><span>    Mounts:     &lt;none&gt;
+</span></span><span style="display:flex;"><span>  Volumes:      &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 可以使用--to-revision参数指定回退到某个历史版本</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl rollout undo deployment nginx-deploy --to-revision=2</span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy rolled back
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deploy,rs,po -owide</span>
+</span></span><span style="display:flex;"><span>NAME                           READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES         SELECTOR
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy   3/3     <span style="color:#ae81ff">3</span>            <span style="color:#ae81ff">3</span>           14m   nginx        nginx:1.18.0   app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                     DESIRED   CURRENT   READY   AGE   CONTAINERS   IMAGES         SELECTOR
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-79fccc485   <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>       10m   nginx        nginx:1.18.0   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>79fccc485
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-ff6655784   <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>       14m   nginx        nginx:1.16.1   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>ff6655784
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                               READY   STATUS    RESTARTS   AGE   IP              NODE           NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-79fccc485-dwhhr   1/1     Running   <span style="color:#ae81ff">0</span>          49s   172.25.92.70    k8s-master02   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-79fccc485-kp2pd   1/1     Running   <span style="color:#ae81ff">0</span>          51s   172.17.125.23   k8s-node01     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-79fccc485-z425l   1/1     Running   <span style="color:#ae81ff">0</span>          53s   172.27.14.229   k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span></code></pre></div><h4 id="更新详情">更新详情<a hidden class="anchor" aria-hidden="true" href="#更新详情">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe deployments.apps nginx-deploy </span>
+</span></span><span style="display:flex;"><span>Name:                   nginx-deploy
+</span></span><span style="display:flex;"><span>Namespace:              default
+</span></span><span style="display:flex;"><span>CreationTimestamp:      Wed, <span style="color:#ae81ff">12</span> Jan <span style="color:#ae81ff">2022</span> 13:17:12 +0800
+</span></span><span style="display:flex;"><span>Labels:                 app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span>Annotations:            deployment.kubernetes.io/revision: <span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span>                        kubernetes.io/change-cause: kubectl apply --filename<span style="color:#f92672">=</span>nginx-deploy.yaml --record<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>Selector:               app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span>Replicas:               <span style="color:#ae81ff">3</span> desired | <span style="color:#ae81ff">3</span> updated | <span style="color:#ae81ff">3</span> total | <span style="color:#ae81ff">3</span> available | <span style="color:#ae81ff">0</span> unavailable
+</span></span><span style="display:flex;"><span>StrategyType:           RollingUpdate
+</span></span><span style="display:flex;"><span>MinReadySeconds:        <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>RollingUpdateStrategy:  25% max unavailable, 25% max surge <span style="color:#75715e"># 更新策略</span>
+</span></span><span style="display:flex;"><span>Pod Template:
+</span></span><span style="display:flex;"><span>  Labels:  app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span>  Containers:
+</span></span><span style="display:flex;"><span>   nginx:
+</span></span><span style="display:flex;"><span>    Image:        nginx:1.18.0
+</span></span><span style="display:flex;"><span>    Port:         80/TCP
+</span></span><span style="display:flex;"><span>    Host Port:    0/TCP
+</span></span><span style="display:flex;"><span>    Environment:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>    Mounts:       &lt;none&gt;
+</span></span><span style="display:flex;"><span>  Volumes:        &lt;none&gt;
+</span></span><span style="display:flex;"><span>Conditions:
+</span></span><span style="display:flex;"><span>  Type           Status  Reason
+</span></span><span style="display:flex;"><span>  ----           ------  ------
+</span></span><span style="display:flex;"><span>  Available      True    MinimumReplicasAvailable
+</span></span><span style="display:flex;"><span>  Progressing    True    NewReplicaSetAvailable
+</span></span><span style="display:flex;"><span>OldReplicaSets:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>NewReplicaSet:   nginx-deploy-79fccc485 <span style="color:#f92672">(</span>3/3 replicas created<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Events: <span style="color:#75715e"># 可以看到之前的操作记录和更新记录</span>
+</span></span><span style="display:flex;"><span>  Type    Reason             Age                    From                   Message
+</span></span><span style="display:flex;"><span>  ----    ------             ----                   ----                   -------
+</span></span><span style="display:flex;"><span>  Normal  ScalingReplicaSet  7m30s                  deployment-controller  Scaled up replica set nginx-deploy-ff6655784 to <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  Normal  ScalingReplicaSet  7m27s                  deployment-controller  Scaled down replica set nginx-deploy-79fccc485 to <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  Normal  ScalingReplicaSet  7m25s <span style="color:#f92672">(</span>x2 over 17m<span style="color:#f92672">)</span>    deployment-controller  Scaled up replica set nginx-deploy-ff6655784 to <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>  Normal  ScalingReplicaSet  7m23s <span style="color:#f92672">(</span>x3 over 7m27s<span style="color:#f92672">)</span>  deployment-controller  <span style="color:#f92672">(</span>combined from similar events<span style="color:#f92672">)</span>: Scaled down replica set nginx-deploy-79fccc485 to <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>  Normal  ScalingReplicaSet  3m16s <span style="color:#f92672">(</span>x2 over 13m<span style="color:#f92672">)</span>    deployment-controller  Scaled up replica set nginx-deploy-79fccc485 to <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  Normal  ScalingReplicaSet  3m14s <span style="color:#f92672">(</span>x2 over 13m<span style="color:#f92672">)</span>    deployment-controller  Scaled down replica set nginx-deploy-ff6655784 to <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  Normal  ScalingReplicaSet  3m14s <span style="color:#f92672">(</span>x2 over 13m<span style="color:#f92672">)</span>    deployment-controller  Scaled up replica set nginx-deploy-79fccc485 to <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  Normal  ScalingReplicaSet  3m12s <span style="color:#f92672">(</span>x2 over 13m<span style="color:#f92672">)</span>    deployment-controller  Scaled down replica set nginx-deploy-ff6655784 to <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  Normal  ScalingReplicaSet  3m12s <span style="color:#f92672">(</span>x2 over 13m<span style="color:#f92672">)</span>    deployment-controller  Scaled up replica set nginx-deploy-79fccc485 to <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>  Normal  ScalingReplicaSet  3m10s <span style="color:#f92672">(</span>x2 over 10m<span style="color:#f92672">)</span>    deployment-controller  Scaled down replica set nginx-deploy-ff6655784 to <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看回滚状态</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl rollout status deploy nginx-deploy</span>
+</span></span><span style="display:flex;"><span>deployment <span style="color:#e6db74">&#34;nginx-deploy&#34;</span> successfully rolled out
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 历史记录</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl rollout history deploy nginx-deploy</span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy
+</span></span><span style="display:flex;"><span>REVISION  CHANGE-CAUSE
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3</span>         &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">4</span>         kubectl set image deployment/nginx-deploy nginx<span style="color:#f92672">=</span>nginx:1.18.0 --record<span style="color:#f92672">=</span>true
+</span></span></code></pre></div><h4 id="暂停与恢复">暂停与恢复<a hidden class="anchor" aria-hidden="true" href="#暂停与恢复">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 暂停 deployment 的更新，暂停后除非恢复更新，否则操作不会生效，当需要多项更新时可以使用</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl rollout pause deployment nginx-deploy </span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy paused
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl set image deploy/nginx-deploy nginx=nginx:1.16.1 --record</span>
+</span></span><span style="display:flex;"><span>Flag --record has been deprecated, --record will be removed in the future
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy image updated
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deployments.apps -owide</span>
+</span></span><span style="display:flex;"><span>NAME           READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES         SELECTOR
+</span></span><span style="display:flex;"><span>nginx-deploy   3/3     <span style="color:#ae81ff">0</span>            <span style="color:#ae81ff">3</span>           25m   nginx        nginx:1.16.1   app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 可以看到镜像确实是更新了，但RS和Pod在用的还是老版本的，也就是并未生效</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get rs,pod -owide</span>
+</span></span><span style="display:flex;"><span>NAME                                     DESIRED   CURRENT   READY   AGE   CONTAINERS   IMAGES         SELECTOR
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-79fccc485   <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>       22m   nginx        nginx:1.18.0   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>79fccc485
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-ff6655784   <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>       26m   nginx        nginx:1.16.1   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>ff6655784
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                               READY   STATUS    RESTARTS   AGE   IP              NODE           NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-79fccc485-dwhhr   1/1     Running   <span style="color:#ae81ff">0</span>          12m   172.25.92.70    k8s-master02   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-79fccc485-kp2pd   1/1     Running   <span style="color:#ae81ff">0</span>          12m   172.17.125.23   k8s-node01     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-79fccc485-z425l   1/1     Running   <span style="color:#ae81ff">0</span>          12m   172.27.14.229   k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 接着进行下一项更新，配置CPU和内存资源</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl set resources deploy nginx-deploy -c nginx --limits=cpu=100m,memory=128Mi --requests=cpu=10m,memory=16Mi</span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy resource requirements updated
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 恢复deployment的更新</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl rollout resume deployment nginx-deploy </span>
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy resumed
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 正在更新</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get rs</span>
+</span></span><span style="display:flex;"><span>NAME                     DESIRED   CURRENT   READY   AGE
+</span></span><span style="display:flex;"><span>nginx-deploy-79fccc485   <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">1</span>       28m
+</span></span><span style="display:flex;"><span>nginx-deploy-975d4fc74   <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">2</span>       5s
+</span></span><span style="display:flex;"><span>nginx-deploy-ff6655784   <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>       32m
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 更新完成后</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deploy,rs,po -owide</span>
+</span></span><span style="display:flex;"><span>NAME                           READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES         SELECTOR
+</span></span><span style="display:flex;"><span>deployment.apps/nginx-deploy   3/3     <span style="color:#ae81ff">3</span>            <span style="color:#ae81ff">3</span>           32m   nginx        nginx:1.16.1   app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                     DESIRED   CURRENT   READY   AGE   CONTAINERS   IMAGES         SELECTOR
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-79fccc485   <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>       28m   nginx        nginx:1.18.0   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>79fccc485
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-975d4fc74   <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>         <span style="color:#ae81ff">3</span>       25s   nginx        nginx:1.16.1   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>975d4fc74
+</span></span><span style="display:flex;"><span>replicaset.apps/nginx-deploy-ff6655784   <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>         <span style="color:#ae81ff">0</span>       32m   nginx        nginx:1.16.1   app<span style="color:#f92672">=</span>nginx,pod-template-hash<span style="color:#f92672">=</span>ff6655784
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                               READY   STATUS    RESTARTS   AGE   IP              NODE           NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-975d4fc74-6d92q   1/1     Running   <span style="color:#ae81ff">0</span>          25s   172.27.14.230   k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-975d4fc74-7c7f2   1/1     Running   <span style="color:#ae81ff">0</span>          22s   172.17.125.24   k8s-node01     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>pod/nginx-deploy-975d4fc74-snpkb   1/1     Running   <span style="color:#ae81ff">0</span>          20s   172.25.92.71    k8s-master02   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 可以看到资源配额和镜像版本均已更新</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe deployments.apps nginx-deploy </span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>Pod Template:
+</span></span><span style="display:flex;"><span>  Labels:  app<span style="color:#f92672">=</span>nginx
+</span></span><span style="display:flex;"><span>  Containers:
+</span></span><span style="display:flex;"><span>   nginx:
+</span></span><span style="display:flex;"><span>    Image:      nginx:1.16.1
+</span></span><span style="display:flex;"><span>    Port:       80/TCP
+</span></span><span style="display:flex;"><span>    Host Port:  0/TCP
+</span></span><span style="display:flex;"><span>    Limits:
+</span></span><span style="display:flex;"><span>      cpu:     100m
+</span></span><span style="display:flex;"><span>      memory:  128Mi
+</span></span><span style="display:flex;"><span>    Requests:
+</span></span><span style="display:flex;"><span>      cpu:        10m
+</span></span><span style="display:flex;"><span>      memory:     16Mi
+</span></span><span style="display:flex;"><span>    Environment:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>    Mounts:       &lt;none&gt;
+</span></span><span style="display:flex;"><span>  Volumes:        &lt;none&gt;
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><h4 id="其他配置">其他配置<a hidden class="anchor" aria-hidden="true" href="#其他配置">#</a></h4>
+<ul>
+<li>.spec.revisionHistoryLimit：设置保留RS旧的revision的个数，设置为0的话，不保留历史数据</li>
+<li>.spec.minReadySeconds：可选参数，指定新创建的Pod在没有任何容器崩溃的情况下视为Ready最小的秒数，默认为0，即一旦被创建就视为可用。</li>
+<li>滚动更新的策略：
+<ul>
+<li>.spec.strategy.type：更新deployment的方式，默认是RollingUpdate
+<ul>
+<li>RollingUpdate：滚动更新，可以指定maxSurge和maxUnavailable
+<ul>
+<li>maxUnavailable：指定在回滚或更新时最大不可用的Pod的数量，可选字段，默认25%，可以设置成数字或百分比，如果该值为0，那么maxSurge就不能0</li>
+<li>maxSurge：可以超过期望值的最大Pod数，可选字段，默认为25%，可以设置成数字或百分比，如果该值为0，那么maxUnavailable不能为0</li>
+</ul>
+</li>
+<li>Recreate：重建，先删除旧的Pod，在创建新的Pod</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># spec中的配置实例</span>
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  progressDeadlineSeconds: <span style="color:#ae81ff">600</span>
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  revisionHistoryLimit: <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: nginx
+</span></span><span style="display:flex;"><span>  strategy:
+</span></span><span style="display:flex;"><span>    rollingUpdate:
+</span></span><span style="display:flex;"><span>      maxSurge: 25%
+</span></span><span style="display:flex;"><span>      maxUnavailable: 25%
+</span></span><span style="display:flex;"><span>    type: RollingUpdate
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      ...
+</span></span></code></pre></div><h3 id="statefulset">StatefulSet<a hidden class="anchor" aria-hidden="true" href="#statefulset">#</a></h3>
+<p>StatefulSet常用于部署有状态的且需要有序启动的应用程序，比如在生产环境中，可以部署ElasticSearch集群、MongoDB集群或者需要持久化的RabbitMQ集群、Redis集群、Kafka集群和ZooKeeper集群等。</p>
+<p>StatefulSet 中的 Pod 拥有独一无二的身份标识。这个标识基于 StatefulSet 控制器分配给每个 Pod 的唯一顺序索引。Pod 的名称的形式为<code>&lt;statefulset name&gt;-&lt;ordinal index&gt;</code> 。例如: web的StatefulSet 拥有两个副本，所以它创建了两个 Pod: web-0和web-1。</p>
+<p>和 Deployment 相同的是，StatefulSet 管理了基于相同容器定义的一组 Pod；但和 Deployment 不同的是，StatefulSet 为它们的每个 Pod 维护了一个固定的ID标识。这些 Pod 是基于相同的声明来创建的，但是不能相互替换: 无论怎么调度，每个 Pod 都有一个永久不变的ID标识。</p>
+<p>StatefulSet创建的Pod一般使用Headless Service（无头服务）进行通信，和普通的Service的区别在于Headless Service没有ClusterIP，它使用的是Endpoint进行互相通信，Headless一般的格式为：statefulSetName-{0..N-1}.serviceName.namespace.svc.cluster.local。</p>
+<ul>
+<li>serviceName为Headless Service的名字，创建StatefulSet时，必须指定Headless Service名称</li>
+<li>0..N-1为Pod所在的序号，从0开始到N-1</li>
+<li>statefulSetName为StatefulSet的名字</li>
+<li>namespace为服务所在的命名空间</li>
+<li>.cluster.local为Cluster Domain（集群域）</li>
+</ul>
+<h4 id="使用场景">使用场景<a hidden class="anchor" aria-hidden="true" href="#使用场景">#</a></h4>
+<ul>
+<li>稳定的、唯一的网络标识符,即Pod重新调度后其PodName和HostName不变(当然IP是会变的)</li>
+<li>稳定的、持久的存储,即Pod重新调度后还是能访问到相同的持久化数据,基于PVC实现</li>
+<li>有序的、优雅的部署和缩放</li>
+<li>有序的、自动的滚动更新</li>
+</ul>
+<p>如上面,稳定意味着 Pod 调度或重新调度的整个过程是有持久性的。</p>
+<p>如果应用程序不需要任何稳定的标识符或有序的部署、删除或伸缩，则应该使用由一组无状态的副本控制器提供的工作负载来部署应用程序，比如使用 Deployment 或者 ReplicaSet 可能更适用于无状态应用部署需要。</p>
+<h4 id="限制">限制<a hidden class="anchor" aria-hidden="true" href="#限制">#</a></h4>
+<ul>
+<li>给定 Pod 的存储必须由 PersistentVolume(PV) 驱动基于所请求的 storage class 来提供,或者由管理员预先提供</li>
+<li>删除或者收缩 StatefulSet 并不会删除它关联的存储卷.这样做是为了保证数据安全</li>
+<li>StatefulSet 当前需要 headless 服务来负责 Pod 的网络标识。需要先创建此服务。</li>
+<li>删除StatefulSet时，StatefulSet 不提供任何终止 Pod 的保证。为了实现 StatefulSet 中的 Pod 可以有序和优雅的终止，可以在删除之前将 StatefulSet缩放为0。</li>
+<li>在默认Pod管理策略(OrderedReady) 时使用滚动更新，可能进入需要人工干预才能修复的损坏状态</li>
+</ul>
+<h4 id="部署">部署<a hidden class="anchor" aria-hidden="true" href="#部署">#</a></h4>
+<ul>
+<li>对于包含 N 个 副本的 StatefulSet，当部署 Pod 时，它们是依次创建的，顺序为 0~(N-1)</li>
+<li>当删除 Pod 时，它们是逆序终止的,顺序为 (N-1)~0</li>
+<li>在将缩放操作应用到 Pod 之前，它前面的所有 Pod 必须是 Running 和 Ready 状态</li>
+<li>在Pod 终止之前，所有的继任者必须完全关闭</li>
+</ul>
+<p>StatefulSet 不应将 pod.Spec.TerminationGracePeriodSeconds 设置为 0。这种做法是不安全的，要强烈阻止。</p>
+<ul>
+<li>部署顺序</li>
+</ul>
+<p>在下面的 nginx 示例被创建后，会按照 web-0、web-1、web-2 的顺序部署三个 Pod。在 web-0 进入 Running 和 Ready 状态前不会部署 web-1。在 web-1 进入 Running 和 Ready 状态前不会部署 web-2。</p>
+<p>如果 web-1 已经处于 Running 和 Ready 状态，而 web-2 尚未部署，在此期间发生了 web-0 运行失败，那么 web-2 将不会被部署，要等到 web-0 部署完成并进入 Running 和 Ready 状态后，才会部署 web-2。</p>
+<ul>
+<li>收缩顺序</li>
+</ul>
+<p>如果想将示例中的 StatefulSet 收缩为 replicas=1，首先被终止的是 web-2。在 web-2 没有被完全停止和删除前，web-1 不会被终止。当 web-2 已被终止和删除；但web-1 尚未被终止，如果在此期间发生 web-0 运行失败，那么就不会终止 web-1，必须等到 web-0 进入 Running 和 Ready 状态后才会终止 web-1</p>
+<h4 id="sts实例">STS实例<a hidden class="anchor" aria-hidden="true" href="#sts实例">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cat &lt;&lt; &#34;EOF&#34; &gt; statefulset.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Service
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: nginx
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: nginx
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  ports:
+</span></span><span style="display:flex;"><span>  - port: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>    name: http
+</span></span><span style="display:flex;"><span>  type: ClusterIP
+</span></span><span style="display:flex;"><span>  clusterIP: None
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    app: nginx
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: StatefulSet
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: web
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: nginx <span style="color:#75715e"># has to match .spec.template.metadata.labels</span>
+</span></span><span style="display:flex;"><span>  serviceName: nginx
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">3</span> <span style="color:#75715e"># by default is 1</span>
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: nginx <span style="color:#75715e"># has to match .spec.selector.matchLabels</span>
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      terminationGracePeriodSeconds: <span style="color:#ae81ff">10</span>   <span style="color:#75715e"># 默认30秒</span>
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: nginx
+</span></span><span style="display:flex;"><span>        image: nginx:1.18.0
+</span></span><span style="display:flex;"><span>        imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>        ports:
+</span></span><span style="display:flex;"><span>        - containerPort: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>          name: http
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f statefulset.yaml </span>
+</span></span><span style="display:flex;"><span>service/nginx created
+</span></span><span style="display:flex;"><span>statefulset.apps/web created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get svc</span>
+</span></span><span style="display:flex;"><span>NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT<span style="color:#f92672">(</span>S<span style="color:#f92672">)</span>   AGE
+</span></span><span style="display:flex;"><span>kubernetes   ClusterIP   10.96.0.1    &lt;none&gt;        443/TCP   30d
+</span></span><span style="display:flex;"><span>nginx        ClusterIP   None         &lt;none&gt;        80/TCP    27s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get sts -owide</span>
+</span></span><span style="display:flex;"><span>NAME   READY   AGE   CONTAINERS   IMAGES
+</span></span><span style="display:flex;"><span>web    3/3     63s   nginx        nginx:1.18.0
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -owide</span>
+</span></span><span style="display:flex;"><span>NAME    READY   STATUS    RESTARTS   AGE   IP              NODE           NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>web-0   1/1     Running   <span style="color:#ae81ff">0</span>          83s   172.27.14.233   k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>web-1   1/1     Running   <span style="color:#ae81ff">0</span>          81s   172.17.125.28   k8s-node01     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>web-2   1/1     Running   <span style="color:#ae81ff">0</span>          79s   172.25.92.73    k8s-master02   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建busybox Pod进去查看三个web-Pod的域名信息</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cat &lt;&lt; &#34;EOF&#34; &gt; busybox.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: busybox
+</span></span><span style="display:flex;"><span>  namespace: default
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: busybox
+</span></span><span style="display:flex;"><span>    image: busybox:1.28
+</span></span><span style="display:flex;"><span>    command:
+</span></span><span style="display:flex;"><span>      - sleep
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;3600&#34;</span>
+</span></span><span style="display:flex;"><span>    imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>  restartPolicy: Always
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f busybox.yaml </span>
+</span></span><span style="display:flex;"><span>pod/busybox created
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 进入busybox解析域名</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl exec busybox -it -- sh</span>
+</span></span><span style="display:flex;"><span>/ <span style="color:#75715e"># nslookup web-0.nginx</span>
+</span></span><span style="display:flex;"><span>Server:    10.96.0.10
+</span></span><span style="display:flex;"><span>Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Name:      web-0.nginx
+</span></span><span style="display:flex;"><span>Address 1: 172.27.14.233 web-0.nginx.default.svc.cluster.local
+</span></span><span style="display:flex;"><span>/ <span style="color:#75715e"># nslookup web-1.nginx</span>
+</span></span><span style="display:flex;"><span>Server:    10.96.0.10
+</span></span><span style="display:flex;"><span>Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Name:      web-1.nginx
+</span></span><span style="display:flex;"><span>Address 1: 172.17.125.28 web-1.nginx.default.svc.cluster.local
+</span></span><span style="display:flex;"><span>/ <span style="color:#75715e"># nslookup web-2.nginx</span>
+</span></span><span style="display:flex;"><span>Server:    10.96.0.10
+</span></span><span style="display:flex;"><span>Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Name:      web-2.nginx
+</span></span><span style="display:flex;"><span>Address 1: 172.25.92.73 web-2.nginx.default.svc.cluster.local
+</span></span><span style="display:flex;"><span>/ <span style="color:#75715e"># exit</span>
+</span></span></code></pre></div><h4 id="删除sts">删除STS<a hidden class="anchor" aria-hidden="true" href="#删除sts">#</a></h4>
+<p>删除STS有两种方式：级联删除和非级联删除。非级联删除时，STS被删除后Pod依旧存活，变成了Orphan Pod（即孤儿Pod），孤儿Pod可以被单独操作。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 使用--cascade=orphan参数实现非级联删除</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl delete sts web --cascade=orphan</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get sts web</span>
+</span></span><span style="display:flex;"><span>Error from server <span style="color:#f92672">(</span>NotFound<span style="color:#f92672">)</span>: statefulsets.apps <span style="color:#e6db74">&#34;web&#34;</span> not found
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get pod | grep web</span>
+</span></span><span style="display:flex;"><span>web-0                         1/1     Running     <span style="color:#ae81ff">0</span>          30m
+</span></span><span style="display:flex;"><span>web-1                         1/1     Running     <span style="color:#ae81ff">0</span>          29m
+</span></span><span style="display:flex;"><span>web-2                         1/1     Running     <span style="color:#ae81ff">0</span>          28m
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 删除Pod web-1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl delete po web-1</span>
+</span></span><span style="display:flex;"><span>pod <span style="color:#e6db74">&#34;web-1&#34;</span> deleted
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get pod | grep web</span>
+</span></span><span style="display:flex;"><span>web-0                         1/1     Running     <span style="color:#ae81ff">0</span>          30m
+</span></span><span style="display:flex;"><span>web-2                         1/1     Running     <span style="color:#ae81ff">0</span>          29m
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 重建STS，并把副本数量修改为2</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># cat statefulset.yaml | grep repli</span>
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">2</span> <span style="color:#75715e"># by default is 1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f statefulset.yaml</span>
+</span></span><span style="display:flex;"><span>service/nginx unchanged
+</span></span><span style="display:flex;"><span>statefulset.apps/web created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po | grep web</span>
+</span></span><span style="display:flex;"><span>web-0                         1/1     Running     <span style="color:#ae81ff">0</span>          32m
+</span></span><span style="display:flex;"><span>web-1                         1/1     Running     <span style="color:#ae81ff">0</span>          13s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 级联删除</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl delete sts web</span>
+</span></span><span style="display:flex;"><span>statefulset.apps <span style="color:#e6db74">&#34;web&#34;</span> deleted
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po | grep web</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 此时STS和Pod都删掉了</span>
+</span></span></code></pre></div><blockquote>
+<p>非级联删除时，由于web-1被删了，而且副本数变成了2，所以重建STS（用原来的配置文件）后，会先删除web-2，然后重新创建Pod web-1，web-0已存在，不发生变化。</p>
+</blockquote>
+<h3 id="daemonset">DaemonSet<a hidden class="anchor" aria-hidden="true" href="#daemonset">#</a></h3>
+<p>DaemonSet守护进程确保全部（或匹配的一部分）节点上部署一个Pod。当有新的节点加入集群时，也会为它们新增一个Pod，当有节点从集群移除时，这些Pod也会被回收。</p>
+<p>DaemonSet典型用法:</p>
+<ul>
+<li>在每个节点上运行集群守护进程，例如 glusterd、ceph</li>
+<li>在每个节点上运行日志守护进程，例如 fluentd、logstash</li>
+<li>在每个节点上运行监控守护进程，例如 Prometheus Node Exporter、Flowmill、Sysdig 代理、collectd、Dynatrace OneAgent、AppDynamics 代理、Datadog 代理、New Relic 代理、Ganglia gmond 或者 Instana 代理</li>
+</ul>
+<h4 id="daemonset实例">DaemonSet实例<a hidden class="anchor" aria-hidden="true" href="#daemonset实例">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 创建yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cat &lt;&lt; &#34;EOF&#34; &gt; daemonset.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: DaemonSet
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: fluentd-elasticsearch
+</span></span><span style="display:flex;"><span>  namespace: default
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    k8s-app: fluentd-logging
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      name: fluentd-elasticsearch
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        name: fluentd-elasticsearch
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      tolerations:
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># 容忍在master节点运行</span>
+</span></span><span style="display:flex;"><span>      - key: node-role.kubernetes.io/master
+</span></span><span style="display:flex;"><span>        effect: NoSchedule
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: fluentd-elasticsearch
+</span></span><span style="display:flex;"><span>        image: registry.cn-beijing.aliyuncs.com/google_registry/fluentd:v2.5.2
+</span></span><span style="display:flex;"><span>        resources:
+</span></span><span style="display:flex;"><span>          limits:
+</span></span><span style="display:flex;"><span>            cpu: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            memory: 200Mi
+</span></span><span style="display:flex;"><span>          requests:
+</span></span><span style="display:flex;"><span>            cpu: 100m
+</span></span><span style="display:flex;"><span>            memory: 200Mi
+</span></span><span style="display:flex;"><span>        volumeMounts:
+</span></span><span style="display:flex;"><span>        - name: varlog
+</span></span><span style="display:flex;"><span>          mountPath: /var/log
+</span></span><span style="display:flex;"><span>        - name: varlibdockercontainers
+</span></span><span style="display:flex;"><span>          mountPath: /var/lib/docker/containers
+</span></span><span style="display:flex;"><span>          readOnly: true
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># 优雅关闭应用,时间设置.超过该时间会强制关闭,默认30秒</span>
+</span></span><span style="display:flex;"><span>      terminationGracePeriodSeconds: <span style="color:#ae81ff">30</span>
+</span></span><span style="display:flex;"><span>      volumes:
+</span></span><span style="display:flex;"><span>      - name: varlog
+</span></span><span style="display:flex;"><span>        hostPath:
+</span></span><span style="display:flex;"><span>          path: /var/log
+</span></span><span style="display:flex;"><span>      - name: varlibdockercontainers
+</span></span><span style="display:flex;"><span>        hostPath:
+</span></span><span style="display:flex;"><span>          path: /var/lib/docker/containers
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f daemonset.yaml </span>
+</span></span><span style="display:flex;"><span>daemonset.apps/fluentd-elasticsearch created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get ds -owide</span>
+</span></span><span style="display:flex;"><span>NAME                    DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE   CONTAINERS              IMAGES                                                            SELECTOR
+</span></span><span style="display:flex;"><span>fluentd-elasticsearch   <span style="color:#ae81ff">5</span>         <span style="color:#ae81ff">5</span>         <span style="color:#ae81ff">0</span>       <span style="color:#ae81ff">5</span>            <span style="color:#ae81ff">0</span>           &lt;none&gt;          11s   fluentd-elasticsearch   registry.cn-beijing.aliyuncs.com/google_registry/fluentd:v2.5.2   name<span style="color:#f92672">=</span>fluentd-elasticsearch
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 可见DaemonSet在每个节点上都有相应的pod</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -owide</span>
+</span></span><span style="display:flex;"><span>NAME                          READY   STATUS    RESTARTS   AGE    IP               NODE           NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>fluentd-elasticsearch-blmjp   1/1     Running   <span style="color:#ae81ff">0</span>          2m9s   172.18.195.19    k8s-master03   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>fluentd-elasticsearch-t8bpk   1/1     Running   <span style="color:#ae81ff">0</span>          2m9s   172.17.125.29    k8s-node01     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>fluentd-elasticsearch-v8dwj   1/1     Running   <span style="color:#ae81ff">0</span>          2m9s   172.27.14.236    k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>fluentd-elasticsearch-w9wpb   1/1     Running   <span style="color:#ae81ff">0</span>          2m9s   172.25.92.74     k8s-master02   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>fluentd-elasticsearch-xrphv   1/1     Running   <span style="color:#ae81ff">0</span>          2m9s   172.25.244.193   k8s-master01   &lt;none&gt;           &lt;none&gt;
+</span></span></code></pre></div><blockquote>
+<p>DaemonSet更新与回滚和Deployment一致</p>
+</blockquote>
+<h3 id="job">Job<a hidden class="anchor" aria-hidden="true" href="#job">#</a></h3>
+<p>Job 负责仅执行一次的任务，它保证批处理任务的一个或多个 Pod 成功结束。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl explain job</span>
+</span></span><span style="display:flex;"><span>KIND:     Job
+</span></span><span style="display:flex;"><span>VERSION:  batch/v1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>DESCRIPTION:
+</span></span><span style="display:flex;"><span>     Job represents the configuration of a single job.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>FIELDS:
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cat &lt;&lt; &#34;EOF&#34; &gt; job-example.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: batch/v1
+</span></span><span style="display:flex;"><span>kind: Job
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: pi
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      name: pi
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: pi
+</span></span><span style="display:flex;"><span>        image: perl
+</span></span><span style="display:flex;"><span>        command: <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;perl&#34;</span>, <span style="color:#e6db74">&#34;-Mbignum=bpi&#34;</span>, <span style="color:#e6db74">&#34;-wle&#34;</span>, <span style="color:#e6db74">&#34;print bpi(1000)&#34;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>      restartPolicy: Never
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po</span>
+</span></span><span style="display:flex;"><span>NAME                      READY   STATUS      RESTARTS   AGE
+</span></span><span style="display:flex;"><span>daemonset-example-f57kg   1/1     Running     <span style="color:#ae81ff">0</span>          13m
+</span></span><span style="display:flex;"><span>pi-2nlj5                  0/1     Completed   <span style="color:#ae81ff">0</span>          4m
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get job</span>
+</span></span><span style="display:flex;"><span>NAME   COMPLETIONS   DURATION   AGE
+</span></span><span style="display:flex;"><span>pi     1/1           3m19s      4m15s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po pi-2nlj5 -o wide</span>
+</span></span><span style="display:flex;"><span>NAME       READY   STATUS      RESTARTS   AGE     IP              NODE        NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>pi-2nlj5   0/1     Completed   <span style="color:#ae81ff">0</span>          4m54s   172.16.36.119   k8s-node1   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看日志可以看到job执行的结果</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 计算出了圆周率后1000位</span>
+</span></span></code></pre></div><p><img loading="lazy" src="https://deemoprobe.oss-cn-shanghai.aliyuncs.com/images/20201123180138.png" alt="20201123180138"  />
+</p>
+<h3 id="cronjob">CronJob<a hidden class="anchor" aria-hidden="true" href="#cronjob">#</a></h3>
+<p>Cron Job 管理基于时间的 Job，即:</p>
+<ul>
+<li>在给定时间点只运行一次</li>
+<li>周期性地在设定时间点运行</li>
+</ul>
+<p>典型的用法示例:</p>
+<ul>
+<li>在给你写的时间点调度 Job 运行</li>
+<li>创建周期性运行的 Job，例如: 数据库备份、发送邮件</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl explain cj</span>
+</span></span><span style="display:flex;"><span>KIND:     CronJob
+</span></span><span style="display:flex;"><span>VERSION:  batch/v1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>DESCRIPTION:
+</span></span><span style="display:flex;"><span>     CronJob represents the configuration of a single cron job.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>FIELDS:
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建cronjob yaml文件</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cat &lt;&lt; &#34;EOF&#34; &gt; cronjob-example.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: batch/v1
+</span></span><span style="display:flex;"><span>kind: CronJob
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: hello
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  schedule: <span style="color:#e6db74">&#34;*/1 * * * *&#34;</span> <span style="color:#75715e"># 分 时 日 月 星期</span>
+</span></span><span style="display:flex;"><span>  successfulJobsHistoryLimit: <span style="color:#ae81ff">3</span> <span style="color:#75715e"># 保留成功的记录数</span>
+</span></span><span style="display:flex;"><span>  failedJobHistoryLimit: <span style="color:#ae81ff">1</span> <span style="color:#75715e"># 保留失败的记录数</span>
+</span></span><span style="display:flex;"><span>  concurrencyPolicy: Allow <span style="color:#75715e"># 并发调度策略</span>
+</span></span><span style="display:flex;"><span>  suspend: false <span style="color:#75715e"># 是否暂停后续任务，默认false</span>
+</span></span><span style="display:flex;"><span>  jobTemplate:
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      template:
+</span></span><span style="display:flex;"><span>	    metadata:
+</span></span><span style="display:flex;"><span>		  labels:
+</span></span><span style="display:flex;"><span>		    run: hello
+</span></span><span style="display:flex;"><span>        spec:
+</span></span><span style="display:flex;"><span>          containers:
+</span></span><span style="display:flex;"><span>          - name: hello
+</span></span><span style="display:flex;"><span>            image: busybox
+</span></span><span style="display:flex;"><span>            args:
+</span></span><span style="display:flex;"><span>            - /bin/sh
+</span></span><span style="display:flex;"><span>            - -c
+</span></span><span style="display:flex;"><span>            - date; echo Hello CronJob
+</span></span><span style="display:flex;"><span>			imagePolicy: Always
+</span></span><span style="display:flex;"><span>          restartPolicy: OnFailure
+</span></span><span style="display:flex;"><span>		  
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f cronjob-example.yaml</span>
+</span></span><span style="display:flex;"><span>cronjob.batch/hello created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get cj</span>
+</span></span><span style="display:flex;"><span>NAME    SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE
+</span></span><span style="display:flex;"><span>hello   */1 * * * *   False     <span style="color:#ae81ff">0</span>        44s             69s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po</span>
+</span></span><span style="display:flex;"><span>NAME                   READY   STATUS      RESTARTS   AGE
+</span></span><span style="display:flex;"><span>hello-27366655-8mm5c   0/1     Completed   <span style="color:#ae81ff">0</span>          84s
+</span></span><span style="display:flex;"><span>hello-27366656-pjbv6   0/1     Completed   <span style="color:#ae81ff">0</span>          24s
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看输出日志</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl logs hello-27366655-8mm5c</span>
+</span></span><span style="display:flex;"><span>Wed Jan <span style="color:#ae81ff">12</span> 14:55:17 UTC <span style="color:#ae81ff">2022</span>
+</span></span><span style="display:flex;"><span>Hello CronJob
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl logs hello-27366656-pjbv6</span>
+</span></span><span style="display:flex;"><span>Wed Jan <span style="color:#ae81ff">12</span> 14:56:15 UTC <span style="color:#ae81ff">2022</span>
+</span></span><span style="display:flex;"><span>Hello CronJob
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get job</span>
+</span></span><span style="display:flex;"><span>NAME             COMPLETIONS   DURATION   AGE
+</span></span><span style="display:flex;"><span>hello-27366655   1/1           17s        2m29s
+</span></span><span style="display:flex;"><span>hello-27366656   1/1           16s        89s
+</span></span><span style="display:flex;"><span>hello-27366657   0/1           29s        29s
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 删除cronjob</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl delete cronjob hello</span>
+</span></span><span style="display:flex;"><span>cronjob.batch <span style="color:#e6db74">&#34;hello&#34;</span> deleted
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get job</span>
+</span></span><span style="display:flex;"><span>No resources found in default namespace.
+</span></span></code></pre></div><p>并发调度策略concurrencyPolicy:</p>
+<ul>
+<li>Allow：允许多个任务同时进行</li>
+<li>Forbid：不允许并发，当前任务未完成，新任务不会创建</li>
+<li>Replace：如果之前的任务尚未完成，则创建新的代替之</li>
+</ul>
+<h3 id="hpa">HPA<a hidden class="anchor" aria-hidden="true" href="#hpa">#</a></h3>
+<p>顾名思义，Horizontal Pod Autoscaling（Pod 水平自动缩放），可以基于 CPU 利用率自动伸缩 ReplicationController、Deployment、ReplicaSet 和 StatefulSet 中的 Pod 数量。除了 CPU 利用率，也可以基于其他应程序提供的<code>自定义度量指标</code>来执行自动扩缩。 Pod 自动扩缩不适用于无法扩缩的对象，比如 DaemonSet。</p>
+<p>Pod 水平自动扩缩特性由 Kubernetes API 资源和控制器实现。资源决定了控制器的行为。控制器会周期性地调整副本控制器或 Deployment 中的副本数量，以使得类似 Pod 平均 CPU 利用率、平均内存利用率这类观测到的度量值与用户所设定的目标值匹配。</p>
+<p>下面是HPA工作机制模型图:</p>
+<p><img loading="lazy" src="https://deemoprobe.oss-cn-shanghai.aliyuncs.com/images/20201222152148.png" alt="20201222152148"  />
+</p>
+<p>HPA两个版本区别:</p>
+<ul>
+<li>autoscaling/v1：稳定版本，只支持 cpu</li>
+<li>autoscaling/v2beta：测试阶段
+<ul>
+<li>v2beta1(支持CPU、内存和自定义指标)</li>
+<li>v2beta2(支持CPU、内存、自定义指标Custom和额外指标ExternalMetrics)</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Kubernetes目前（v1.23.0后）autoscaling/v2版本已进入稳定版，支持CPU、内存、自定义指标Custom和额外指标ExternalMetrics</p>
+</blockquote>
+<h4 id="指标">指标<a hidden class="anchor" aria-hidden="true" href="#指标">#</a></h4>
+<p>Pod 水平自动伸缩器的实现是一个控制回路，由控制器管理器的<code>--horizontal-pod-autoscaler-sync-period</code>参数指定周期（默认值为 15 秒）。</p>
+<p>每个周期内，控制器管理器根据每个<code>HorizontalPodAutoscaler</code>定义中指定的指标查询资源利用率。控制器管理器可以从资源度量指标 API（按 Pod 统计的资源用量）和自定义度量指标 API（其他指标）获取度量值。</p>
+<ul>
+<li>对于按 Pod 统计的资源指标（如 CPU），控制器从资源指标 API 中获取每一个<code>HorizontalPodAutoscaler</code>指定的 Pod 的度量值，如果设置了目标使用率，控制器获取每个 Pod 中的容器资源使用情况，并计算资源使用率。 如果设置了 target 值，将直接使用原始数据（不再计算百分比）。 接下来，控制器根据平均的资源使用率或原始值计算出扩缩的比例，进而计算出目标副本数。</li>
+<li>如果 Pod 使用自定义指标，控制器机制与资源指标类似，区别在于自定义指标只使用原始值，而不是使用率。</li>
+<li>如果 Pod 使用对象指标和外部指标（每个指标描述一个对象信息）。这个指标将直接根据目标设定值相比较，并生成一个上面提到的扩缩比例。在<code>autoscaling/v2beta2</code>版本 API 中，这个指标也可以根据 Pod 数量平分后再计算。</li>
+</ul>
+<p>通常情况下，控制器将从一系列的聚合API（metrics.k8s.io、custom.metrics.k8s.io 和 external.metrics.k8s.io）中获取度量值。<code>metrics.k8s.io</code> API 通常由 Metrics 服务器（需要提前启动）提供。</p>
+<h4 id="hpa使用">HPA使用<a hidden class="anchor" aria-hidden="true" href="#hpa使用">#</a></h4>
+<p>1.使用kubectl</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 自动伸缩deploy/php-apache，目标CPU使用率50%，deploy副本数在1~10之间</span>
+</span></span><span style="display:flex;"><span>kubectl autoscale deployment php-apache --cpu-percent<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span> --min<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> --max<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>
+</span></span></code></pre></div><p>2.使用yaml创建</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 作用同上</span>
+</span></span><span style="display:flex;"><span>apiVersion: autoscaling/v2
+</span></span><span style="display:flex;"><span>kind: HorizontalPodAutoscaler
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: php-apache
+</span></span><span style="display:flex;"><span>  namespace: default
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  scaleTargetRef:
+</span></span><span style="display:flex;"><span>    apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>    kind: Deployment
+</span></span><span style="display:flex;"><span>    name: php-apache
+</span></span><span style="display:flex;"><span>  minReplicas: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  maxReplicas: <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>  targetCPUUtilizationPercentage: <span style="color:#ae81ff">50</span>
+</span></span></code></pre></div><h4 id="示例">示例<a hidden class="anchor" aria-hidden="true" href="#示例">#</a></h4>
+<p>下载国内示例镜像</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 集群所有可调度Pod的节点先获取要使用的hpa示例镜像</span>
+</span></span><span style="display:flex;"><span>docker pull registry.cn-beijing.aliyuncs.com/google_registry/hpa-example
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cat &lt;&lt; &#34;EOF&#34; &gt; php-apache.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: php-apache
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      hpa: php-apache
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        hpa: php-apache
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: php-apache
+</span></span><span style="display:flex;"><span>        image: registry.cn-beijing.aliyuncs.com/google_registry/hpa-example
+</span></span><span style="display:flex;"><span>        imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>        ports:
+</span></span><span style="display:flex;"><span>        - containerPort: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>        resources:
+</span></span><span style="display:flex;"><span>          limits:
+</span></span><span style="display:flex;"><span>            cpu: 500m
+</span></span><span style="display:flex;"><span>          requests:
+</span></span><span style="display:flex;"><span>            cpu: 200m
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Service
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: php-apache
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    hpa: php-apache
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  ports:
+</span></span><span style="display:flex;"><span>  - port: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    hpa: php-apache
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f php-apache.yaml </span>
+</span></span><span style="display:flex;"><span>deployment.apps/php-apache created
+</span></span><span style="display:flex;"><span>service/php-apache created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deployments.apps </span>
+</span></span><span style="display:flex;"><span>NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>php-apache   1/1     <span style="color:#ae81ff">1</span>            <span style="color:#ae81ff">1</span>           9s
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建HPA</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 当pod中CPU使用率达50%就扩容.最小1个,最大10个</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10</span>
+</span></span><span style="display:flex;"><span>horizontalpodautoscaler.autoscaling/php-apache autoscaled
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get hpa</span>
+</span></span><span style="display:flex;"><span>NAME         REFERENCE               TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+</span></span><span style="display:flex;"><span>php-apache   Deployment/php-apache   0%/50%    <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">10</span>        <span style="color:#ae81ff">1</span>          18s
+</span></span></code></pre></div><ul>
+<li>压测php-apache</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 创建压测Pod并进入, 先不要退出</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl run -it load-test --image=busybox /bin/sh</span>
+</span></span><span style="display:flex;"><span>/ <span style="color:#75715e"># </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 另起一窗口可查看到pod在运行</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po | grep load</span>
+</span></span><span style="display:flex;"><span>load-test                     1/1     Running   <span style="color:#ae81ff">0</span>             26s
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 在load-test继续中操作，连续访问php-apache的Service</span>
+</span></span><span style="display:flex;"><span>/ <span style="color:#75715e"># while true; do wget -q -O- http://php-apache.default.svc.cluster.local; done</span>
+</span></span><span style="display:flex;"><span>OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 一分钟左右，在另外一个窗口可看到，负载飙升, 副本数增多</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get hpa</span>
+</span></span><span style="display:flex;"><span>NAME         REFERENCE               TARGETS    MINPODS   MAXPODS   REPLICAS   AGE
+</span></span><span style="display:flex;"><span>php-apache   Deployment/php-apache   254%/50%   <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">10</span>        <span style="color:#ae81ff">3</span>          21m
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 自动扩容</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deploy,rs,po</span>
+</span></span><span style="display:flex;"><span>NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>deployment.apps/php-apache   6/6     <span style="color:#ae81ff">6</span>            <span style="color:#ae81ff">6</span>           23m
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                    DESIRED   CURRENT   READY   AGE
+</span></span><span style="display:flex;"><span>replicaset.apps/php-apache-7db9c95858   <span style="color:#ae81ff">6</span>         <span style="color:#ae81ff">6</span>         <span style="color:#ae81ff">6</span>       23m
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                              READY   STATUS    RESTARTS      AGE
+</span></span><span style="display:flex;"><span>pod/php-apache-7db9c95858-6wrp2   1/1     Running   <span style="color:#ae81ff">0</span>             32s
+</span></span><span style="display:flex;"><span>pod/php-apache-7db9c95858-7dbjv   1/1     Running   <span style="color:#ae81ff">0</span>             10m
+</span></span><span style="display:flex;"><span>pod/php-apache-7db9c95858-cfwrk   1/1     Running   <span style="color:#ae81ff">0</span>             32s
+</span></span><span style="display:flex;"><span>pod/php-apache-7db9c95858-ksbgh   1/1     Running   <span style="color:#ae81ff">0</span>             47s
+</span></span><span style="display:flex;"><span>pod/php-apache-7db9c95858-m9mtn   1/1     Running   <span style="color:#ae81ff">0</span>             47s
+</span></span><span style="display:flex;"><span>pod/php-apache-7db9c95858-znczt   1/1     Running   <span style="color:#ae81ff">0</span>             32s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 停止压测</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ctrl+C停止在跑的循环</span>
+</span></span><span style="display:flex;"><span>/ <span style="color:#75715e"># while true; do wget -q -O- http://php-apache.default.svc.cluster.local; done</span>
+</span></span><span style="display:flex;"><span>OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!.&lt;省略很多输出&gt;..!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!OK!^C
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 停止压测后负载降下来</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get hpa</span>
+</span></span><span style="display:flex;"><span>NAME         REFERENCE               TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+</span></span><span style="display:flex;"><span>php-apache   Deployment/php-apache   0%/50%    <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">10</span>        <span style="color:#ae81ff">6</span>          24m
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 再过几分钟副本数也降了</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get hpa</span>
+</span></span><span style="display:flex;"><span>NAME         REFERENCE               TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+</span></span><span style="display:flex;"><span>php-apache   Deployment/php-apache   0%/50%    <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">10</span>        <span style="color:#ae81ff">1</span>          29m
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deploy,rs,po</span>
+</span></span><span style="display:flex;"><span>NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>deployment.apps/php-apache   1/1     <span style="color:#ae81ff">1</span>            <span style="color:#ae81ff">1</span>           31m
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                                    DESIRED   CURRENT   READY   AGE
+</span></span><span style="display:flex;"><span>replicaset.apps/php-apache-7db9c95858   <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">1</span>         <span style="color:#ae81ff">1</span>       31m
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                              READY   STATUS    RESTARTS      AGE
+</span></span><span style="display:flex;"><span>pod/php-apache-7db9c95858-7dbjv   1/1     Running   <span style="color:#ae81ff">0</span>             18m
+</span></span></code></pre></div><blockquote>
+<p>说明:停止压测，pod数量也不会立即降下来.而是过段时间后才会慢慢降下来.这是为了防止由于网络原因或者间歇性流量突增、突降，导致pod回收太快后面流量上来后Pod数量不够</p>
+</blockquote>
+
+
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="prev" href="https://deemoprobe.github.io/posts/tech/kuberneteslabelselector/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>KubernetesLabelSelector</span>
+  </a>
+  <a class="next" href="https://deemoprobe.github.io/posts/tech/kubernetespod/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>KubernetesPod</span>
+  </a>
+</nav>
+
+        </footer>
+    </div>
+</article>
+</main>
+
+<footer class="footer">
+    
+        <span id="runtime_span"></span>
+        <script
+            type="text/javascript">function show_runtime() { window.setTimeout("show_runtime()", 1000); X = new Date("1/1/2023 1:00:00"); Y = new Date(); T = (Y.getTime() - X.getTime()); M = 24 * 60 * 60 * 1000; a = T / M; A = Math.floor(a); b = (a - A) * 24; B = Math.floor(b); c = (b - B) * 60; C = Math.floor((b - B) * 60); D = Math.floor((c - C) * 60); runtime_span.innerHTML = "网站已运行" + A + "天" + B + "小时" + C + "分" + D + "秒" } show_runtime();</script>
+    
+    
+    <br>
+    <span>
+        Copyright
+        &copy;
+        2022-2023
+        <a href="https://deemoprobe.github.io/" style="color:#939393;">William&#39;s Blog</a>
+        All Rights Reserved
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '📄复制';
+
+        function copyingDone() {
+            copybutton.innerText = '👌🏻已复制!';
+            setTimeout(() => {
+                copybutton.innerText = '📄复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+
+<script>
+    $("code[class^=language] ").on("mouseover", function () {
+        if (this.clientWidth < this.scrollWidth) {
+            $(this).css("width", "135%")
+            $(this).css("border-top-right-radius", "var(--radius)")
+        }
+    }).on("mouseout", function () {
+        $(this).css("width", "100%")
+        $(this).css("border-top-right-radius", "unset")
+    })
+</script>
+</body>
+
+</html>

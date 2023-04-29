@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>Read | William&#39;s Blog</title>
-<meta name="keywords" content="">
-<meta name="description" content="页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能">
+<title>KubernetesWebDemo | William&#39;s Blog</title>
+<meta name="keywords" content="kubernetes">
+<meta name="description" content="Kubernetes Web实例">
 <meta name="author" content="deemoprobe">
-<link rel="canonical" href="https://deemoprobe.github.io/posts/read/read/">
+<link rel="canonical" href="https://deemoprobe.github.io/posts/tech/kuberneteswebdemo/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.4ff503bcd1fac86ff7aae2a7670a5373c685d74bf74dc61eb3b14254f795b8f7.css" integrity="sha256-T/UDvNH6yG/3quKnZwpTc8aF10v3TcYes7FCVPeVuPc=" rel="preload stylesheet" as="style">
 <script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
         onload="hljs.initHighlightingOnLoad();"></script>
@@ -75,16 +75,18 @@ var _hmt = _hmt || [];
   s.parentNode.insertBefore(hm, s);
 })();
 </script>
-<meta property="og:title" content="Read" />
-<meta property="og:description" content="页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能" />
+<meta property="og:title" content="KubernetesWebDemo" />
+<meta property="og:description" content="Kubernetes Web实例" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://deemoprobe.github.io/posts/read/read/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2023-04-26T11:53:50+08:00" />
-<meta property="article:modified_time" content="2023-04-26T11:53:50+08:00" />
+<meta property="og:url" content="https://deemoprobe.github.io/posts/tech/kuberneteswebdemo/" />
+<meta property="og:image" content="https://deemoprobe.github.io/img/kubernetes.png" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-04-29T14:27:46+08:00" />
+<meta property="article:modified_time" content="2023-04-29T14:27:46+08:00" />
 
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Read"/>
-<meta name="twitter:description" content="页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能"/>
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://deemoprobe.github.io/img/kubernetes.png" />
+<meta name="twitter:title" content="KubernetesWebDemo"/>
+<meta name="twitter:description" content="Kubernetes Web实例"/>
 
 
 <script type="application/ld+json">
@@ -103,14 +105,14 @@ var _hmt = _hmt || [];
         {
           "@type": "ListItem",
           "position":  2 ,
-          "name": "📕 阅读",
-          "item": "https://deemoprobe.github.io/posts/read/"
+          "name": "👨🏻‍💻 技术",
+          "item": "https://deemoprobe.github.io/posts/tech/"
         }, 
     {
       "@type": "ListItem",
       "position":  3 ,
-      "name": "Read",
-      "item": "https://deemoprobe.github.io/posts/read/read/"
+      "name": "KubernetesWebDemo",
+      "item": "https://deemoprobe.github.io/posts/tech/kuberneteswebdemo/"
     }
   ]
 }
@@ -119,24 +121,24 @@ var _hmt = _hmt || [];
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Read",
-  "name": "Read",
-  "description": "页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能",
+  "headline": "KubernetesWebDemo",
+  "name": "KubernetesWebDemo",
+  "description": "Kubernetes Web实例",
   "keywords": [
-    ""
+    "kubernetes"
   ],
-  "articleBody": "页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能\n",
-  "wordCount" : "43",
+  "articleBody": "实例说明 创建运行在Tomcat里面的Web APP，实现JSP页面通过jdbc直接访问MySQL数据库在页面上展示并动态添加数据。基于书籍《Kubernetes权威指南》中的一个实验。 需要两个容器: Web APP 和 MySQL\n创建MySQL # 创建RC cat \u003c\u003c \"EOF\" \u003e mysql_rc.yaml apiVersion: v1 # 定义为 RC (副本控制器) # ReplicationSet目前在替代ReplicationController的写法,意义相同 kind: ReplicationController metadata: # RC的名称,全局唯一 name: mysql spec: # 希望创建的pod个数 replicas: 1 selector: # 选择符合该标签的pod app: mysql # 根据模板下的定义来创建pod template: metadata: labels: # pod的标签,对应RC的selector app: mysql # 定义pod规则 spec: # pod内容器的定义 containers: # 容器名称 - name: mysql # 容器所使用的的镜像(不指定版本的话就默认拉取最新版) # 由于最新版驱动的问题, 所以最好使用指定版本 image: mysql:5.6 ports: # 开放的端口号 - containerPort: 3306 # 容器环境变量 env: - name: MYSQL_ROOT_PASSWORD value: \"123456\" EOF kubectl create -f mysql_rc.yaml # 创建 SVC cat \u003c\u003c \"EOF\" \u003e mysql_svc.yaml apiVersion: v1 kind: Service metadata: name: mysql spec: ports: - port: 3306 selector: app: mysql EOF kubectl create -f mysql_svc.yaml [root@k8main manifests]# kubectl get pods,svc NAME READY STATUS RESTARTS AGE pod/mysql-8d27z 1/1 Running 0 6m42s NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE service/mysql ClusterIP 192.168.68.128 3306/TCP 10s # 查看pod状态 kubectl describe po mysql 创建 MyWeb APP # 创建RC cat \u003c\u003c \"EOF\" \u003e myweb_rc.yaml apiVersion: v1 kind: ReplicationController metadata: name: myweb spec: replicas: 2 selector: app: myweb template: metadata: labels: app: myweb spec: containers: - name: myweb image: kubeguide/tomcat-app:v1 ports: - containerPort: 8080 env: - name: MYSQL_SERVICE_HOST # 这里的IP是名为MySQL的pod虚拟IP(CLUSTER-IP) value: 192.168.68.128 - name: MYSQL_SERVICE_PORT value: \"3306\" EOF kubectl create -f myweb_rc.yaml # 创建 SVC cat \u003c\u003c \"EOF\" \u003e myweb_svc.yaml apiVersion: v1 kind: Service metadata: name: myweb spec: selector: app: myweb type: NodePort ports: # 本地服务的8080端口映射到外部端口30001 - port: 8080 nodePort: 30001 EOF kubectl create -f myweb_svc.yaml 访问结果 访问地址：IP:30001/demo/\n",
+  "wordCount" : "617",
   "inLanguage": "en",
-  "datePublished": "2023-04-26T11:53:50+08:00",
-  "dateModified": "2023-04-26T11:53:50+08:00",
+  "image":"https://deemoprobe.github.io/img/kubernetes.png","datePublished": "2023-04-29T14:27:46+08:00",
+  "dateModified": "2023-04-29T14:27:46+08:00",
   "author":[{
     "@type": "Person",
     "name": "deemoprobe"
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://deemoprobe.github.io/posts/read/read/"
+    "@id": "https://deemoprobe.github.io/posts/tech/kuberneteswebdemo/"
   },
   "publisher": {
     "@type": "Organization",
@@ -245,10 +247,13 @@ var _hmt = _hmt || [];
 <article class="post-single">
     <div id="single-content">
         <header class="post-header">
-            <div class="breadcrumbs"><a href="https://deemoprobe.github.io/">🏠 主页</a>&nbsp;»&nbsp;<a href="https://deemoprobe.github.io/posts/">📚文章</a>&nbsp;»&nbsp;<a href="https://deemoprobe.github.io/posts/read/">📕 阅读</a></div>
+            
             <h1 class="post-title">
-                Read
+                KubernetesWebDemo
             </h1>
+            <div class="post-description">
+                Kubernetes Web实例
+            </div>
             <div class="post-meta">
 
 <style>
@@ -268,7 +273,7 @@ var _hmt = _hmt || [];
 <span class="parent-post-meta">
     <span id="post_meta_style_1">
         <span class="fa fa-calendar-check-o"></span>
-        <span>2023-04-26
+        <span>2023-04-29
             &nbsp;&nbsp;
         </span>
     </span>
@@ -281,13 +286,13 @@ var _hmt = _hmt || [];
     
     <span id="post_meta_style_3">
         <span class="fa fa-file-word-o"></span>
-        <span>43字
+        <span>617字
             &nbsp;&nbsp;
         </span>
     </span>
     <span id="post_meta_style_4">
         <span class="fa fa-clock-o"></span>
-        <span>1分钟
+        <span>2分钟
             &nbsp;&nbsp;
         </span>
     </span>
@@ -301,6 +306,7 @@ var _hmt = _hmt || [];
         <span class="fa fa-tags" style="opacity: 0.8"></span>
         <span>
             <span class="post-tags-meta">
+                <a href="https://deemoprobe.github.io/tags/kubernetes/" style="color: var(--secondary)!important;">kubernetes</a>
             </span>
         </span>
     </span>
@@ -318,7 +324,10 @@ var _hmt = _hmt || [];
                 </span>
 
 </div>
-        </header> <aside id="toc-container" class="toc-container wide">
+        </header> 
+<figure class="entry-cover1"><img style="zoom:50%;" loading="lazy" src="https://deemoprobe.github.io/img/kubernetes.png" alt="">
+    
+</figure><aside id="toc-container" class="toc-container wide">
     <div class="toc">
         <details  open>
         <summary accesskey="c" title="(Alt + C)">
@@ -327,7 +336,13 @@ var _hmt = _hmt || [];
 
         <div class="inner"><ul>
                 <li>
-                    <a href="#%e9%a1%b5%e9%9d%a2%e6%b5%8b%e8%af%95" aria-label="页面测试">页面测试</a>
+                    <a href="#%e5%ae%9e%e4%be%8b%e8%af%b4%e6%98%8e" aria-label="实例说明">实例说明</a></li>
+                <li>
+                    <a href="#%e5%88%9b%e5%bb%bamysql" aria-label="创建MySQL">创建MySQL</a></li>
+                <li>
+                    <a href="#%e5%88%9b%e5%bb%ba-myweb-app" aria-label="创建 MyWeb APP">创建 MyWeb APP</a></li>
+                <li>
+                    <a href="#%e8%ae%bf%e9%97%ae%e7%bb%93%e6%9e%9c" aria-label="访问结果">访问结果</a>
                 </li>
             </ul>
         </div>
@@ -392,8 +407,127 @@ var _hmt = _hmt || [];
         return rect.top + win.pageYOffset;
     }
 </script>
-        <div class="post-content"><h2 id="页面测试">页面测试<a hidden class="anchor" aria-hidden="true" href="#页面测试">#</a></h2>
-<p>由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能</p>
+        <div class="post-content"><h2 id="实例说明">实例说明<a hidden class="anchor" aria-hidden="true" href="#实例说明">#</a></h2>
+<p>创建运行在Tomcat里面的Web APP，实现JSP页面通过jdbc直接访问MySQL数据库在页面上展示并动态添加数据。基于书籍《Kubernetes权威指南》中的一个实验。
+需要两个容器: Web APP 和 MySQL</p>
+<h2 id="创建mysql">创建MySQL<a hidden class="anchor" aria-hidden="true" href="#创建mysql">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 创建RC</span>
+</span></span><span style="display:flex;"><span>cat &lt;&lt; <span style="color:#e6db74">&#34;EOF&#34;</span> &gt; mysql_rc.yaml
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 定义为 RC (副本控制器)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ReplicationSet目前在替代ReplicationController的写法,意义相同</span>
+</span></span><span style="display:flex;"><span>kind: ReplicationController
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># RC的名称,全局唯一</span>
+</span></span><span style="display:flex;"><span>  name: mysql
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># 希望创建的pod个数</span>
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 选择符合该标签的pod</span>
+</span></span><span style="display:flex;"><span>    app: mysql
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># 根据模板下的定义来创建pod</span>
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># pod的标签,对应RC的selector</span>
+</span></span><span style="display:flex;"><span>        app: mysql
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 定义pod规则</span>
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># pod内容器的定义</span>
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># 容器名称</span>
+</span></span><span style="display:flex;"><span>      - name: mysql
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 容器所使用的的镜像(不指定版本的话就默认拉取最新版)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 由于最新版驱动的问题, 所以最好使用指定版本</span>
+</span></span><span style="display:flex;"><span>        image: mysql:5.6
+</span></span><span style="display:flex;"><span>        ports:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 开放的端口号</span>
+</span></span><span style="display:flex;"><span>        - containerPort: <span style="color:#ae81ff">3306</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 容器环境变量</span>
+</span></span><span style="display:flex;"><span>        env:
+</span></span><span style="display:flex;"><span>        - name: MYSQL_ROOT_PASSWORD
+</span></span><span style="display:flex;"><span>          value: <span style="color:#e6db74">&#34;123456&#34;</span>
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>kubectl create -f mysql_rc.yaml
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建 SVC</span>
+</span></span><span style="display:flex;"><span>cat &lt;&lt; <span style="color:#e6db74">&#34;EOF&#34;</span> &gt; mysql_svc.yaml
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Service
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: mysql
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  ports:
+</span></span><span style="display:flex;"><span>    - port: <span style="color:#ae81ff">3306</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    app: mysql
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>kubectl create -f mysql_svc.yaml
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8main manifests<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get pods,svc</span>
+</span></span><span style="display:flex;"><span>NAME                         READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/mysql-8d27z              1/1     Running   <span style="color:#ae81ff">0</span>          6m42s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT<span style="color:#f92672">(</span>S<span style="color:#f92672">)</span>        AGE
+</span></span><span style="display:flex;"><span>service/mysql        ClusterIP   192.168.68.128   &lt;none&gt;        3306/TCP       10s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看pod状态</span>
+</span></span><span style="display:flex;"><span>kubectl describe po mysql
+</span></span></code></pre></div><h2 id="创建-myweb-app">创建 MyWeb APP<a hidden class="anchor" aria-hidden="true" href="#创建-myweb-app">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 创建RC</span>
+</span></span><span style="display:flex;"><span>cat &lt;&lt; <span style="color:#e6db74">&#34;EOF&#34;</span> &gt; myweb_rc.yaml
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: ReplicationController
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: myweb
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    app: myweb
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: myweb
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: myweb
+</span></span><span style="display:flex;"><span>        image: kubeguide/tomcat-app:v1
+</span></span><span style="display:flex;"><span>        ports:
+</span></span><span style="display:flex;"><span>        - containerPort: <span style="color:#ae81ff">8080</span>
+</span></span><span style="display:flex;"><span>        env:
+</span></span><span style="display:flex;"><span>        - name: MYSQL_SERVICE_HOST
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e"># 这里的IP是名为MySQL的pod虚拟IP(CLUSTER-IP)</span>
+</span></span><span style="display:flex;"><span>          value: 192.168.68.128
+</span></span><span style="display:flex;"><span>        - name: MYSQL_SERVICE_PORT
+</span></span><span style="display:flex;"><span>          value: <span style="color:#e6db74">&#34;3306&#34;</span>
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>kubectl create -f myweb_rc.yaml
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建 SVC</span>
+</span></span><span style="display:flex;"><span>cat &lt;&lt; <span style="color:#e6db74">&#34;EOF&#34;</span> &gt; myweb_svc.yaml
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Service
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: myweb
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    app: myweb
+</span></span><span style="display:flex;"><span>  type: NodePort
+</span></span><span style="display:flex;"><span>  ports:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 本地服务的8080端口映射到外部端口30001</span>
+</span></span><span style="display:flex;"><span>    - port: <span style="color:#ae81ff">8080</span>
+</span></span><span style="display:flex;"><span>      nodePort: <span style="color:#ae81ff">30001</span>
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>kubectl create -f myweb_svc.yaml
+</span></span></code></pre></div><h2 id="访问结果">访问结果<a hidden class="anchor" aria-hidden="true" href="#访问结果">#</a></h2>
+<p>访问地址：IP:30001/demo/</p>
+<p><img loading="lazy" src="https://deemoprobe.oss-cn-shanghai.aliyuncs.com/images/20201026143020.png" alt="20201026143020"  />
+</p>
 
 
         </div>
@@ -401,15 +535,15 @@ var _hmt = _hmt || [];
         <footer class="post-footer">
             
 <nav class="paginav">
-  <a class="prev" href="https://deemoprobe.github.io/posts/life/life/">
+  <a class="prev" href="https://deemoprobe.github.io/posts/tech/kubernetesconfigmap/">
     <span class="title">« 上一页</span>
     <br>
-    <span>Life</span>
+    <span>KubernetesConfigMap</span>
   </a>
-  <a class="next" href="https://deemoprobe.github.io/posts/blog/blog/">
+  <a class="next" href="https://deemoprobe.github.io/posts/tech/kuberneteslabelselector/">
     <span class="title">下一页 »</span>
     <br>
-    <span>Blog</span>
+    <span>KubernetesLabelSelector</span>
   </a>
 </nav>
 

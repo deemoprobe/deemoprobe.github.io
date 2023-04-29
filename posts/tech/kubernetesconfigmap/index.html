@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>KubernetesConfigMap | William&#39;s Blog</title>
+<meta name="keywords" content="kubernetes">
+<meta name="description" content="Kubernetes ">
+<meta name="author" content="deemoprobe">
+<link rel="canonical" href="https://deemoprobe.github.io/posts/tech/kubernetesconfigmap/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4ff503bcd1fac86ff7aae2a7670a5373c685d74bf74dc61eb3b14254f795b8f7.css" integrity="sha256-T/UDvNH6yG/3quKnZwpTc8aF10v3TcYes7FCVPeVuPc=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
+        onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="icon" type="image/png" sizes="16x16" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="icon" type="image/png" sizes="32x32" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="apple-touch-icon" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="mask-icon" href="https://deemoprobe.github.io/img/bear.gif">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script defer src="https://unpkg.com/mermaid@8.8.1/dist/mermaid.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script src="https://cdn.staticfile.org/jquery/3.6.3/jquery.min.js"></script>
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="KubernetesConfigMap" />
+<meta property="og:description" content="Kubernetes " />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://deemoprobe.github.io/posts/tech/kubernetesconfigmap/" />
+<meta property="og:image" content="https://deemoprobe.github.io/img/kubernetes.png" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-04-29T14:28:03+08:00" />
+<meta property="article:modified_time" content="2023-04-29T14:28:03+08:00" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://deemoprobe.github.io/img/kubernetes.png" />
+<meta name="twitter:title" content="KubernetesConfigMap"/>
+<meta name="twitter:description" content="Kubernetes "/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://deemoprobe.github.io/posts/"
+        },
+
+        {
+          "@type": "ListItem",
+          "position":  2 ,
+          "name": "👨🏻‍💻 技术",
+          "item": "https://deemoprobe.github.io/posts/tech/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "KubernetesConfigMap",
+      "item": "https://deemoprobe.github.io/posts/tech/kubernetesconfigmap/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "KubernetesConfigMap",
+  "name": "KubernetesConfigMap",
+  "description": "Kubernetes ",
+  "keywords": [
+    "kubernetes"
+  ],
+  "articleBody": "概念 ConfigMap是一种API对象，用来将非机密性的数据保存到健值对中。使用时可以用作环境变量、命令参数或者存储卷中的配置文件。提供向容器内注入信息的功能。\nConfigMap将环境配置信息和容器镜像解耦，便于应用配置的修改。\n备注: ConfigMap 并不提供保密或者加密功能。如果想存储的数据是机密的，可以使用Secret或其他第三方工具来保证数据的私密性。而不是用 ConfigMap。\nConfigMap的一些限制:\n如需获取ConfigMap的内容到容器，则ConfigMap必须在Pod之前创建 ConfigMap受Namespace限制，Pod只有和ConfigMap处于相同Namespace下的才可以引用它 静态Pod无法引用ConfigMap 使用volumeMounts给Pod挂载ConfigMap时，mountPath只能是目录，而不能是文件；容器内部该目录下如果原有文件，那么将会被新挂载的ConfigMap覆盖 使用ConfigMap 通过目录创建 --from-file指定目录下所有文件都作为ConfigMap中的键值对来使用，键为文件名，值为文件内容。\n[root@k8s-master01 ~]# mkdir -p yamls/configmap [root@k8s-master01 ~]# cd yamls/configmap/ [root@k8s-master01 configmap]# vim game.properties enemies=aliens lives=3 enemies.cheat=true enemies.cheat.level=noGoodRotten secret.code.passphrase=UUDDLRLRBABAs secret.code.allowed=true secret.code.lives=30 [root@k8s-master01 configmap]# vim ui.properties color.good=purple color.bad=yellow allow.textmode=true how.nice.to.look=fairlyNice [root@k8s-master01 configmap]# kubectl create configmap game --from-file=/root/yamls/configmap/ configmap/game created [root@k8s-master01 configmap]# kubectl get cm NAME DATA AGE game 2 44s [root@k8s-master01 configmap]# kubectl get cm game -oyaml apiVersion: v1 data: game.properties: | # |后为文件键值对内容 enemies=aliens lives=3 enemies.cheat=true enemies.cheat.level=noGoodRotten secret.code.passphrase=UUDDLRLRBABAs secret.code.allowed=true secret.code.lives=30 ui.properties: | color.good=purple color.bad=yellow allow.textmode=true how.nice.to.look=fairlyNice kind: ConfigMap metadata: creationTimestamp: \"2022-03-15T01:27:41Z\" name: game namespace: default resourceVersion: \"161625\" uid: 784d08a8-1d6e-4f5f-ab2e-330348d4bf69 # 也可以通过describe命令查看 [root@k8s-master01 configmap]# kubectl describe cm game Name: game Namespace: default Labels: Annotations: Data ==== game.properties: ---- enemies=aliens lives=3 enemies.cheat=true enemies.cheat.level=noGoodRotten secret.code.passphrase=UUDDLRLRBABAs secret.code.allowed=true secret.code.lives=30 ui.properties: ---- color.good=purple color.bad=yellow allow.textmode=true how.nice.to.look=fairlyNice BinaryData # 用来保存二进制数据作为base64编码字串 ==== Events: 通过文件创建 --from-file指定对应配置文件, 可以多次使用引入不同的配置文件\n[root@k8s-master01 configmap]# kubectl create configmap game-ui --from-file=/root/yamls/configmap/ui.properties configmap/game-ui created [root@k8s-master01 configmap]# kubectl get cm NAME DATA AGE game 2 6m44s game-ui 1 14s [root@k8s-master01 configmap]# kubectl describe cm game-ui Name: game-ui Namespace: default Labels: Annotations: Data ==== ui.properties: ---- color.good=purple color.bad=yellow allow.textmode=true how.nice.to.look=fairlyNice BinaryData ==== Events: 通过命令行创建 --from-literal传递配置参数, 可多次使用\n[root@k8s-master01 configmap]# kubectl create configmap game-cli --from-literal=game.name=gogogo --from-literal=\"game.date=2022-03\" configmap/game-cli created [root@k8s-master01 configmap]# kubectl describe cm game-cli Name: game-cli Namespace: default Labels: Annotations: Data ==== game.date: ---- 2022-03 game.name: ---- gogogo BinaryData ==== Events: 通过YAML文件创建 [root@k8s-master01 configmap]# vim game-yaml.yaml apiVersion: v1 kind: ConfigMap metadata: name: game-yaml data: # 类属性键;每一个键都映射到一个简单的值 player_initial_lives: \"3\" ui_properties_file_name: 'user-interface.properties' # 类文件键 game.properties: | enemy.types=aliens,monsters player.maximum-lives=5 user-interface.properties: | color.good=green color.bad=yellow [root@k8s-master01 configmap]# kubectl apply -f game-yaml.yaml configmap/game-yaml created [root@k8s-master01 configmap]# kubectl describe cm game-yaml Name: game-yaml Namespace: default Labels: Annotations: Data ==== game.properties: ---- enemy.types=aliens,monsters player.maximum-lives=5 player_initial_lives: ---- 3 ui_properties_file_name: ---- user-interface.properties user-interface.properties: ---- color.good=green color.bad=yellow BinaryData ==== Events: Pod中使用ConfigMap 在Pod中加载ConfigMap配置\n查看当前的configmap [root@k8s-master01 configmap]# kubectl get cm NAME DATA AGE game 2 16m game-cli 2 5m13s game-ui 1 10m game-yaml 4 2m32s 作为环境变量引用 [root@k8s-master01 configmap]# vim pod-from-cm.yaml apiVersion: v1 kind: Pod metadata: name: pod-from-cm spec: containers: - name: myapp image: registry.cn-beijing.aliyuncs.com/google_registry/myapp:v1 command: [\"/bin/sh\", \"-c\", \"env\"] ### 引用方式1，直接应用键值对 env: - name: GAME_NAME # 指定环境变量名 valueFrom: configMapKeyRef: name: game-cli ### 这个name的值来自 ConfigMap key: game.name ### 这个key的值为需要取值的键 - name: GAME_DATE valueFrom: configMapKeyRef: name: game-cli key: game.date ### 引用方式2，引用ConfigMap文件 envFrom: - configMapRef: name: game ### 这个name的值来自 ConfigMap restartPolicy: Never [root@k8s-master01 configmap]# kubectl apply -f pod-from-cm.yaml pod/pod-from-cm created [root@k8s-master01 configmap]# kubectl get po pod-from-cm NAME READY STATUS RESTARTS AGE pod-from-cm 0/1 Completed 0 5s # 查看Pod日志，可见相关环境变量已经导入 [root@k8s-master01 configmap]# kubectl logs pod-from-cm KUBERNETES_SERVICE_PORT=443 MYAPP_SVC_PORT_80_TCP_ADDR=10.98.57.156 KUBERNETES_PORT=tcp://10.96.0.1:443 ui.properties=color.good=purple color.bad=yellow allow.textmode=true how.nice.to.look=fairlyNice MYAPP_SVC_PORT_80_TCP_PORT=80 HOSTNAME=pod-from-cm SHLVL=1 GAME_DATE=2022-03 MYAPP_SVC_PORT_80_TCP_PROTO=tcp HOME=/root NGINX_PORT_80_TCP=tcp://10.100.71.223:80 game.properties=enemies=aliens lives=3 enemies.cheat=true enemies.cheat.level=noGoodRotten secret.code.passphrase=UUDDLRLRBABAs secret.code.allowed=true secret.code.lives=30 GAME_NAME=gogogo ... 输出环境变量 # 创建yaml文件 [root@k8s-master01 configmap]# vim pod-cm-env.yaml apiVersion: v1 kind: Pod metadata: name: pod-cm-env spec: containers: - name: myapp image: registry.cn-beijing.aliyuncs.com/google_registry/myapp:v1 command: [\"/bin/sh\", \"-c\", \"echo \\\"Game name is $(GAME_NAME_AGAIN)\\nGame date is $(GAME_DATE_AGAIN)\\\"\"] env: - name: GAME_NAME_AGAIN valueFrom: configMapKeyRef: name: game-cli key: game.name - name: GAME_DATE_AGAIN valueFrom: configMapKeyRef: name: game-cli key: game.date restartPolicy: Never [root@k8s-master01 configmap]# kubectl apply -f pod-cm-env.yaml pod/pod-cm-env created [root@k8s-master01 configmap]# kubectl get po pod-cm-env NAME READY STATUS RESTARTS AGE pod-cm-env 0/1 Completed 0 6s [root@k8s-master01 configmap]# kubectl logs pod-cm-env Game name is gogogo Game date is 2022-03 数据卷中使用 [root@k8s-master01 configmap]# vim po-cm-vol.yaml apiVersion: v1 kind: Pod metadata: name: pod-cm-vol spec: containers: - name: myapp image: registry.cn-beijing.aliyuncs.com/google_registry/myapp:v1 command: [\"/bin/sh\", \"-c\", \"sleep 600\"] # 延迟十分钟再进入completed volumeMounts: - name: config-volume mountPath: \"/config\" readOnly: true volumes: - name: config-volume configMap: name: game items: # 如果不指定，则调用该cm下所有配置 - key: \"game.properties\" path: \"game.properties\" restartPolicy: Never [root@k8s-master01 configmap]# kubectl apply -f pod-cm-vol.yaml pod/pod-cm-vol created [root@k8s-master01 configmap]# kubectl get po pod-cm-vol NAME READY STATUS RESTARTS AGE pod-cm-vol 1/1 Running 0 8s # 确认cm配置 [root@k8s-master01 configmap]# kubectl describe cm game Name: game Namespace: default Labels: Annotations: Data ==== game.properties: ---- enemies=aliens lives=3 enemies.cheat=true enemies.cheat.level=noGoodRotten secret.code.passphrase=UUDDLRLRBABAs secret.code.allowed=true secret.code.lives=30 ui.properties: ---- color.good=purple color.bad=yellow allow.textmode=true how.nice.to.look=fairlyNice BinaryData ==== Events: # 进入pod-cm-vol内查看配置挂载的文件 [root@k8s-master volume]# kubectl exec -it pod-configmap-volume sh [root@k8s-master01 configmap]# kubectl exec -it pod-cm-vol -- sh / # ls /config game.properties / # cat /config/game.properties # 此文件链接的文件为只读文件，通常是真实数据文件的软链接 enemies=aliens lives=3 enemies.cheat=true enemies.cheat.level=noGoodRotten secret.code.passphrase=UUDDLRLRBABAs secret.code.allowed=true secret.code.lives=30 ConfigMap热更新 准备工作 # 创建yaml文件,创建ConfigMap和Deploy [root@k8s-master01 configmap]# vim pod-cm-hot.yaml app: myapp matchLabels: selector: replicas: 2 release: v1 apiVersion: v1 kind: ConfigMap metadata: name: cm-loglevel namespace: default data: log_level: INFO --- apiVersion: apps/v1 kind: Deployment metadata: name: mydeploy namespace: default spec: replicas: 2 selector: matchLabels: app: myapp release: v1 template: metadata: labels: app: myapp release: v1 spec: containers: - name: myapp image: registry.cn-beijing.aliyuncs.com/google_registry/myapp:v1 imagePullPolicy: IfNotPresent ports: - containerPort: 80 volumeMounts: - name: config-volume mountPath: \"/config\" volumes: - name: config-volume configMap: name: cm-loglevel [root@k8s-master01 configmap]# kubectl apply -f pod-cm-hot.yaml configmap/cm-loglevel created deployment.apps/mydeploy created [root@k8s-master01 configmap]# kubectl get deployments.apps mydeploy NAME READY UP-TO-DATE AVAILABLE AGE mydeploy 2/2 2 2 16s [root@k8s-master01 configmap]# kubectl get cm cm-loglevel NAME DATA AGE cm-loglevel 1 28s [root@k8s-master01 configmap]# kubectl describe cm cm-loglevel Name: cm-loglevel Namespace: default Labels: Annotations: Data ==== log_level: ---- INFO BinaryData ==== Events: [root@k8s-master01 configmap]# kubectl get po -owide | grep mydeploy mydeploy-77c886996d-wbnrs 1/1 Running 0 100s 172.18.195.14 k8s-master03 mydeploy-77c886996d-zrg8n 1/1 Running 0 101s 172.27.14.204 k8s-node02 # 查看pod中的log_level [root@k8s-master01 configmap]# kubectl exec -it mydeploy-77c886996d-wbnrs -- cat /config/log_level INFO 热更新log_level # 修改log_level=DEBUG [root@k8s-master01 configmap]# kubectl edit cm cm-loglevel apiVersion: v1 data: log_level: DEBUG kind: ConfigMap ... # 查看对应的configmap, log_level已修改为DEBUG [root@k8s-master01 configmap]# kubectl describe cm cm-loglevel Name: cm-loglevel Namespace: default Labels: Annotations: Data ==== log_level: ---- DEBUG BinaryData ==== Events: # 查看pod中log_level已修改为DEBUG [root@k8s-master01 configmap]# kubectl exec -it mydeploy-77c886996d-wbnrs -- cat /config/log_level DEBUG 不可变的ConfigMap 为了确保ConfigMap不会被无意中修改，可以设置不可变的ConfigMap。此功能特性由ImmutableEphemeralVolumes控制。可以通过将immutable字段设置为true创建不可变更的ConfigMap。一旦某ConfigMap被标记为不可变更，则无法逆转这一变化，也无法更改data或binaryData字段的内容。只能删除并重建 ConfigMap。\n[root@k8s-master01 configmap]# vim cm-immutable.yaml apiVersion: v1 kind: ConfigMap metadata: name: cm-immutable data: name: deemoprobe date: 2022-03 label: test immutable: true [root@k8s-master01 configmap]# kubectl apply -f cm-immutable.yaml configmap/cm-immutable created [root@k8s-master01 configmap]# kubectl describe cm cm-immutable Name: cm-immutable Namespace: default Labels: Annotations: Data ==== name: ---- deemoprobe date: ---- 2022-03 label: ---- test BinaryData ==== Events: # 尝试修改yaml文件应用时会提示如下 [root@k8s-master01 configmap]# kubectl apply -f cm-immutable.yaml The ConfigMap \"cm-immutable\" is invalid: data: Forbidden: field is immutable when `immutable` is set # 尝试使用edit命令修改会提示如下 [root@k8s-master01 configmap]# kubectl edit cm cm-immutable # configmaps \"cm-immutable\" was not valid: # * data: Forbidden: field is immutable when `immutable` is set ",
+  "wordCount" : "2232",
+  "inLanguage": "en",
+  "image":"https://deemoprobe.github.io/img/kubernetes.png","datePublished": "2023-04-29T14:28:03+08:00",
+  "dateModified": "2023-04-29T14:28:03+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "deemoprobe"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://deemoprobe.github.io/posts/tech/kubernetesconfigmap/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "William's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://deemoprobe.github.io/img/bear.gif"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://deemoprobe.github.io/" accesskey="h" title="William&#39;s Blog (Alt + H)">
+            <img src="https://deemoprobe.github.io/img/bear.gif" alt="logo" aria-label="logo"
+                 height="35">William&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://deemoprobe.github.io/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/archives/" title="📈 归档">
+                <span>📈 归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/tools" title="🧱 工具">
+                <span>🧱 工具</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            
+            <h1 class="post-title">
+                KubernetesConfigMap
+            </h1>
+            <div class="post-description">
+                Kubernetes 
+            </div>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2023-04-29
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>2232字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>5分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>deemoprobe
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+            <span class="post-tags-meta">
+                <a href="https://deemoprobe.github.io/tags/kubernetes/" style="color: var(--secondary)!important;">kubernetes</a>
+            </span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    
+                </span>
+
+</div>
+        </header> 
+<figure class="entry-cover1"><img style="zoom:50%;" loading="lazy" src="https://deemoprobe.github.io/img/kubernetes.png" alt="">
+    
+</figure><aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">文章目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e6%a6%82%e5%bf%b5" aria-label="概念">概念</a></li>
+                <li>
+                    <a href="#%e4%bd%bf%e7%94%a8configmap" aria-label="使用ConfigMap">使用ConfigMap</a><ul>
+                        
+                <li>
+                    <a href="#%e9%80%9a%e8%bf%87%e7%9b%ae%e5%bd%95%e5%88%9b%e5%bb%ba" aria-label="通过目录创建">通过目录创建</a></li>
+                <li>
+                    <a href="#%e9%80%9a%e8%bf%87%e6%96%87%e4%bb%b6%e5%88%9b%e5%bb%ba" aria-label="通过文件创建">通过文件创建</a></li>
+                <li>
+                    <a href="#%e9%80%9a%e8%bf%87%e5%91%bd%e4%bb%a4%e8%a1%8c%e5%88%9b%e5%bb%ba" aria-label="通过命令行创建">通过命令行创建</a></li>
+                <li>
+                    <a href="#%e9%80%9a%e8%bf%87yaml%e6%96%87%e4%bb%b6%e5%88%9b%e5%bb%ba" aria-label="通过YAML文件创建">通过YAML文件创建</a></li></ul>
+                </li>
+                <li>
+                    <a href="#pod%e4%b8%ad%e4%bd%bf%e7%94%a8configmap" aria-label="Pod中使用ConfigMap">Pod中使用ConfigMap</a><ul>
+                        
+                <li>
+                    <a href="#%e6%9f%a5%e7%9c%8b%e5%bd%93%e5%89%8d%e7%9a%84configmap" aria-label="查看当前的configmap">查看当前的configmap</a></li>
+                <li>
+                    <a href="#%e4%bd%9c%e4%b8%ba%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f%e5%bc%95%e7%94%a8" aria-label="作为环境变量引用">作为环境变量引用</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e8%be%93%e5%87%ba%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f" aria-label="输出环境变量">输出环境变量</a></li>
+                <li>
+                    <a href="#%e6%95%b0%e6%8d%ae%e5%8d%b7%e4%b8%ad%e4%bd%bf%e7%94%a8" aria-label="数据卷中使用">数据卷中使用</a></li>
+                <li>
+                    <a href="#configmap%e7%83%ad%e6%9b%b4%e6%96%b0" aria-label="ConfigMap热更新">ConfigMap热更新</a><ul>
+                        
+                <li>
+                    <a href="#%e5%87%86%e5%a4%87%e5%b7%a5%e4%bd%9c" aria-label="准备工作">准备工作</a></li>
+                <li>
+                    <a href="#%e7%83%ad%e6%9b%b4%e6%96%b0log_level" aria-label="热更新log_level">热更新log_level</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e4%b8%8d%e5%8f%af%e5%8f%98%e7%9a%84configmap" aria-label="不可变的ConfigMap">不可变的ConfigMap</a>
+                </li>
+            </ul>
+        </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        
+        activeElement = elements[0];
+        const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+        document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+    }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+            const id = encodeURI(element.getAttribute('id')).toLowerCase();
+            if (element === activeElement){
+                document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+            } else {
+                document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+            }
+        })
+    }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+        <div class="post-content"><h2 id="概念">概念<a hidden class="anchor" aria-hidden="true" href="#概念">#</a></h2>
+<p>ConfigMap是一种API对象，用来将非机密性的数据保存到健值对中。使用时可以用作环境变量、命令参数或者存储卷中的配置文件。提供向容器内注入信息的功能。</p>
+<p>ConfigMap将环境配置信息和容器镜像解耦，便于应用配置的修改。</p>
+<p>备注: ConfigMap 并不提供保密或者加密功能。如果想存储的数据是机密的，可以使用Secret或其他第三方工具来保证数据的私密性。而不是用 ConfigMap。</p>
+<p>ConfigMap的一些<strong>限制</strong>:</p>
+<ul>
+<li>如需获取ConfigMap的内容到容器，则ConfigMap必须在Pod之前创建</li>
+<li>ConfigMap受Namespace限制，Pod只有和ConfigMap处于相同Namespace下的才可以引用它</li>
+<li>静态Pod无法引用ConfigMap</li>
+<li>使用volumeMounts给Pod挂载ConfigMap时，mountPath只能是目录，而不能是文件；容器内部该目录下如果原有文件，那么将会被新挂载的ConfigMap覆盖</li>
+</ul>
+<h2 id="使用configmap">使用ConfigMap<a hidden class="anchor" aria-hidden="true" href="#使用configmap">#</a></h2>
+<h3 id="通过目录创建">通过目录创建<a hidden class="anchor" aria-hidden="true" href="#通过目录创建">#</a></h3>
+<p><code>--from-file</code>指定目录下所有文件都作为ConfigMap中的键值对来使用，键为文件名，值为文件内容。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># mkdir -p yamls/configmap</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cd yamls/configmap/</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># vim game.properties</span>
+</span></span><span style="display:flex;"><span>enemies<span style="color:#f92672">=</span>aliens
+</span></span><span style="display:flex;"><span>lives<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>enemies.cheat<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>enemies.cheat.level<span style="color:#f92672">=</span>noGoodRotten
+</span></span><span style="display:flex;"><span>secret.code.passphrase<span style="color:#f92672">=</span>UUDDLRLRBABAs
+</span></span><span style="display:flex;"><span>secret.code.allowed<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>secret.code.lives<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># vim ui.properties</span>
+</span></span><span style="display:flex;"><span>color.good<span style="color:#f92672">=</span>purple
+</span></span><span style="display:flex;"><span>color.bad<span style="color:#f92672">=</span>yellow
+</span></span><span style="display:flex;"><span>allow.textmode<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>how.nice.to.look<span style="color:#f92672">=</span>fairlyNice
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl create configmap game --from-file=/root/yamls/configmap/</span>
+</span></span><span style="display:flex;"><span>configmap/game created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get cm</span>
+</span></span><span style="display:flex;"><span>NAME               DATA   AGE
+</span></span><span style="display:flex;"><span>game               <span style="color:#ae81ff">2</span>      44s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get cm game -oyaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>data:
+</span></span><span style="display:flex;"><span>  game.properties: | <span style="color:#75715e"># |后为文件键值对内容</span>
+</span></span><span style="display:flex;"><span>    enemies<span style="color:#f92672">=</span>aliens
+</span></span><span style="display:flex;"><span>    lives<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>    enemies.cheat<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>    enemies.cheat.level<span style="color:#f92672">=</span>noGoodRotten
+</span></span><span style="display:flex;"><span>    secret.code.passphrase<span style="color:#f92672">=</span>UUDDLRLRBABAs
+</span></span><span style="display:flex;"><span>    secret.code.allowed<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>    secret.code.lives<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>
+</span></span><span style="display:flex;"><span>  ui.properties: |
+</span></span><span style="display:flex;"><span>    color.good<span style="color:#f92672">=</span>purple
+</span></span><span style="display:flex;"><span>    color.bad<span style="color:#f92672">=</span>yellow
+</span></span><span style="display:flex;"><span>    allow.textmode<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>    how.nice.to.look<span style="color:#f92672">=</span>fairlyNice
+</span></span><span style="display:flex;"><span>kind: ConfigMap
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  creationTimestamp: <span style="color:#e6db74">&#34;2022-03-15T01:27:41Z&#34;</span>
+</span></span><span style="display:flex;"><span>  name: game
+</span></span><span style="display:flex;"><span>  namespace: default
+</span></span><span style="display:flex;"><span>  resourceVersion: <span style="color:#e6db74">&#34;161625&#34;</span>
+</span></span><span style="display:flex;"><span>  uid: 784d08a8-1d6e-4f5f-ab2e-330348d4bf69
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 也可以通过describe命令查看</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe cm game </span>
+</span></span><span style="display:flex;"><span>Name:         game
+</span></span><span style="display:flex;"><span>Namespace:    default
+</span></span><span style="display:flex;"><span>Labels:       &lt;none&gt;
+</span></span><span style="display:flex;"><span>Annotations:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Data
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>game.properties:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>enemies<span style="color:#f92672">=</span>aliens
+</span></span><span style="display:flex;"><span>lives<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>enemies.cheat<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>enemies.cheat.level<span style="color:#f92672">=</span>noGoodRotten
+</span></span><span style="display:flex;"><span>secret.code.passphrase<span style="color:#f92672">=</span>UUDDLRLRBABAs
+</span></span><span style="display:flex;"><span>secret.code.allowed<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>secret.code.lives<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ui.properties:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>color.good<span style="color:#f92672">=</span>purple
+</span></span><span style="display:flex;"><span>color.bad<span style="color:#f92672">=</span>yellow
+</span></span><span style="display:flex;"><span>allow.textmode<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>how.nice.to.look<span style="color:#f92672">=</span>fairlyNice
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BinaryData <span style="color:#75715e"># 用来保存二进制数据作为base64编码字串</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Events:  &lt;none&gt;
+</span></span></code></pre></div><h3 id="通过文件创建">通过文件创建<a hidden class="anchor" aria-hidden="true" href="#通过文件创建">#</a></h3>
+<p><code>--from-file</code>指定对应配置文件, 可以多次使用引入不同的配置文件</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl create configmap game-ui --from-file=/root/yamls/configmap/ui.properties </span>
+</span></span><span style="display:flex;"><span>configmap/game-ui created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get cm</span>
+</span></span><span style="display:flex;"><span>NAME               DATA   AGE
+</span></span><span style="display:flex;"><span>game               <span style="color:#ae81ff">2</span>      6m44s
+</span></span><span style="display:flex;"><span>game-ui            <span style="color:#ae81ff">1</span>      14s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe cm game-ui </span>
+</span></span><span style="display:flex;"><span>Name:         game-ui
+</span></span><span style="display:flex;"><span>Namespace:    default
+</span></span><span style="display:flex;"><span>Labels:       &lt;none&gt;
+</span></span><span style="display:flex;"><span>Annotations:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Data
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>ui.properties:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>color.good<span style="color:#f92672">=</span>purple
+</span></span><span style="display:flex;"><span>color.bad<span style="color:#f92672">=</span>yellow
+</span></span><span style="display:flex;"><span>allow.textmode<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>how.nice.to.look<span style="color:#f92672">=</span>fairlyNice
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BinaryData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Events:  &lt;none&gt;
+</span></span></code></pre></div><h3 id="通过命令行创建">通过命令行创建<a hidden class="anchor" aria-hidden="true" href="#通过命令行创建">#</a></h3>
+<p><code>--from-literal</code>传递配置参数, 可多次使用</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl create configmap game-cli --from-literal=game.name=gogogo --from-literal=&#34;game.date=2022-03&#34;</span>
+</span></span><span style="display:flex;"><span>configmap/game-cli created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe cm game-cli </span>
+</span></span><span style="display:flex;"><span>Name:         game-cli
+</span></span><span style="display:flex;"><span>Namespace:    default
+</span></span><span style="display:flex;"><span>Labels:       &lt;none&gt;
+</span></span><span style="display:flex;"><span>Annotations:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Data
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>game.date:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>2022-03
+</span></span><span style="display:flex;"><span>game.name:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>gogogo
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BinaryData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Events:  &lt;none&gt;
+</span></span></code></pre></div><h3 id="通过yaml文件创建">通过YAML文件创建<a hidden class="anchor" aria-hidden="true" href="#通过yaml文件创建">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># vim game-yaml.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: ConfigMap
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: game-yaml
+</span></span><span style="display:flex;"><span>data:
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># 类属性键;每一个键都映射到一个简单的值</span>
+</span></span><span style="display:flex;"><span>  player_initial_lives: <span style="color:#e6db74">&#34;3&#34;</span>
+</span></span><span style="display:flex;"><span>  ui_properties_file_name: <span style="color:#e6db74">&#39;user-interface.properties&#39;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># 类文件键</span>
+</span></span><span style="display:flex;"><span>  game.properties: |
+</span></span><span style="display:flex;"><span>    enemy.types<span style="color:#f92672">=</span>aliens,monsters
+</span></span><span style="display:flex;"><span>    player.maximum-lives<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>  user-interface.properties: |
+</span></span><span style="display:flex;"><span>    color.good<span style="color:#f92672">=</span>green
+</span></span><span style="display:flex;"><span>    color.bad<span style="color:#f92672">=</span>yellow
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f game-yaml.yaml </span>
+</span></span><span style="display:flex;"><span>configmap/game-yaml created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe cm game-yaml</span>
+</span></span><span style="display:flex;"><span>Name:         game-yaml
+</span></span><span style="display:flex;"><span>Namespace:    default
+</span></span><span style="display:flex;"><span>Labels:       &lt;none&gt;
+</span></span><span style="display:flex;"><span>Annotations:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Data
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>game.properties:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>enemy.types<span style="color:#f92672">=</span>aliens,monsters
+</span></span><span style="display:flex;"><span>player.maximum-lives<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>player_initial_lives:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>ui_properties_file_name:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>user-interface.properties
+</span></span><span style="display:flex;"><span>user-interface.properties:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>color.good<span style="color:#f92672">=</span>green
+</span></span><span style="display:flex;"><span>color.bad<span style="color:#f92672">=</span>yellow
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BinaryData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Events:  &lt;none&gt;
+</span></span></code></pre></div><h2 id="pod中使用configmap">Pod中使用ConfigMap<a hidden class="anchor" aria-hidden="true" href="#pod中使用configmap">#</a></h2>
+<p>在Pod中加载ConfigMap配置</p>
+<h3 id="查看当前的configmap">查看当前的configmap<a hidden class="anchor" aria-hidden="true" href="#查看当前的configmap">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get cm</span>
+</span></span><span style="display:flex;"><span>NAME               DATA   AGE
+</span></span><span style="display:flex;"><span>game               <span style="color:#ae81ff">2</span>      16m
+</span></span><span style="display:flex;"><span>game-cli           <span style="color:#ae81ff">2</span>      5m13s
+</span></span><span style="display:flex;"><span>game-ui            <span style="color:#ae81ff">1</span>      10m
+</span></span><span style="display:flex;"><span>game-yaml          <span style="color:#ae81ff">4</span>      2m32s
+</span></span></code></pre></div><h3 id="作为环境变量引用">作为环境变量引用<a hidden class="anchor" aria-hidden="true" href="#作为环境变量引用">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># vim pod-from-cm.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: pod-from-cm
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: myapp
+</span></span><span style="display:flex;"><span>    image: registry.cn-beijing.aliyuncs.com/google_registry/myapp:v1
+</span></span><span style="display:flex;"><span>    command: <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/bin/sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;env&#34;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">### 引用方式1，直接应用键值对</span>
+</span></span><span style="display:flex;"><span>    env:
+</span></span><span style="display:flex;"><span>    - name: GAME_NAME <span style="color:#75715e"># 指定环境变量名</span>
+</span></span><span style="display:flex;"><span>      valueFrom:
+</span></span><span style="display:flex;"><span>        configMapKeyRef:
+</span></span><span style="display:flex;"><span>          name: game-cli   <span style="color:#75715e">### 这个name的值来自 ConfigMap</span>
+</span></span><span style="display:flex;"><span>          key: game.name       <span style="color:#75715e">### 这个key的值为需要取值的键</span>
+</span></span><span style="display:flex;"><span>    - name: GAME_DATE
+</span></span><span style="display:flex;"><span>      valueFrom:
+</span></span><span style="display:flex;"><span>        configMapKeyRef:
+</span></span><span style="display:flex;"><span>          name: game-cli
+</span></span><span style="display:flex;"><span>          key: game.date
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">### 引用方式2，引用ConfigMap文件</span>
+</span></span><span style="display:flex;"><span>    envFrom:
+</span></span><span style="display:flex;"><span>    - configMapRef:
+</span></span><span style="display:flex;"><span>        name: game   <span style="color:#75715e">### 这个name的值来自 ConfigMap</span>
+</span></span><span style="display:flex;"><span>  restartPolicy: Never
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f pod-from-cm.yaml </span>
+</span></span><span style="display:flex;"><span>pod/pod-from-cm created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po pod-from-cm </span>
+</span></span><span style="display:flex;"><span>NAME          READY   STATUS      RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod-from-cm   0/1     Completed   <span style="color:#ae81ff">0</span>          5s
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看Pod日志，可见相关环境变量已经导入</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl logs pod-from-cm </span>
+</span></span><span style="display:flex;"><span>KUBERNETES_SERVICE_PORT<span style="color:#f92672">=</span><span style="color:#ae81ff">443</span>
+</span></span><span style="display:flex;"><span>MYAPP_SVC_PORT_80_TCP_ADDR<span style="color:#f92672">=</span>10.98.57.156
+</span></span><span style="display:flex;"><span>KUBERNETES_PORT<span style="color:#f92672">=</span>tcp://10.96.0.1:443
+</span></span><span style="display:flex;"><span>ui.properties<span style="color:#f92672">=</span>color.good<span style="color:#f92672">=</span>purple
+</span></span><span style="display:flex;"><span>color.bad<span style="color:#f92672">=</span>yellow
+</span></span><span style="display:flex;"><span>allow.textmode<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>how.nice.to.look<span style="color:#f92672">=</span>fairlyNice
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>MYAPP_SVC_PORT_80_TCP_PORT<span style="color:#f92672">=</span><span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>HOSTNAME<span style="color:#f92672">=</span>pod-from-cm
+</span></span><span style="display:flex;"><span>SHLVL<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>GAME_DATE<span style="color:#f92672">=</span>2022-03
+</span></span><span style="display:flex;"><span>MYAPP_SVC_PORT_80_TCP_PROTO<span style="color:#f92672">=</span>tcp
+</span></span><span style="display:flex;"><span>HOME<span style="color:#f92672">=</span>/root
+</span></span><span style="display:flex;"><span>NGINX_PORT_80_TCP<span style="color:#f92672">=</span>tcp://10.100.71.223:80
+</span></span><span style="display:flex;"><span>game.properties<span style="color:#f92672">=</span>enemies<span style="color:#f92672">=</span>aliens
+</span></span><span style="display:flex;"><span>lives<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>enemies.cheat<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>enemies.cheat.level<span style="color:#f92672">=</span>noGoodRotten
+</span></span><span style="display:flex;"><span>secret.code.passphrase<span style="color:#f92672">=</span>UUDDLRLRBABAs
+</span></span><span style="display:flex;"><span>secret.code.allowed<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>secret.code.lives<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>GAME_NAME<span style="color:#f92672">=</span>gogogo
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><h2 id="输出环境变量">输出环境变量<a hidden class="anchor" aria-hidden="true" href="#输出环境变量">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 创建yaml文件</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># vim pod-cm-env.yaml </span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: pod-cm-env
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: myapp
+</span></span><span style="display:flex;"><span>    image: registry.cn-beijing.aliyuncs.com/google_registry/myapp:v1
+</span></span><span style="display:flex;"><span>    command: <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/bin/sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;echo \&#34;Game name is </span><span style="color:#66d9ef">$(</span>GAME_NAME_AGAIN<span style="color:#66d9ef">)</span><span style="color:#e6db74">\nGame date is </span><span style="color:#66d9ef">$(</span>GAME_DATE_AGAIN<span style="color:#66d9ef">)</span><span style="color:#e6db74">\&#34;&#34;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>    env:
+</span></span><span style="display:flex;"><span>    - name: GAME_NAME_AGAIN
+</span></span><span style="display:flex;"><span>      valueFrom:
+</span></span><span style="display:flex;"><span>        configMapKeyRef:
+</span></span><span style="display:flex;"><span>          name: game-cli
+</span></span><span style="display:flex;"><span>          key: game.name
+</span></span><span style="display:flex;"><span>    - name: GAME_DATE_AGAIN
+</span></span><span style="display:flex;"><span>      valueFrom:
+</span></span><span style="display:flex;"><span>        configMapKeyRef:
+</span></span><span style="display:flex;"><span>          name: game-cli
+</span></span><span style="display:flex;"><span>          key: game.date
+</span></span><span style="display:flex;"><span>  restartPolicy: Never
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f pod-cm-env.yaml </span>
+</span></span><span style="display:flex;"><span>pod/pod-cm-env created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po pod-cm-env </span>
+</span></span><span style="display:flex;"><span>NAME         READY   STATUS      RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod-cm-env   0/1     Completed   <span style="color:#ae81ff">0</span>          6s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl logs pod-cm-env </span>
+</span></span><span style="display:flex;"><span>Game name is gogogo
+</span></span><span style="display:flex;"><span>Game date is 2022-03
+</span></span></code></pre></div><h2 id="数据卷中使用">数据卷中使用<a hidden class="anchor" aria-hidden="true" href="#数据卷中使用">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># vim po-cm-vol.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: pod-cm-vol
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: myapp
+</span></span><span style="display:flex;"><span>    image: registry.cn-beijing.aliyuncs.com/google_registry/myapp:v1
+</span></span><span style="display:flex;"><span>    command: <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/bin/sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;sleep 600&#34;</span><span style="color:#f92672">]</span> <span style="color:#75715e"># 延迟十分钟再进入completed</span>
+</span></span><span style="display:flex;"><span>    volumeMounts:
+</span></span><span style="display:flex;"><span>    - name: config-volume
+</span></span><span style="display:flex;"><span>      mountPath: <span style="color:#e6db74">&#34;/config&#34;</span>
+</span></span><span style="display:flex;"><span>      readOnly: true
+</span></span><span style="display:flex;"><span>  volumes:
+</span></span><span style="display:flex;"><span>  - name: config-volume
+</span></span><span style="display:flex;"><span>    configMap:
+</span></span><span style="display:flex;"><span>      name: game
+</span></span><span style="display:flex;"><span>      items: <span style="color:#75715e"># 如果不指定，则调用该cm下所有配置</span>
+</span></span><span style="display:flex;"><span>      - key: <span style="color:#e6db74">&#34;game.properties&#34;</span>
+</span></span><span style="display:flex;"><span>        path: <span style="color:#e6db74">&#34;game.properties&#34;</span>
+</span></span><span style="display:flex;"><span>  restartPolicy: Never
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f pod-cm-vol.yaml </span>
+</span></span><span style="display:flex;"><span>pod/pod-cm-vol created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po pod-cm-vol </span>
+</span></span><span style="display:flex;"><span>NAME         READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod-cm-vol   1/1     Running   <span style="color:#ae81ff">0</span>          8s
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 确认cm配置</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe cm game</span>
+</span></span><span style="display:flex;"><span>Name:         game
+</span></span><span style="display:flex;"><span>Namespace:    default
+</span></span><span style="display:flex;"><span>Labels:       &lt;none&gt;
+</span></span><span style="display:flex;"><span>Annotations:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Data
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>game.properties:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>enemies<span style="color:#f92672">=</span>aliens
+</span></span><span style="display:flex;"><span>lives<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>enemies.cheat<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>enemies.cheat.level<span style="color:#f92672">=</span>noGoodRotten
+</span></span><span style="display:flex;"><span>secret.code.passphrase<span style="color:#f92672">=</span>UUDDLRLRBABAs
+</span></span><span style="display:flex;"><span>secret.code.allowed<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>secret.code.lives<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ui.properties:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>color.good<span style="color:#f92672">=</span>purple
+</span></span><span style="display:flex;"><span>color.bad<span style="color:#f92672">=</span>yellow
+</span></span><span style="display:flex;"><span>allow.textmode<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>how.nice.to.look<span style="color:#f92672">=</span>fairlyNice
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BinaryData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Events:  &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 进入pod-cm-vol内查看配置挂载的文件</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master volume<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl exec -it pod-configmap-volume sh</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl exec -it pod-cm-vol -- sh</span>
+</span></span><span style="display:flex;"><span>/ <span style="color:#75715e"># ls /config</span>
+</span></span><span style="display:flex;"><span>game.properties
+</span></span><span style="display:flex;"><span>/ <span style="color:#75715e"># cat /config/game.properties # 此文件链接的文件为只读文件，通常是真实数据文件的软链接</span>
+</span></span><span style="display:flex;"><span>enemies<span style="color:#f92672">=</span>aliens
+</span></span><span style="display:flex;"><span>lives<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>enemies.cheat<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>enemies.cheat.level<span style="color:#f92672">=</span>noGoodRotten
+</span></span><span style="display:flex;"><span>secret.code.passphrase<span style="color:#f92672">=</span>UUDDLRLRBABAs
+</span></span><span style="display:flex;"><span>secret.code.allowed<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>secret.code.lives<span style="color:#f92672">=</span><span style="color:#ae81ff">30</span>
+</span></span></code></pre></div><h2 id="configmap热更新">ConfigMap热更新<a hidden class="anchor" aria-hidden="true" href="#configmap热更新">#</a></h2>
+<h3 id="准备工作">准备工作<a hidden class="anchor" aria-hidden="true" href="#准备工作">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 创建yaml文件,创建ConfigMap和Deploy</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># vim pod-cm-hot.yaml</span>
+</span></span><span style="display:flex;"><span>      app: myapp
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>        release: v1
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: ConfigMap
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: cm-loglevel
+</span></span><span style="display:flex;"><span>  namespace: default
+</span></span><span style="display:flex;"><span>data:
+</span></span><span style="display:flex;"><span>  log_level: INFO
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: mydeploy
+</span></span><span style="display:flex;"><span>  namespace: default
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: myapp
+</span></span><span style="display:flex;"><span>      release: v1
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: myapp
+</span></span><span style="display:flex;"><span>        release: v1
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: myapp
+</span></span><span style="display:flex;"><span>        image: registry.cn-beijing.aliyuncs.com/google_registry/myapp:v1
+</span></span><span style="display:flex;"><span>        imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>        ports:
+</span></span><span style="display:flex;"><span>        - containerPort: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>        volumeMounts:
+</span></span><span style="display:flex;"><span>        - name: config-volume
+</span></span><span style="display:flex;"><span>          mountPath: <span style="color:#e6db74">&#34;/config&#34;</span>
+</span></span><span style="display:flex;"><span>      volumes:
+</span></span><span style="display:flex;"><span>      - name: config-volume
+</span></span><span style="display:flex;"><span>        configMap:
+</span></span><span style="display:flex;"><span>          name: cm-loglevel
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f pod-cm-hot.yaml </span>
+</span></span><span style="display:flex;"><span>configmap/cm-loglevel created
+</span></span><span style="display:flex;"><span>deployment.apps/mydeploy created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deployments.apps mydeploy </span>
+</span></span><span style="display:flex;"><span>NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>mydeploy   2/2     <span style="color:#ae81ff">2</span>            <span style="color:#ae81ff">2</span>           16s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get cm cm-loglevel </span>
+</span></span><span style="display:flex;"><span>NAME          DATA   AGE
+</span></span><span style="display:flex;"><span>cm-loglevel   <span style="color:#ae81ff">1</span>      28s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe cm cm-loglevel </span>
+</span></span><span style="display:flex;"><span>Name:         cm-loglevel
+</span></span><span style="display:flex;"><span>Namespace:    default
+</span></span><span style="display:flex;"><span>Labels:       &lt;none&gt;
+</span></span><span style="display:flex;"><span>Annotations:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Data
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>log_level:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>INFO
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BinaryData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Events:  &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -owide | grep mydeploy</span>
+</span></span><span style="display:flex;"><span>mydeploy-77c886996d-wbnrs   1/1     Running     <span style="color:#ae81ff">0</span>             100s    172.18.195.14    k8s-master03   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>mydeploy-77c886996d-zrg8n   1/1     Running     <span style="color:#ae81ff">0</span>             101s    172.27.14.204    k8s-node02     &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看pod中的log_level</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl exec -it mydeploy-77c886996d-wbnrs -- cat /config/log_level</span>
+</span></span><span style="display:flex;"><span>INFO
+</span></span></code></pre></div><h3 id="热更新log_level">热更新log_level<a hidden class="anchor" aria-hidden="true" href="#热更新log_level">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 修改log_level=DEBUG</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl edit cm cm-loglevel </span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>data:
+</span></span><span style="display:flex;"><span>  log_level: DEBUG
+</span></span><span style="display:flex;"><span>kind: ConfigMap
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看对应的configmap, log_level已修改为DEBUG</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe cm cm-loglevel </span>
+</span></span><span style="display:flex;"><span>Name:         cm-loglevel
+</span></span><span style="display:flex;"><span>Namespace:    default
+</span></span><span style="display:flex;"><span>Labels:       &lt;none&gt;
+</span></span><span style="display:flex;"><span>Annotations:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Data
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>log_level:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>DEBUG
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BinaryData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Events:  &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看pod中log_level已修改为DEBUG</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl exec -it mydeploy-77c886996d-wbnrs -- cat /config/log_level</span>
+</span></span><span style="display:flex;"><span>DEBUG
+</span></span></code></pre></div><h2 id="不可变的configmap">不可变的ConfigMap<a hidden class="anchor" aria-hidden="true" href="#不可变的configmap">#</a></h2>
+<p>为了确保ConfigMap不会被无意中修改，可以设置不可变的ConfigMap。此功能特性由<code>ImmutableEphemeralVolumes</code>控制。可以通过将<code>immutable</code>字段设置为<code>true</code>创建不可变更的ConfigMap。一旦某ConfigMap被标记为不可变更，则无法逆转这一变化，也无法更改data或binaryData字段的内容。只能删除并重建 ConfigMap。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># vim cm-immutable.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: ConfigMap
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: cm-immutable
+</span></span><span style="display:flex;"><span>data:
+</span></span><span style="display:flex;"><span>  name: deemoprobe
+</span></span><span style="display:flex;"><span>  date: 2022-03
+</span></span><span style="display:flex;"><span>  label: test
+</span></span><span style="display:flex;"><span>immutable: true
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f cm-immutable.yaml </span>
+</span></span><span style="display:flex;"><span>configmap/cm-immutable created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe cm cm-immutable </span>
+</span></span><span style="display:flex;"><span>Name:         cm-immutable
+</span></span><span style="display:flex;"><span>Namespace:    default
+</span></span><span style="display:flex;"><span>Labels:       &lt;none&gt;
+</span></span><span style="display:flex;"><span>Annotations:  &lt;none&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Data
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>name:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>deemoprobe
+</span></span><span style="display:flex;"><span>date:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>2022-03
+</span></span><span style="display:flex;"><span>label:
+</span></span><span style="display:flex;"><span>----
+</span></span><span style="display:flex;"><span>test
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>BinaryData
+</span></span><span style="display:flex;"><span><span style="color:#f92672">====</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Events:  &lt;none&gt;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 尝试修改yaml文件应用时会提示如下</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f cm-immutable.yaml </span>
+</span></span><span style="display:flex;"><span>The ConfigMap <span style="color:#e6db74">&#34;cm-immutable&#34;</span> is invalid: data: Forbidden: field is immutable when <span style="color:#e6db74">`</span>immutable<span style="color:#e6db74">`</span> is set
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 尝试使用edit命令修改会提示如下</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 configmap<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl edit cm cm-immutable</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># configmaps &#34;cm-immutable&#34; was not valid:</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># * data: Forbidden: field is immutable when `immutable` is set</span>
+</span></span></code></pre></div>
+
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="prev" href="https://deemoprobe.github.io/posts/tech/kubernetessecret/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>KubernetesSecret</span>
+  </a>
+  <a class="next" href="https://deemoprobe.github.io/posts/tech/kuberneteswebdemo/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>KubernetesWebDemo</span>
+  </a>
+</nav>
+
+        </footer>
+    </div>
+</article>
+</main>
+
+<footer class="footer">
+    
+        <span id="runtime_span"></span>
+        <script
+            type="text/javascript">function show_runtime() { window.setTimeout("show_runtime()", 1000); X = new Date("1/1/2023 1:00:00"); Y = new Date(); T = (Y.getTime() - X.getTime()); M = 24 * 60 * 60 * 1000; a = T / M; A = Math.floor(a); b = (a - A) * 24; B = Math.floor(b); c = (b - B) * 60; C = Math.floor((b - B) * 60); D = Math.floor((c - C) * 60); runtime_span.innerHTML = "网站已运行" + A + "天" + B + "小时" + C + "分" + D + "秒" } show_runtime();</script>
+    
+    
+    <br>
+    <span>
+        Copyright
+        &copy;
+        2022-2023
+        <a href="https://deemoprobe.github.io/" style="color:#939393;">William&#39;s Blog</a>
+        All Rights Reserved
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '📄复制';
+
+        function copyingDone() {
+            copybutton.innerText = '👌🏻已复制!';
+            setTimeout(() => {
+                copybutton.innerText = '📄复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+
+<script>
+    $("code[class^=language] ").on("mouseover", function () {
+        if (this.clientWidth < this.scrollWidth) {
+            $(this).css("width", "135%")
+            $(this).css("border-top-right-radius", "var(--radius)")
+        }
+    }).on("mouseout", function () {
+        $(this).css("width", "100%")
+        $(this).css("border-top-right-radius", "unset")
+    })
+</script>
+</body>
+
+</html>

@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>Read | William&#39;s Blog</title>
-<meta name="keywords" content="">
-<meta name="description" content="页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能">
+<title>KubernetesUpgrade | William&#39;s Blog</title>
+<meta name="keywords" content="kubernetes">
+<meta name="description" content="Kubernetes ">
 <meta name="author" content="deemoprobe">
-<link rel="canonical" href="https://deemoprobe.github.io/posts/read/read/">
+<link rel="canonical" href="https://deemoprobe.github.io/posts/tech/kubernetesupgrade/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.4ff503bcd1fac86ff7aae2a7670a5373c685d74bf74dc61eb3b14254f795b8f7.css" integrity="sha256-T/UDvNH6yG/3quKnZwpTc8aF10v3TcYes7FCVPeVuPc=" rel="preload stylesheet" as="style">
 <script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
         onload="hljs.initHighlightingOnLoad();"></script>
@@ -75,16 +75,18 @@ var _hmt = _hmt || [];
   s.parentNode.insertBefore(hm, s);
 })();
 </script>
-<meta property="og:title" content="Read" />
-<meta property="og:description" content="页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能" />
+<meta property="og:title" content="KubernetesUpgrade" />
+<meta property="og:description" content="Kubernetes " />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://deemoprobe.github.io/posts/read/read/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2023-04-26T11:53:50+08:00" />
-<meta property="article:modified_time" content="2023-04-26T11:53:50+08:00" />
+<meta property="og:url" content="https://deemoprobe.github.io/posts/tech/kubernetesupgrade/" />
+<meta property="og:image" content="https://deemoprobe.github.io/img/kubernetes.png" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-04-29T14:31:01+08:00" />
+<meta property="article:modified_time" content="2023-04-29T14:31:01+08:00" />
 
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Read"/>
-<meta name="twitter:description" content="页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能"/>
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://deemoprobe.github.io/img/kubernetes.png" />
+<meta name="twitter:title" content="KubernetesUpgrade"/>
+<meta name="twitter:description" content="Kubernetes "/>
 
 
 <script type="application/ld+json">
@@ -103,14 +105,14 @@ var _hmt = _hmt || [];
         {
           "@type": "ListItem",
           "position":  2 ,
-          "name": "📕 阅读",
-          "item": "https://deemoprobe.github.io/posts/read/"
+          "name": "👨🏻‍💻 技术",
+          "item": "https://deemoprobe.github.io/posts/tech/"
         }, 
     {
       "@type": "ListItem",
       "position":  3 ,
-      "name": "Read",
-      "item": "https://deemoprobe.github.io/posts/read/read/"
+      "name": "KubernetesUpgrade",
+      "item": "https://deemoprobe.github.io/posts/tech/kubernetesupgrade/"
     }
   ]
 }
@@ -119,24 +121,24 @@ var _hmt = _hmt || [];
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Read",
-  "name": "Read",
-  "description": "页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能",
+  "headline": "KubernetesUpgrade",
+  "name": "KubernetesUpgrade",
+  "description": "Kubernetes ",
   "keywords": [
-    ""
+    "kubernetes"
   ],
-  "articleBody": "页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能\n",
-  "wordCount" : "43",
+  "articleBody": "KubernetesUpgrade 2021-0726\n手动升级的还没有详细的方案，大多是基于管理工具部署和升级，比如juju、kubeadm、kops、kubespray等。\n1. 升级步骤 **注意：**该升级步骤是实验性的，建议在测试集群上使用，无法保证线上服务不中断，实际升级完成后无需对线上服务做任何操作。\n大体上的升级步骤是，先升级master节点，然后再一次升级每台node节点。\n2. 升级建议 主要包括以下建议：\n应用使用高级对象定义，如支持滚动更新的Deployment对象 应用要部署成多个实例 使用pod的preStop hook，加强pod的生命周期管理 使用就绪和健康检查探针来确保应用存活和及时阻拦应用流量的分发 2.1. 准备 备份kubernetes原先的二进制文件和配置文件。 下载最新版本的kubernetes二进制包，如1.8.5版本，下载二进制包，我们使用的是kubernetes-server-linux-amd64.tar.gz，分发到集群的每个节点上。 2.2. 升级master节点 停止master节点的进程\nsystemctl stop kube-apiserver systemctl stop kube-scheduler systemctl stop kube-controller-manager systemctl stop kube-proxy systemctl stop kubelet 使用新版本的kubernetes二进制文件替换原来老版本的文件，然后启动master节点上的进程：\nsystemctl start kube-apiserver systemctl start kube-scheduler systemctl start kube-controller-manager 因为我们的master节点同时也作为node节点，所有还要执行下面的”升级node节点“中的步骤。\n2.3. 升级node节点 关闭swap\n# 临时关闭 swapoff -a # 永久关闭，注释掉swap分区即可 vim /etc/fstab #UUID=65c9f92d-4828-4d46-bf19-fb78a38d2fd1 swap swap defaults 0 0 修改kubelet的配置文件\n将kubelet的配置文件/etc/kubernetes/kublet配置文件中的KUBELET_API_SERVER=\"--api-servers=http://172.20.0.113:8080\"行注释掉。\n注意：：kubernetes1.7及以上版本已经没有该配置了，API server的地址写在了kubeconfig文件中。\n停止node节点上的kubernetes进程：\nsystemctl stop kubelet systemctl stop kube-proxy 使用新版本的kubernetes二进制文件替换原来老版本的文件，然后启动node节点上的进程：\nsystemctl start kubelet systemctl start kube-proxy 启动新版本的kube-proxy报错找不到conntrack命令，使用yum install -y conntrack-tools命令安装后重启kube-proxy即可。\n3. 检查 到此升级完成，在master节点上检查节点状态：\nNAME STATUS ROLES AGE VERSION 172.20.0.113 Ready 244d v1.8.5 172.20.0.114 Ready 244d v1.8.5 172.20.0.115 Ready 244d v1.8.5 所有节点的状态都正常，再检查下原先的运行在kubernetes之上的服务是否正常，如果服务正常的话说明这次升级无误。\n",
+  "wordCount" : "1047",
   "inLanguage": "en",
-  "datePublished": "2023-04-26T11:53:50+08:00",
-  "dateModified": "2023-04-26T11:53:50+08:00",
+  "image":"https://deemoprobe.github.io/img/kubernetes.png","datePublished": "2023-04-29T14:31:01+08:00",
+  "dateModified": "2023-04-29T14:31:01+08:00",
   "author":[{
     "@type": "Person",
     "name": "deemoprobe"
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://deemoprobe.github.io/posts/read/read/"
+    "@id": "https://deemoprobe.github.io/posts/tech/kubernetesupgrade/"
   },
   "publisher": {
     "@type": "Organization",
@@ -245,10 +247,13 @@ var _hmt = _hmt || [];
 <article class="post-single">
     <div id="single-content">
         <header class="post-header">
-            <div class="breadcrumbs"><a href="https://deemoprobe.github.io/">🏠 主页</a>&nbsp;»&nbsp;<a href="https://deemoprobe.github.io/posts/">📚文章</a>&nbsp;»&nbsp;<a href="https://deemoprobe.github.io/posts/read/">📕 阅读</a></div>
+            
             <h1 class="post-title">
-                Read
+                KubernetesUpgrade
             </h1>
+            <div class="post-description">
+                Kubernetes 
+            </div>
             <div class="post-meta">
 
 <style>
@@ -268,7 +273,7 @@ var _hmt = _hmt || [];
 <span class="parent-post-meta">
     <span id="post_meta_style_1">
         <span class="fa fa-calendar-check-o"></span>
-        <span>2023-04-26
+        <span>2023-04-29
             &nbsp;&nbsp;
         </span>
     </span>
@@ -281,13 +286,13 @@ var _hmt = _hmt || [];
     
     <span id="post_meta_style_3">
         <span class="fa fa-file-word-o"></span>
-        <span>43字
+        <span>1047字
             &nbsp;&nbsp;
         </span>
     </span>
     <span id="post_meta_style_4">
         <span class="fa fa-clock-o"></span>
-        <span>1分钟
+        <span>3分钟
             &nbsp;&nbsp;
         </span>
     </span>
@@ -301,6 +306,7 @@ var _hmt = _hmt || [];
         <span class="fa fa-tags" style="opacity: 0.8"></span>
         <span>
             <span class="post-tags-meta">
+                <a href="https://deemoprobe.github.io/tags/kubernetes/" style="color: var(--secondary)!important;">kubernetes</a>
             </span>
         </span>
     </span>
@@ -318,7 +324,10 @@ var _hmt = _hmt || [];
                 </span>
 
 </div>
-        </header> <aside id="toc-container" class="toc-container wide">
+        </header> 
+<figure class="entry-cover1"><img style="zoom:50%;" loading="lazy" src="https://deemoprobe.github.io/img/kubernetes.png" alt="">
+    
+</figure><aside id="toc-container" class="toc-container wide">
     <div class="toc">
         <details  open>
         <summary accesskey="c" title="(Alt + C)">
@@ -327,8 +336,25 @@ var _hmt = _hmt || [];
 
         <div class="inner"><ul>
                 <li>
-                    <a href="#%e9%a1%b5%e9%9d%a2%e6%b5%8b%e8%af%95" aria-label="页面测试">页面测试</a>
+                    <a href="#kubernetesupgrade" aria-label="KubernetesUpgrade">KubernetesUpgrade</a><ul>
+                        
+                <li>
+                    <a href="#1-%e5%8d%87%e7%ba%a7%e6%ad%a5%e9%aa%a4" aria-label="1. 升级步骤">1. 升级步骤</a></li>
+                <li>
+                    <a href="#2-%e5%8d%87%e7%ba%a7%e5%bb%ba%e8%ae%ae" aria-label="2. 升级建议">2. 升级建议</a><ul>
+                        
+                <li>
+                    <a href="#21-%e5%87%86%e5%a4%87" aria-label="2.1. 准备">2.1. 准备</a></li>
+                <li>
+                    <a href="#22-%e5%8d%87%e7%ba%a7master%e8%8a%82%e7%82%b9" aria-label="2.2. 升级master节点">2.2. 升级master节点</a></li>
+                <li>
+                    <a href="#23-%e5%8d%87%e7%ba%a7node%e8%8a%82%e7%82%b9" aria-label="2.3. 升级node节点">2.3. 升级node节点</a></li></ul>
                 </li>
+                <li>
+                    <a href="#3-%e6%a3%80%e6%9f%a5" aria-label="3. 检查">3. 检查</a>
+                </li>
+            </ul>
+            </li>
             </ul>
         </div>
         </details>
@@ -392,8 +418,66 @@ var _hmt = _hmt || [];
         return rect.top + win.pageYOffset;
     }
 </script>
-        <div class="post-content"><h2 id="页面测试">页面测试<a hidden class="anchor" aria-hidden="true" href="#页面测试">#</a></h2>
-<p>由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能</p>
+        <div class="post-content"><h1 id="kubernetesupgrade">KubernetesUpgrade<a hidden class="anchor" aria-hidden="true" href="#kubernetesupgrade">#</a></h1>
+<p>2021-0726</p>
+<p>手动升级的还没有详细的方案，大多是基于管理工具部署和升级，比如juju、kubeadm、kops、kubespray等。</p>
+<h2 id="1-升级步骤">1. 升级步骤<a hidden class="anchor" aria-hidden="true" href="#1-升级步骤">#</a></h2>
+<blockquote>
+<p>**注意：**该升级步骤是实验性的，建议在测试集群上使用，无法保证线上服务不中断，实际升级完成后无需对线上服务做任何操作。</p>
+</blockquote>
+<p>大体上的升级步骤是，先升级master节点，然后再一次升级每台node节点。</p>
+<h2 id="2-升级建议">2. 升级建议<a hidden class="anchor" aria-hidden="true" href="#2-升级建议">#</a></h2>
+<p>主要包括以下建议：</p>
+<ul>
+<li>应用使用高级对象定义，如支持滚动更新的<code>Deployment</code>对象</li>
+<li>应用要部署成多个实例</li>
+<li>使用pod的preStop hook，加强pod的生命周期管理</li>
+<li>使用就绪和健康检查探针来确保应用存活和及时阻拦应用流量的分发</li>
+</ul>
+<h3 id="21-准备">2.1. 准备<a hidden class="anchor" aria-hidden="true" href="#21-准备">#</a></h3>
+<ol>
+<li>备份kubernetes原先的二进制文件和配置文件。</li>
+<li>下载最新版本的kubernetes二进制包，如1.8.5版本，下载二进制包，我们使用的是<a href="https://dl.k8s.io/v1.8.5/kubernetes-server-linux-amd64.tar.gz"  target="_blank" rel="noopener" style="color:#42b983" ;>kubernetes-server-linux-amd64.tar.gz</a>，分发到集群的每个节点上。</li>
+</ol>
+<h3 id="22-升级master节点">2.2. 升级master节点<a hidden class="anchor" aria-hidden="true" href="#22-升级master节点">#</a></h3>
+<p>停止master节点的进程</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>systemctl stop kube-apiserver
+</span></span><span style="display:flex;"><span>systemctl stop kube-scheduler
+</span></span><span style="display:flex;"><span>systemctl stop kube-controller-manager
+</span></span><span style="display:flex;"><span>systemctl stop kube-proxy
+</span></span><span style="display:flex;"><span>systemctl stop kubelet
+</span></span></code></pre></div><p>使用新版本的kubernetes二进制文件替换原来老版本的文件，然后启动master节点上的进程：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>systemctl start kube-apiserver
+</span></span><span style="display:flex;"><span>systemctl start kube-scheduler
+</span></span><span style="display:flex;"><span>systemctl start kube-controller-manager
+</span></span></code></pre></div><p>因为我们的master节点同时也作为node节点，所有还要执行下面的”升级node节点“中的步骤。</p>
+<h3 id="23-升级node节点">2.3. 升级node节点<a hidden class="anchor" aria-hidden="true" href="#23-升级node节点">#</a></h3>
+<p>关闭swap</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 临时关闭</span>
+</span></span><span style="display:flex;"><span>swapoff -a
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 永久关闭，注释掉swap分区即可</span>
+</span></span><span style="display:flex;"><span>vim /etc/fstab
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#UUID=65c9f92d-4828-4d46-bf19-fb78a38d2fd1 swap                    swap    defaults        0 0</span>
+</span></span></code></pre></div><p>修改kubelet的配置文件</p>
+<p>将kubelet的配置文件<code>/etc/kubernetes/kublet</code>配置文件中的<code>KUBELET_API_SERVER=&quot;--api-servers=http://172.20.0.113:8080&quot;</code>行注释掉。</p>
+<blockquote>
+<p><strong>注意：</strong>：kubernetes1.7及以上版本已经没有该配置了，API server的地址写在了kubeconfig文件中。</p>
+</blockquote>
+<p>停止node节点上的kubernetes进程：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>systemctl stop kubelet
+</span></span><span style="display:flex;"><span>systemctl stop kube-proxy
+</span></span></code></pre></div><p>使用新版本的kubernetes二进制文件替换原来老版本的文件，然后启动node节点上的进程：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>systemctl start kubelet
+</span></span><span style="display:flex;"><span>systemctl start kube-proxy
+</span></span></code></pre></div><p>启动新版本的kube-proxy报错找不到<code>conntrack</code>命令，使用<code>yum install -y conntrack-tools</code>命令安装后重启kube-proxy即可。</p>
+<h2 id="3-检查">3. 检查<a hidden class="anchor" aria-hidden="true" href="#3-检查">#</a></h2>
+<p>到此升级完成，在master节点上检查节点状态：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>NAME           STATUS    ROLES     AGE       VERSION
+</span></span><span style="display:flex;"><span>172.20.0.113   Ready     &lt;none&gt;    244d      v1.8.5
+</span></span><span style="display:flex;"><span>172.20.0.114   Ready     &lt;none&gt;    244d      v1.8.5
+</span></span><span style="display:flex;"><span>172.20.0.115   Ready     &lt;none&gt;    244d      v1.8.5
+</span></span></code></pre></div><p>所有节点的状态都正常，再检查下原先的运行在kubernetes之上的服务是否正常，如果服务正常的话说明这次升级无误。</p>
 
 
         </div>
@@ -401,15 +485,15 @@ var _hmt = _hmt || [];
         <footer class="post-footer">
             
 <nav class="paginav">
-  <a class="prev" href="https://deemoprobe.github.io/posts/life/life/">
+  <a class="prev" href="https://deemoprobe.github.io/posts/tech/kubernetestroubleshooting/">
     <span class="title">« 上一页</span>
     <br>
-    <span>Life</span>
+    <span>KubernetesTroubleShooting</span>
   </a>
-  <a class="next" href="https://deemoprobe.github.io/posts/blog/blog/">
+  <a class="next" href="https://deemoprobe.github.io/posts/tech/kubernetespodschedulingstrategy/">
     <span class="title">下一页 »</span>
     <br>
-    <span>Blog</span>
+    <span>KubernetesPodSchedulingStrategy</span>
   </a>
 </nav>
 

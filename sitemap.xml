@@ -3,21 +3,30 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://deemoprobe.github.io/posts/tech/</loc>
-    <lastmod>2023-04-30T02:26:47+08:00</lastmod>
+    <lastmod>2023-04-30T21:52:43+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/posts/</loc>
-    <lastmod>2023-04-30T02:26:47+08:00</lastmod>
+    <lastmod>2023-04-30T21:52:43+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/tags/linux/</loc>
+    <lastmod>2023-04-30T21:52:43+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/posts/tech/linux/</loc>
+    <lastmod>2023-04-30T21:52:43+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/posts/tech/linux/nfs/</loc>
+    <lastmod>2023-04-30T21:52:43+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/</loc>
+    <lastmod>2023-04-30T21:52:43+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/tags/</loc>
+    <lastmod>2023-04-30T21:52:43+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/tags/kubernetes/</loc>
     <lastmod>2023-04-30T02:26:47+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/posts/tech/kubernetesservicediscovery/</loc>
-    <lastmod>2023-04-30T02:26:47+08:00</lastmod>
-  </url><url>
-    <loc>https://deemoprobe.github.io/</loc>
-    <lastmod>2023-04-30T02:26:47+08:00</lastmod>
-  </url><url>
-    <loc>https://deemoprobe.github.io/tags/</loc>
     <lastmod>2023-04-30T02:26:47+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/posts/tech/kubernetesmetrics/</loc>

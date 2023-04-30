@@ -6,7 +6,16 @@
     <description>Recent content on William&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sun, 30 Apr 2023 02:26:47 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 30 Apr 2023 21:52:43 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>NFS</title>
+      <link>https://deemoprobe.github.io/posts/tech/linux/nfs/</link>
+      <pubDate>Sun, 30 Apr 2023 21:52:43 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/linux/nfs/</guid>
+      <description>Linux NFS服务部署</description>
+    </item>
+    
     <item>
       <title>KubernetesServiceDiscovery</title>
       <link>https://deemoprobe.github.io/posts/tech/kubernetesservicediscovery/</link>

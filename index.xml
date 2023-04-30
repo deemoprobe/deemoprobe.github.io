@@ -6,7 +6,16 @@
     <description>Recent content on William&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Sun, 30 Apr 2023 21:52:43 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 30 Apr 2023 22:13:44 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>KubernetesVolume</title>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesvolume/</link>
+      <pubDate>Sun, 30 Apr 2023 22:13:44 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesvolume/</guid>
+      <description>Kubernetes Volume</description>
+    </item>
+    
     <item>
       <title>NFS</title>
       <link>https://deemoprobe.github.io/posts/tech/linux/nfs/</link>
@@ -18,190 +27,190 @@
     
     <item>
       <title>KubernetesServiceDiscovery</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetesservicediscovery/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesservicediscovery/</link>
       <pubDate>Sun, 30 Apr 2023 02:26:47 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetesservicediscovery/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesservicediscovery/</guid>
       <description>Kubernetes Service和服务发现</description>
     </item>
     
     <item>
       <title>KubernetesMetrics</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetesmetrics/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesmetrics/</link>
       <pubDate>Sat, 29 Apr 2023 14:32:00 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetesmetrics/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesmetrics/</guid>
       <description>Kubernetes Metrics</description>
     </item>
     
     <item>
       <title>KubernetesTroubleShooting</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetestroubleshooting/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetestroubleshooting/</link>
       <pubDate>Sat, 29 Apr 2023 14:31:45 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetestroubleshooting/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetestroubleshooting/</guid>
       <description>Kubernetes </description>
     </item>
     
     <item>
       <title>KubernetesUpgrade</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetesupgrade/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesupgrade/</link>
       <pubDate>Sat, 29 Apr 2023 14:31:01 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetesupgrade/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesupgrade/</guid>
       <description>Kubernetes </description>
     </item>
     
     <item>
       <title>KubernetesPodSchedulingStrategy</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetespodschedulingstrategy/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespodschedulingstrategy/</link>
       <pubDate>Sat, 29 Apr 2023 14:30:42 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetespodschedulingstrategy/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespodschedulingstrategy/</guid>
       <description>Kubernetes </description>
     </item>
     
     <item>
       <title>KubernetesSecret</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetessecret/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetessecret/</link>
       <pubDate>Sat, 29 Apr 2023 14:28:09 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetessecret/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetessecret/</guid>
       <description>Kubernetes </description>
     </item>
     
     <item>
       <title>KubernetesConfigMap</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetesconfigmap/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesconfigmap/</link>
       <pubDate>Sat, 29 Apr 2023 14:28:03 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetesconfigmap/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesconfigmap/</guid>
       <description>Kubernetes </description>
     </item>
     
     <item>
       <title>KubernetesWebDemo</title>
-      <link>https://deemoprobe.github.io/posts/tech/kuberneteswebdemo/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kuberneteswebdemo/</link>
       <pubDate>Sat, 29 Apr 2023 14:27:46 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kuberneteswebdemo/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kuberneteswebdemo/</guid>
       <description>Kubernetes Web实例</description>
     </item>
     
     <item>
       <title>KubernetesLabelSelector</title>
-      <link>https://deemoprobe.github.io/posts/tech/kuberneteslabelselector/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kuberneteslabelselector/</link>
       <pubDate>Sat, 29 Apr 2023 14:27:13 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kuberneteslabelselector/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kuberneteslabelselector/</guid>
       <description>Kubernetes Label and Selector</description>
     </item>
     
     <item>
       <title>KubernetesPodController</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetespodcontroller/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespodcontroller/</link>
       <pubDate>Sat, 29 Apr 2023 14:23:19 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetespodcontroller/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespodcontroller/</guid>
       <description>Kubernetes Pod控制器</description>
     </item>
     
     <item>
       <title>KubernetesPod</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetespod/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespod/</link>
       <pubDate>Sat, 29 Apr 2023 14:23:11 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetespod/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespod/</guid>
       <description>Kubernetes Pod</description>
     </item>
     
     <item>
       <title>KubernetesNamespace</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetesnamespace/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesnamespace/</link>
       <pubDate>Sat, 29 Apr 2023 14:21:17 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetesnamespace/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesnamespace/</guid>
       <description>Kubernetes Namespace</description>
     </item>
     
     <item>
       <title>Kuberntes CLI</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetescli/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetescli/</link>
       <pubDate>Sat, 29 Apr 2023 14:19:33 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetescli/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetescli/</guid>
       <description>kubernetes命令行工具kubectl</description>
     </item>
     
     <item>
       <title>KubernetesBinaryInstallation HA</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetesbinaryinstallation-ha/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesbinaryinstallation-ha/</link>
       <pubDate>Sat, 29 Apr 2023 14:17:51 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetesbinaryinstallation-ha/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesbinaryinstallation-ha/</guid>
       <description>二进制方式部署kubernetes高可用集群</description>
     </item>
     
     <item>
       <title>KubernetesKubeadmInstallation HA</title>
-      <link>https://deemoprobe.github.io/posts/tech/kuberneteskubeadminstallation-ha/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kuberneteskubeadminstallation-ha/</link>
       <pubDate>Sat, 29 Apr 2023 14:12:14 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kuberneteskubeadminstallation-ha/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kuberneteskubeadminstallation-ha/</guid>
       <description>kubeadm方式部署kubernetes高可用集群</description>
     </item>
     
     <item>
       <title>KubernetesArchitecture HA</title>
-      <link>https://deemoprobe.github.io/posts/tech/kubernetesarchitecture-ha/</link>
+      <link>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesarchitecture-ha/</link>
       <pubDate>Fri, 28 Apr 2023 11:45:50 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/kubernetesarchitecture-ha/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesarchitecture-ha/</guid>
       <description>Kubernetes高可用架构介绍</description>
     </item>
     
     <item>
       <title>DockerImagesOptimization</title>
-      <link>https://deemoprobe.github.io/posts/tech/dockerimagesoptimization/</link>
+      <link>https://deemoprobe.github.io/posts/tech/docker/dockerimagesoptimization/</link>
       <pubDate>Wed, 26 Apr 2023 18:43:22 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/dockerimagesoptimization/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/docker/dockerimagesoptimization/</guid>
       <description>Docker镜像体积优化</description>
     </item>
     
     <item>
       <title>DockerbuildContext</title>
-      <link>https://deemoprobe.github.io/posts/tech/dockerbuildcontext/</link>
+      <link>https://deemoprobe.github.io/posts/tech/docker/dockerbuildcontext/</link>
       <pubDate>Wed, 26 Apr 2023 18:35:27 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/dockerbuildcontext/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/docker/dockerbuildcontext/</guid>
       <description>本文包含docker build上下文、构建方式和实例</description>
     </item>
     
     <item>
       <title>DockerfileGrammer</title>
-      <link>https://deemoprobe.github.io/posts/tech/dockerfilegrammer/</link>
+      <link>https://deemoprobe.github.io/posts/tech/docker/dockerfilegrammer/</link>
       <pubDate>Wed, 26 Apr 2023 14:52:37 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/dockerfilegrammer/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/docker/dockerfilegrammer/</guid>
       <description>Dockerfile语法，构建以及实例分析</description>
     </item>
     
     <item>
       <title>DockerCommandLineInterface</title>
-      <link>https://deemoprobe.github.io/posts/tech/dockercli/</link>
+      <link>https://deemoprobe.github.io/posts/tech/docker/dockercli/</link>
       <pubDate>Wed, 26 Apr 2023 14:52:26 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/dockercli/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/docker/dockercli/</guid>
       <description>docker常用命令一览</description>
     </item>
     
     <item>
       <title>Docker</title>
-      <link>https://deemoprobe.github.io/posts/tech/docker/</link>
+      <link>https://deemoprobe.github.io/posts/tech/docker/docker/</link>
       <pubDate>Wed, 26 Apr 2023 14:51:34 +0800</pubDate>
       
-      <guid>https://deemoprobe.github.io/posts/tech/docker/</guid>
+      <guid>https://deemoprobe.github.io/posts/tech/docker/docker/</guid>
       <description>docker容器技术基础</description>
     </item>
     

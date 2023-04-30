@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>KubernetesPod | William&#39;s Blog</title>
+<meta name="keywords" content="kubernetes">
+<meta name="description" content="Kubernetes Pod">
+<meta name="author" content="deemoprobe">
+<link rel="canonical" href="https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespod/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4ff503bcd1fac86ff7aae2a7670a5373c685d74bf74dc61eb3b14254f795b8f7.css" integrity="sha256-T/UDvNH6yG/3quKnZwpTc8aF10v3TcYes7FCVPeVuPc=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
+        onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="icon" type="image/png" sizes="16x16" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="icon" type="image/png" sizes="32x32" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="apple-touch-icon" href="https://deemoprobe.github.io/img/bear.gif">
+<link rel="mask-icon" href="https://deemoprobe.github.io/img/bear.gif">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script defer src="https://unpkg.com/mermaid@8.8.1/dist/mermaid.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script src="https://cdn.staticfile.org/jquery/3.6.3/jquery.min.js"></script>
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="KubernetesPod" />
+<meta property="og:description" content="Kubernetes Pod" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespod/" />
+<meta property="og:image" content="https://deemoprobe.github.io/img/kubernetes.png" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-04-29T14:23:11+08:00" />
+<meta property="article:modified_time" content="2023-04-29T14:23:11+08:00" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://deemoprobe.github.io/img/kubernetes.png" />
+<meta name="twitter:title" content="KubernetesPod"/>
+<meta name="twitter:description" content="Kubernetes Pod"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://deemoprobe.github.io/posts/"
+        },
+
+        {
+          "@type": "ListItem",
+          "position":  2 ,
+          "name": "👨🏻‍💻 技术",
+          "item": "https://deemoprobe.github.io/posts/tech/"
+        },
+
+        {
+          "@type": "ListItem",
+          "position":  3 ,
+          "name": "Kubernetes",
+          "item": "https://deemoprobe.github.io/posts/tech/kubernetes/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  4 ,
+      "name": "KubernetesPod",
+      "item": "https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespod/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "KubernetesPod",
+  "name": "KubernetesPod",
+  "description": "Kubernetes Pod",
+  "keywords": [
+    "kubernetes"
+  ],
+  "articleBody": "概念 Pod是Kubernetes中创建管理和可部署的最小计算单元，它由一个或多个容器组成，每个Pod包含了一个Pause容器，Pause容器是Pod的父容器，负责僵尸进程的回收管理，通过Pause容器可以使同一个Pod里面的多个容器共享存储、网络、PID、IPC等。\n定义Pod Pod 中的容器会被调度到集群中的同一计算节点上。通常情况下，很少去直接创建Pod单实例，一般是通过Pod控制器（Deployment、DaemonSet、StatefulSet、CronJob等）进行创建和管理，并且这些高级资源具有Pod所不具备的很多特性（如无状态服务控制器deployment的伸缩回滚，有状态服务控制器StatefulSet的实例绑定）。控制器创建Pod后Scheduler根据预设条件和调度算法将Pod调度到集群合适的节点上，Pod会保持在该节点上运行，直到Pod结束执行、Pod对象被删除、Pod因资源不足而被驱逐或者节点失效为止。\n说明：重启 Pod 中的容器不应与重启 Pod 混淆。 Pod 不是进程，而是容器运行的环境。在被删除之前，Pod 会一直存在。\nPod yaml文件示例\n[root@k8s-master01 ~]# kubectl explain pod | egrep -v \"^$|^\\s*http\"|sed s/\"More info:\"// KIND: Pod VERSION: v1 DESCRIPTION: Pod is a collection of containers that can run on a host. This resource is created by clients and scheduled onto hosts. FIELDS: apiVersion APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. kind Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. metadata Standard object's metadata. spec Specification of the desired behavior of the pod. status Most recently observed status of the pod. This data may not be up to date. Populated by the system. Read-only. # yaml文件示例 apiVersion: v1 # 必选，API的版本号 kind: Pod # 必选，类型Pod metadata: # 必选，元数据 name: nginx # 必选，符合RFC1035规范的Pod名称 namespace: default # 可选，Pod所在的命名空间，默认为default labels: # 可选，标签选择器，一般用于过滤和区分Pod app: nginx role: frontend # 可以写多个 annotations: # 可选，注释键值对列表，可以写多个 app: nginx spec: # 必选，用于定义容器的详细信息 initContainers: # 初始化容器，在容器启动之前执行的一些初始化操作 - command: - sh - -c - echo \"I am InitContainer for init some configuration\" image: busybox imagePullPolicy: IfNotPresent name: init-container containers: # 必选，容器列表 - name: nginx # 必选，符合RFC 1035规范的容器名称 image: nginx:latest # 必选，容器所用的镜像的地址 imagePullPolicy: Always # 可选，镜像拉取策略 command: # 可选，容器启动执行的命令 - nginx - -g - \"daemon off;\" workingDir: /usr/share/nginx/html # 可选，容器的工作目录 volumeMounts: # 可选，存储卷配置，可以配置多个 - name: webroot # 存储卷名称 mountPath: /usr/share/nginx/html # 挂载目录 readOnly: true # 只读 ports: # 可选，容器需要暴露的端口号列表 - name: http # 端口名称 containerPort: 80 # 端口号 protocol: TCP # 端口协议，默认TCP env: # 可选，环境变量配置列表 - name: TZ # 变量名 value: Asia/Shanghai # 变量的值 - name: LANG value: en_US.utf8 resources: # 可选，资源限制和资源请求限制 limits: # 最大限制设置 cpu: 1000m memory: 1024Mi requests: # 启动所需的资源 cpu: 100m memory: 512Mi # startupProbe: # 可选，检测容器内进程是否完成启动。注意三种检查方式同时只能使用一种。 # httpGet: # httpGet检测方式，生产环境建议使用httpGet实现接口级健康检查，健康检查由应用程序提供。 # path: /api/successStart # 检查路径 # port: 80 readinessProbe: # 可选，健康检查。注意三种检查方式同时只能使用一种。 httpGet: # httpGet检测方式，生产环境建议使用httpGet实现接口级健康检查，健康检查由应用程序提供。 path: / # 检查路径 port: 80 # 监控端口 #livenessProbe: # 可选，健康检查 #exec: # 执行容器命令检测方式 #command: #- cat #- /health #httpGet: # httpGet检测方式 # path: /_health # 检查路径 # port: 8080 # httpHeaders: # 检查的请求头 # - name: end-user # value: Jason tcpSocket: # 端口检测方式 port: 80 initialDelaySeconds: 60 # 初始化时间 timeoutSeconds: 2 # 超时时间 periodSeconds: 20 # 检测间隔 successThreshold: 2 # 检查成功为2次表示就绪 failureThreshold: 1 # 检测失败1次表示未就绪 lifecycle: postStart: # 容器创建完成后执行的指令, 可以是exec httpGet TCPSocket exec: command: - sh - -c - 'mkdir /data/' preStop: httpGet: path: / port: 80 # exec: # command: # - sh # - -c # - sleep 9 restartPolicy: Always # 可选，默认为Always #nodeSelector: # 可选，指定Node节点 # region: subnet7 imagePullSecrets: # 可选，拉取镜像使用的secret，可以配置多个 - name: default-dockercfg-86258 hostNetwork: false # 可选，是否为主机模式，如是，会占用主机端口 volumes: # 共享存储卷列表 - name: webroot # 名称，与上面volumeMounts对应 emptyDir: {} # 挂载目录 #hostPath: # 挂载本机目录 # path: /etc/hosts 在高级资源中创建Pod是通过文件中template Pod模板字段来创建Pod\n# 例如创建Job， apiVersion: batch/v1 kind: Job metadata: name: hello spec: template: # 这里是Pod对象模版 spec: containers: - name: hello image: busybox command: ['sh', '-c', 'echo \"Hello, Kubernetes!\" \u0026\u0026 sleep 3600'] restartPolicy: OnFailure ... 零宕机部署 Pod的零宕机上下线，可以通过加入初始化容器（InitContainers）、Pod上线接收流量前的**健康检查（探针StartupProbe/LivenessProbe/ReadinessProbe）和Pod生命周期回调(postStart/preStop)**来实现。借此可以实现deployment零宕机滚动更新。\n初始化容器 初始化容器即InitContainer，主要作用是在主应用容器启动之前，做一些初始化的操作，比如创建文件、修改内核参数、等待依赖程序启动或其他需要在主程序启动之前需要做的工作。常见用途有：\n安装应用容器中不存在的实用工具或个性化代码 安全地运行这些工具，避免这些工具导致应用镜像的安全性降低 root身份执行一些高权限命令 初始化容器相关操作执行完成后退出，不会给业务容器带来安全隐患\nInitContainer与postStart的区别：\nInitContainer：不依赖主容器，可以有更高的权限，一定会在主容器启动之前完成 postStart：依赖主容器，这个回调在主容器被创建之后立即执行。但是不能保证会在容器启动前执行，即入口点（ENTRYPOINT）之前执行。 InitContainer与普通容器的区别：\n普通容器考虑到安全性，通常权限不会给很大，InitContainer可以执行高权限的操作，操作完成立即退出 总是运行到完成，不完成不会启动主容器 多个初始化容器，上一个运行完成才会运行下一个 如果Pod的InitContainer失败，Kubernetes会不断地重启该Pod，直到成功为止，除非Pod的restartPolicy值为Never 不支持 lifecycle、livenessProbe、readinessProbe 和 startupProbe # 实例 [root@k8s-master01 yamls]# vim initcontainer.yml apiVersion: apps/v1 kind: Deployment metadata: labels: app: test-init name: test-init namespace: kube-public spec: replicas: 1 selector: matchLabels: app: test-init template: # pod配置 metadata: labels: app: test-init spec: volumes: - name: data emptyDir: {} initContainers: # 在应用容器启动前使用root权限创建相关文件 - command: - sh - -c - touch /mnt/test-init.txt image: nginx imagePullPolicy: IfNotPresent name: init-touch volumeMounts: - name: data mountPath: /mnt containers: - image: nginx imagePullPolicy: IfNotPresent name: test-init volumeMounts: - name: data mountPath: /mnt [root@k8s-master01 yamls]# kubectl apply -f initcontainer.yml [root@k8s-master01 yamls]# kubectl get deploy,po -n kube-public NAME READY UP-TO-DATE AVAILABLE AGE deployment.apps/test-init 1/1 1 1 5m5s NAME READY STATUS RESTARTS AGE pod/test-init-6d4c45d5b7-4qnl8 1/1 Running 0 5m5s [root@k8s-master01 yamls]# kubectl exec -it -n kube-public test-init-6d4c45d5b7-4qnl8 -- ls /mnt Defaulted container \"test-init\" out of: test-init, init-touch (init) test-init.txt Pod探针 生产环境中，应用容器能正常启动并不代表能正常处理请求，所以要合理配置健康检查。Pod健康检查有三种探针：\nstartupProbe（1.16版本后）：用于判断容器内应用程序是否已经启动。如果配置了startupProbe，会先禁止其他的探测，直到容器成功内程序启动为止。如果探测失败，kubelet会杀死容器并根据重启策略处理；如果探测成功，或未配置startupProbe探针，则标记为success livenessProbe：用于探测容器是否在运行（存活），如果探测失败，kubelet会杀死容器根据重启策略处理。若没有配置该探针，则标记为success readinessProbe：一般用于探测容器内的程序是否准备就绪（接收处理请求），如果探测失败，Endpoint Controller将从Service的Endpoints中删除该Pod的IP地址。若未配置该探针则默认标记为success Pod探针的实现方式 ExecAction：在容器内执行一个命令，如果返回值为0，则认为容器健康 TCPSocketAction：通过TCP连接检查容器内的端口是否是通的，如果是通的就认为容器健康 HTTPGetAction：通过应用程序暴露的API地址来检查程序是否是正常的，如果状态码为200~400之间，则认为容器健康 Pod健康检查结果：\nSuccess：检查通过 Failed：检查失败，kubelet根据Pod重启策略进一步处理 Unknown：检查失败，状态未知，不进行任何处理 Pod镜像拉取策略（imagePullPolicy）：\nAlways：总是拉取直至成功，镜像tag未指定时（即latest），默认为Always Never：无论镜像是否存在都不拉取 IfNotPresent：镜像不存在时拉取 Pod重启策略（restartPolicy）：\nAlways：默认策略，容器失效时，自动重启 OnFailure：容器以不为0的状态码终止，自动重启 Never：无论何种状态，都不重启 下面案例coredns的健康检查配置中livenessProbe通过httpGet的方式检测提供8080/health接口，检查容器是否处于运行状态，检查通过后接着进行ReadinessProbe探针检测，httpGet方式检测提供的8181/ready接口，检测通过则表示容器内程序运行正常，可以接收流量。健康检查接口需要在镜像中预定程序源码中写好，为后续接入健康检查做准备。\n# 以coredns为例，可以看到健康检查配置了LivenessProbe和ReadinessProbe [root@k8s-master01 ~]# kubectl get deploy -n kube-system coredns -oyaml ... spec: containers: ... livenessProbe: failureThreshold: 5 httpGet: path: /health port: 8080 scheme: HTTP initialDelaySeconds: 60 periodSeconds: 10 successThreshold: 1 timeoutSeconds: 5 ... readinessProbe: failureThreshold: 3 httpGet: path: /ready port: 8181 scheme: HTTP periodSeconds: 10 successThreshold: 1 timeoutSeconds: 11 ... 特殊情况：如果遇到容器内程序启动时间太长，超过了initialDelaySeconds设定的容器初始化时间，那么健康检查也不会通过，容器会不断被杀掉重启，造成服务无法正常运行。像上面这些情况就需要检测容器内程序是否健康，此时可以使用startupProbe。\n探针检查参数配置 initialDelaySeconds: 10 # 容器启动且存活，等待10s后开始检测。若不配置，默认为0s timeoutSeconds: 2 # 检测超时后的等待时间，默认为1s periodSeconds: 20 # 检测间隔时间，默认为10s successThreshold: 1 # 检测连续成功1次后标记Pod就绪 failureThreshold: 2 # 检测连续失败2次后标记Pod失败 startupProbe实例 采用HTTPGetAction探测方式\n实例使用的nginx:latest镜像并没有预设下面所写的健康检查接口，所以检测是不会通过的，可以通过Events查看。重启策略如果不指定，默认是restartPolicy: Always，失败后会一直重启\n[root@k8s-master01 ~]# cat \u003c\u003c \"EOF\" \u003e startupprobe-httpget.yaml apiVersion: v1 kind: Pod metadata: labels: test: startupprobe-httpget name: startupprobe-httpget spec: containers: - name: nginx image: nginx ports: - containerPort: 8080 startupProbe: httpGet: path: /health port: 8080 initialDelaySeconds: 15 timeoutSeconds: 1 EOF [root@k8s-master01 ~]# kubectl apply -f startupprobe-httpget.yaml pod/startupprobe-httpget created [root@k8s-master01 ~]# kubectl describe po startupprobe-httpget ... Startup: http-get http://:8080/health delay=15s timeout=1s period=10s #success=1 #failure=3 ... Events: Type Reason Age From Message ---- ------ ---- ---- ------- Normal Scheduled 56s default-Scheduler Successfully assigned default/startupprobe-httpget to k8s-node02 Normal Pulling 56s kubelet Pulling image \"nginx\" Normal Pulled 40s kubelet Successfully pulled image \"nginx\" in 15.591936231s Normal Created 40s kubelet Created container nginx Normal Started 40s kubelet Started container nginx Warning Unhealthy 7s (x2 over 17s) kubelet Startup probe failed: Get \"http://172.27.14.202:8080/health\": dial tcp 172.27.14.202:8080: connect: connection refused # 查看Pod状态，健康检查不通过，处于Running但并没有Ready，并且还在不断重启 [root@k8s-master01 ~]# kubectl get po NAME READY STATUS RESTARTS AGE startupprobe-httpget 0/1 Running 5 (20s ago) 4m40s livenessProbe实例 采用ExecAction探测方式\n# 创建liveness.yaml [root@k8s-master01 ~]# cat \u003c\u003c \"EOF\" \u003e livenessprobe-exec.yaml apiVersion: v1 kind: Pod metadata: labels: test: livenessprobe-exec name: livenessprobe-exec spec: containers: - name: liveness image: busybox args: - /bin/sh - -c - echo ok \u003e /tmp/healthy; sleep 10; rm -rf /tmp/healthy; sleep 60 livenessProbe: exec: command: - cat - /tmp/healthy initialDelaySeconds: 15 periodSeconds: 5 EOF [root@k8s-master01 ~]# kubectl apply -f livenessprobe-exec.yaml pod/livenessprobe-exec created [root@k8s-master01 ~]# kubectl describe po livenessprobe-exec ... Liveness: exec [cat /tmp/healthy] delay=15s timeout=1s period=5s #success=1 #failure=3 ... Events: Type Reason Age From Message ---- ------ ---- ---- ------- Normal Scheduled 34s default-Scheduler Successfully assigned default/livenessprobe-exec to k8s-node02 Normal Pulling 33s kubelet Pulling image \"busybox\" Normal Pulled 20s kubelet Successfully pulled image \"busybox\" in 13.224110856s Normal Created 20s kubelet Created container liveness Normal Started 20s kubelet Started container liveness Warning Unhealthy 4s kubelet Liveness probe failed: cat: can not open '/tmp/healthy': No such file or directory # 观察Pod状态可以发现一开始是正常的，后面因为健康检查失败重启了 [root@k8s-master01 ~]# kubectl get po NAME READY STATUS RESTARTS AGE livenessprobe-exec 1/1 Running 0 75s [root@k8s-master01 ~]# kubectl get po NAME READY STATUS RESTARTS AGE livenessprobe-exec 1/1 Running 1 (21s ago) 91s 在这个配置文件中，Pod 中只有一个容器。periodSeconds字段指定了 kubelet 应该每 5 秒执行一次健康检查。initialDelaySeconds字段告诉 kubelet 在执行第一次探测前应该等待 15 秒。 kubelet 在容器内执行命令cat /tmp/healthy来进行探测。 如果命令执行成功并且返回值为 0，kubelet 就会认为这个容器是健康存活的。 如果这个命令返回非 0 值，kubelet 会杀死这个容器并重新启动它。\nreadinessProbe实例 采用TCPSocketAction探测方式\nnginx启动后默认开启80端口，下面健康检查会通过\n[root@k8s-master01 ~]# vim readinessprobe-tcpsocket.yaml apiVersion: v1 kind: Pod metadata: labels: test: readinessprobe-tcpsocket name: readinessprobe-tcpsocket spec: containers: - name: nginx image: nginx imagePullPolicy: IfNotPresent ports: - containerPort: 80 readinessProbe: tcpSocket: port: 80 initialDelaySeconds: 5 periodSeconds: 10 [root@k8s-master01 ~]# kubectl apply -f readinessprobe-tcpsocket.yaml pod/readinessprobe-tcpsocket created [root@k8s-master01 ~]# kubectl get po readinessprobe-tcpsocket NAME READY STATUS RESTARTS AGE readinessprobe-tcpsocket 1/1 Running 0 20s [root@k8s-master01 ~]# kubectl describe po readinessprobe-tcpsocket ... Readiness: tcp-socket :80 delay=5s timeout=1s period=10s #success=1 #failure=3 ... Events: Type Reason Age From Message ---- ------ ---- ---- ------- Normal Scheduled 112s default-Scheduler Successfully assigned default/readinessprobe-tcpsocket to k8s-node02 Normal Pulling 112s kubelet Pulling image \"nginx\" Normal Pulled 102s kubelet Successfully pulled image \"nginx\" in 9.699109421s Normal Created 102s kubelet Created container nginx Normal Started 102s kubelet Started container nginx Successfully pulled image \"nginx\" in 9.699109421s拉取镜像花时间约9.7s，健康检查间隔时间是10s，所以大约在19.7sPod标记为Running状态\nPod生命周期 以下Pod创建和删除流程建立在容器运行时为containerd基础上进行\nPod创建流程 用户通过kubectl、RESTful API或其他客户端向APIServer发起创建pod请求 APIServer将pod对象写入etcd持久化存储，写入成功后，APIServer将收到etcd的确认信息 APIServer标记新的pod被创建 Scheduler监听到APIServer处有新的pod被创建。首先检查pod是否已经调度（检查spec.nodeName字段），如果未被调度，那么Scheduler会为pod分配一个合适的调度节点，并将状态写入spec.nodeName字段中，完成pod的绑定 Scheduler反馈pod的绑定信息到APIServer后写入etcd，同时Scheduler也持续监听pod对象的变化，若spec.nodeName字段不为空，则不进行任何处理 kubelet监听APIServer处pod的变化，当发现pod被调度到自己所在的节点时（即spec.nodeName字段值为自己所在节点），kubelet调用CRI gRPC申请启动容器 kubelet首先调用RunPodSandbox接口。containerd确认PodSandbox的pause镜像是否存在。由于所有PodSandbox使用同一个pause镜像，如果节点中已有其他在运行的pod，则pause就已经存在。接着创建Network Namespace，调用CNI接口设置容器网络，containerd使用这个网络启动PodSandbox kubelet申请在PodSandbox下创建容器，如果镜像不存在，则调用CRI的PullImage接口通过containerd拉取镜像 kubelet调用CRI的CreateContainer接口通过containerd创建容器 kubelet调用StartContainer接口通过containerd启动容器 无论容器是否启动成功，kubelet都会将最新的容器状态更新到pod的status字段中，其他控制器组件通过该字段获取pod的状态 APIServer将pod状态写入etcd，kubelet将持续监听APIServer Pod删除流程 用户通过kubectl、RESTful API或其他客户端向APIServer发起删除pod请求 pod对象不会被APIServer立即删除，APIServer在pod中添加deletionTimestamp和deletionGracePeriodSeconds（默认30s）字段，并写入etcd中 APIServer将pod已删除的信息返回给用户，用户查看pod状态已被更新为Terminating kubelet监听到APIServer处的自身的pod对象deletionTimestamp字段被设置时，开始准备删除pod kubelet调用StopContainer接口通过containerd停止容器，containerd首先会调用runc向容器发送SIGTERM信号，容器停止或deletionGracePeriodSeconds超时后，runc发送SIGKILL信号杀死所有容器进程，完成容器停止 kubelet收到containerd的容器已停止信息后，将状态更新到pod的status字段中 APIServer更新pod状态并写入etcd endpoint监听到pod状态发生改变后，删除pod相关的endpoint对象 APIServer更新endpoint状态并写入etcd kube-proxy监听到endpoint变化后，移除pod相关的转发规则 pod内所有容器被停止后，containerd调用CNI将容器的网络删除，然后通过StopPodSandbox接口停止PodSandbox，停止后，kubelet进行一系列的清理工作，例如清理pod的CGroup 如果pod有finalizer，即使PodSandbox被停止，这个pod也不会消失，需要等待其他控制器完成finalizer相关的清理工作，finalizer清空后，canBeDeleted方法返回true，kubelet发起最终的deletionGracePeriodSeconds=0的删除请求 APIServer将pod从etcd中彻底删除，kubelet实时监听 Pod优雅退出 Pod正常情况下退出（删除）流程有两个时间线：网络规则清理和Pod本身的删除。这两个时间线是并行的，大致如下：\n网络规则清理流程：\nAPIServer会收到Pod删除的请求，在Etcd中更新Pod的状态为Terminating Endpoint Controller将该Pod的ip从Endpoint对象中删除 Kube-proxy根据Endpoint对象的改变更新网络规则（iptables或ipvs），不再将流量路由到被删除的Pod Pod删除流程：\nAPIServer 会收到Pod删除的请求，在Etcd中更新Pod的状态为Terminating； kubelet在节点上清理容器的相关资源，例如存储，网络 kubelet发送SIGTERM进程给容器，如果容器中的进程未做任何配置，则容器立即退出 如果容器未在默认的30秒时间内退出，Kubelet发送SIGKILL给容器，强制让容器退出 实际环境可能会遇到的情况：\npod的请求未处理完就被退出 pod已经退出还有流量流向pod（即网络规则未清理完成Pod已经被删除了） 上面这两种情况需要设置pod优雅退出参数来优化退出流程。可以增加preStop生命周期参数或修改terminationGracePeriodSeconds参数。preStop用来完成pod退出前要执行的操作，\n如果 preStop 回调所需要的时间长于默认30s，则必须修改 terminationGracePeriodSeconds 属性值来使其正常工作。\n# 实例 apiVersion: v1 kind: Pod metadata: name: lifecycle-demo spec: terminationGracePeriodSeconds: 45 # set terminationGracePeriodSeconds containers: - name: lifecycle-demo-container image: nginx lifecycle: postStart: exec: command: [\"/bin/sh\", \"-c\", \"echo Hello from the postStart \u003e /usr/share/message\"] preStop: exec: command: [\"/bin/sh\",\"-c\",\"nginx -s quit; while killall -0 nginx; do sleep 1; done\"] ",
+  "wordCount" : "7386",
+  "inLanguage": "en",
+  "image":"https://deemoprobe.github.io/img/kubernetes.png","datePublished": "2023-04-29T14:23:11+08:00",
+  "dateModified": "2023-04-29T14:23:11+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "deemoprobe"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespod/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "William's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://deemoprobe.github.io/img/bear.gif"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://deemoprobe.github.io/" accesskey="h" title="William&#39;s Blog (Alt + H)">
+            <img src="https://deemoprobe.github.io/img/bear.gif" alt="logo" aria-label="logo"
+                 height="35">William&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://deemoprobe.github.io/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/archives/" title="📈 归档">
+                <span>📈 归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/tools" title="🧱 工具">
+                <span>🧱 工具</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://deemoprobe.github.io/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            
+            <h1 class="post-title">
+                KubernetesPod
+            </h1>
+            <div class="post-description">
+                Kubernetes Pod
+            </div>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2023-04-29
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>7386字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>15分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>deemoprobe
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+            <span class="post-tags-meta">
+                <a href="https://deemoprobe.github.io/tags/kubernetes/" style="color: var(--secondary)!important;">kubernetes</a>
+            </span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    
+                </span>
+
+</div>
+        </header> 
+<figure class="entry-cover1"><img style="zoom:50%;" loading="lazy" src="https://deemoprobe.github.io/img/kubernetes.png" alt="">
+    
+</figure><aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">文章目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e6%a6%82%e5%bf%b5" aria-label="概念">概念</a></li>
+                <li>
+                    <a href="#%e5%ae%9a%e4%b9%89pod" aria-label="定义Pod">定义Pod</a></li>
+                <li>
+                    <a href="#%e9%9b%b6%e5%ae%95%e6%9c%ba%e9%83%a8%e7%bd%b2" aria-label="零宕机部署">零宕机部署</a></li>
+                <li>
+                    <a href="#%e5%88%9d%e5%a7%8b%e5%8c%96%e5%ae%b9%e5%99%a8" aria-label="初始化容器">初始化容器</a></li>
+                <li>
+                    <a href="#pod%e6%8e%a2%e9%92%88" aria-label="Pod探针">Pod探针</a><ul>
+                        
+                <li>
+                    <a href="#pod%e6%8e%a2%e9%92%88%e7%9a%84%e5%ae%9e%e7%8e%b0%e6%96%b9%e5%bc%8f" aria-label="Pod探针的实现方式">Pod探针的实现方式</a></li>
+                <li>
+                    <a href="#%e6%8e%a2%e9%92%88%e6%a3%80%e6%9f%a5%e5%8f%82%e6%95%b0%e9%85%8d%e7%bd%ae" aria-label="探针检查参数配置">探针检查参数配置</a></li>
+                <li>
+                    <a href="#startupprobe%e5%ae%9e%e4%be%8b" aria-label="startupProbe实例">startupProbe实例</a></li>
+                <li>
+                    <a href="#livenessprobe%e5%ae%9e%e4%be%8b" aria-label="livenessProbe实例">livenessProbe实例</a></li>
+                <li>
+                    <a href="#readinessprobe%e5%ae%9e%e4%be%8b" aria-label="readinessProbe实例">readinessProbe实例</a></li></ul>
+                </li>
+                <li>
+                    <a href="#pod%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f" aria-label="Pod生命周期">Pod生命周期</a><ul>
+                        
+                <li>
+                    <a href="#pod%e5%88%9b%e5%bb%ba%e6%b5%81%e7%a8%8b" aria-label="Pod创建流程">Pod创建流程</a></li>
+                <li>
+                    <a href="#pod%e5%88%a0%e9%99%a4%e6%b5%81%e7%a8%8b" aria-label="Pod删除流程">Pod删除流程</a></li>
+                <li>
+                    <a href="#pod%e4%bc%98%e9%9b%85%e9%80%80%e5%87%ba" aria-label="Pod优雅退出">Pod优雅退出</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        
+        activeElement = elements[0];
+        const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+        document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+    }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+            const id = encodeURI(element.getAttribute('id')).toLowerCase();
+            if (element === activeElement){
+                document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+            } else {
+                document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+            }
+        })
+    }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+        <div class="post-content"><h2 id="概念">概念<a hidden class="anchor" aria-hidden="true" href="#概念">#</a></h2>
+<p>Pod是Kubernetes中创建管理和可部署的<strong>最小计算单元</strong>，它由一个或多个容器组成，每个Pod包含了一个Pause容器，Pause容器是Pod的父容器，负责僵尸进程的回收管理，通过Pause容器可以使同一个Pod里面的多个容器共享存储、网络、PID、IPC等。</p>
+<h2 id="定义pod">定义Pod<a hidden class="anchor" aria-hidden="true" href="#定义pod">#</a></h2>
+<p>Pod 中的容器会被调度到集群中的同一计算节点上。通常情况下，很少去直接创建Pod单实例，一般是通过Pod控制器（Deployment、DaemonSet、StatefulSet、CronJob等）进行创建和管理，并且这些高级资源具有Pod所不具备的很多特性（如无状态服务控制器deployment的伸缩回滚，有状态服务控制器StatefulSet的实例绑定）。控制器创建Pod后Scheduler根据预设条件和调度算法将Pod调度到集群合适的节点上，Pod会保持在该节点上运行，直到Pod结束执行、Pod对象被删除、Pod因资源不足而被驱逐或者节点失效为止。</p>
+<p>说明：重启 Pod 中的容器不应与重启 Pod 混淆。 Pod 不是进程，而是容器运行的环境。在被删除之前，Pod 会一直存在。</p>
+<p><strong>Pod yaml文件示例</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl explain pod | egrep -v &#34;^$|^\s*http&#34;|sed s/&#34;More info:&#34;//</span>
+</span></span><span style="display:flex;"><span>KIND:     Pod
+</span></span><span style="display:flex;"><span>VERSION:  v1
+</span></span><span style="display:flex;"><span>DESCRIPTION:
+</span></span><span style="display:flex;"><span>     Pod is a collection of containers that can run on a host. This resource is
+</span></span><span style="display:flex;"><span>     created by clients and scheduled onto hosts.
+</span></span><span style="display:flex;"><span>FIELDS:
+</span></span><span style="display:flex;"><span>   apiVersion   &lt;string&gt;
+</span></span><span style="display:flex;"><span>     APIVersion defines the versioned schema of this representation of an
+</span></span><span style="display:flex;"><span>     object. Servers should convert recognized schemas to the latest internal
+</span></span><span style="display:flex;"><span>     value, and may reject unrecognized values.
+</span></span><span style="display:flex;"><span>   kind &lt;string&gt;
+</span></span><span style="display:flex;"><span>     Kind is a string value representing the REST resource this object
+</span></span><span style="display:flex;"><span>     represents. Servers may infer this from the endpoint the client submits
+</span></span><span style="display:flex;"><span>     requests to. Cannot be updated. In CamelCase.
+</span></span><span style="display:flex;"><span>   metadata     &lt;Object&gt;
+</span></span><span style="display:flex;"><span>     Standard object<span style="color:#e6db74">&#39;s metadata.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">   spec &lt;Object&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">     Specification of the desired behavior of the pod.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">   status       &lt;Object&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">     Most recently observed status of the pod. This data may not be up to date.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">     Populated by the system. Read-only.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"># yaml文件示例
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">apiVersion: v1       # 必选，API的版本号
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">kind: Pod            # 必选，类型Pod
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">metadata:            # 必选，元数据
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  name: nginx        # 必选，符合RFC1035规范的Pod名称
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  namespace: default # 可选，Pod所在的命名空间，默认为default
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  labels:            # 可选，标签选择器，一般用于过滤和区分Pod
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    app: nginx
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    role: frontend   # 可以写多个
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  annotations:       # 可选，注释键值对列表，可以写多个
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    app: nginx
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">spec:                # 必选，用于定义容器的详细信息
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  initContainers:    # 初始化容器，在容器启动之前执行的一些初始化操作
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  - command:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - sh
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - -c
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - echo &#34;I am InitContainer for init some configuration&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    image: busybox
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    imagePullPolicy: IfNotPresent
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    name: init-container
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  containers:                # 必选，容器列表
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  - name: nginx              # 必选，符合RFC 1035规范的容器名称
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    image: nginx:latest      # 必选，容器所用的镜像的地址
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    imagePullPolicy: Always  # 可选，镜像拉取策略
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    command:                 # 可选，容器启动执行的命令
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - nginx 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - -g
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - &#34;daemon off;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    workingDir: /usr/share/nginx/html  # 可选，容器的工作目录
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    volumeMounts:                      # 可选，存储卷配置，可以配置多个
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - name: webroot                    # 存储卷名称
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      mountPath: /usr/share/nginx/html # 挂载目录
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      readOnly: true                   # 只读
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ports:                 # 可选，容器需要暴露的端口号列表
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - name: http           # 端口名称
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      containerPort: 80    # 端口号
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      protocol: TCP        # 端口协议，默认TCP
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    env:                   # 可选，环境变量配置列表
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - name: TZ             # 变量名
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      value: Asia/Shanghai # 变量的值
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    - name: LANG
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      value: en_US.utf8
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    resources:      # 可选，资源限制和资源请求限制
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      limits:       # 最大限制设置
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        cpu: 1000m
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        memory: 1024Mi
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      requests:     # 启动所需的资源
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        cpu: 100m
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        memory: 512Mi
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">#    startupProbe:  # 可选，检测容器内进程是否完成启动。注意三种检查方式同时只能使用一种。
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">#      httpGet:     # httpGet检测方式，生产环境建议使用httpGet实现接口级健康检查，健康检查由应用程序提供。
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">#            path: /api/successStart # 检查路径
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">#            port: 80
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    readinessProbe: # 可选，健康检查。注意三种检查方式同时只能使用一种。
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      httpGet:      # httpGet检测方式，生产环境建议使用httpGet实现接口级健康检查，健康检查由应用程序提供。
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            path: / # 检查路径
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            port: 80 # 监控端口
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    #livenessProbe: # 可选，健康检查
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      #exec:        # 执行容器命令检测方式
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            #command: 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            #- cat
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            #- /health
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    #httpGet:       # httpGet检测方式
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    #   path: /_health # 检查路径
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    #   port: 8080
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    #   httpHeaders: # 检查的请求头
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    #   - name: end-user
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    #     value: Jason 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      tcpSocket:     # 端口检测方式
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">            port: 80
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      initialDelaySeconds: 60  # 初始化时间
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      timeoutSeconds: 2        # 超时时间
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      periodSeconds: 20        # 检测间隔
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      successThreshold: 2      # 检查成功为2次表示就绪
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      failureThreshold: 1      # 检测失败1次表示未就绪
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    lifecycle:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      postStart: # 容器创建完成后执行的指令, 可以是exec httpGet TCPSocket
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        exec:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">          command:
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">          - sh
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">          - -c
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">          - &#39;</span>mkdir /data/<span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span><span style="display:flex;"><span>      preStop:
+</span></span><span style="display:flex;"><span>        httpGet:      
+</span></span><span style="display:flex;"><span>              path: /
+</span></span><span style="display:flex;"><span>              port: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#  exec:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#    command:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#    - sh</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#    - -c</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">#    - sleep 9</span>
+</span></span><span style="display:flex;"><span>  restartPolicy: Always   <span style="color:#75715e"># 可选，默认为Always</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#nodeSelector: # 可选，指定Node节点</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">#      region: subnet7</span>
+</span></span><span style="display:flex;"><span>  imagePullSecrets:  <span style="color:#75715e"># 可选，拉取镜像使用的secret，可以配置多个</span>
+</span></span><span style="display:flex;"><span>  - name: default-dockercfg-86258
+</span></span><span style="display:flex;"><span>  hostNetwork: false  <span style="color:#75715e"># 可选，是否为主机模式，如是，会占用主机端口</span>
+</span></span><span style="display:flex;"><span>  volumes:            <span style="color:#75715e"># 共享存储卷列表</span>
+</span></span><span style="display:flex;"><span>  - name: webroot     <span style="color:#75715e"># 名称，与上面volumeMounts对应</span>
+</span></span><span style="display:flex;"><span>    emptyDir: <span style="color:#f92672">{}</span>      <span style="color:#75715e"># 挂载目录</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">#hostPath:    # 挂载本机目录</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">#  path: /etc/hosts</span>
+</span></span></code></pre></div><p>在高级资源中创建Pod是通过文件中<code>template</code> Pod模板字段来创建Pod</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 例如创建Job，</span>
+</span></span><span style="display:flex;"><span>apiVersion: batch/v1
+</span></span><span style="display:flex;"><span>kind: Job
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: hello
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 这里是Pod对象模版</span>
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: hello
+</span></span><span style="display:flex;"><span>        image: busybox
+</span></span><span style="display:flex;"><span>        command: <span style="color:#f92672">[</span><span style="color:#e6db74">&#39;sh&#39;</span>, <span style="color:#e6db74">&#39;-c&#39;</span>, <span style="color:#e6db74">&#39;echo &#34;Hello, Kubernetes!&#34; &amp;&amp; sleep 3600&#39;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>      restartPolicy: OnFailure
+</span></span><span style="display:flex;"><span>      ...
+</span></span></code></pre></div><h2 id="零宕机部署">零宕机部署<a hidden class="anchor" aria-hidden="true" href="#零宕机部署">#</a></h2>
+<p>Pod的零宕机上下线，可以通过加入<strong>初始化容器（InitContainers）</strong>、Pod上线接收流量前的**健康检查（探针StartupProbe/LivenessProbe/ReadinessProbe）<strong>和Pod</strong>生命周期回调(postStart/preStop)**来实现。借此可以实现deployment零宕机滚动更新。</p>
+<h2 id="初始化容器">初始化容器<a hidden class="anchor" aria-hidden="true" href="#初始化容器">#</a></h2>
+<p>初始化容器即InitContainer，主要作用是在主应用容器启动之前，做一些初始化的操作，比如创建文件、修改内核参数、等待依赖程序启动或其他需要在主程序启动之前需要做的工作。常见用途有：</p>
+<ul>
+<li>安装应用容器中不存在的实用工具或个性化代码</li>
+<li>安全地运行这些工具，避免这些工具导致应用镜像的安全性降低</li>
+<li>root身份执行一些高权限命令</li>
+</ul>
+<blockquote>
+<p>初始化容器相关操作执行完成后退出，不会给业务容器带来安全隐患</p>
+</blockquote>
+<p>InitContainer与postStart的区别：</p>
+<ul>
+<li>InitContainer：不依赖主容器，可以有更高的权限，一定会在主容器启动之前完成</li>
+<li>postStart：依赖主容器，这个回调在主容器被创建之后立即执行。但是不能保证会在容器启动前执行，即入口点（ENTRYPOINT）之前执行。</li>
+</ul>
+<p>InitContainer与普通容器的区别：</p>
+<ul>
+<li>普通容器考虑到安全性，通常权限不会给很大，InitContainer可以执行高权限的操作，操作完成立即退出</li>
+<li>总是运行到完成，不完成不会启动主容器</li>
+<li>多个初始化容器，上一个运行完成才会运行下一个</li>
+<li>如果Pod的InitContainer失败，Kubernetes会不断地重启该Pod，直到成功为止，除非Pod的<code>restartPolicy</code>值为Never</li>
+<li>不支持 lifecycle、livenessProbe、readinessProbe 和 startupProbe</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 实例</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># vim initcontainer.yml</span>
+</span></span><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: test-init
+</span></span><span style="display:flex;"><span>  name: test-init
+</span></span><span style="display:flex;"><span>  namespace: kube-public
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: test-init
+</span></span><span style="display:flex;"><span>  template: <span style="color:#75715e"># pod配置</span>
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: test-init
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      volumes:
+</span></span><span style="display:flex;"><span>      - name: data
+</span></span><span style="display:flex;"><span>        emptyDir: <span style="color:#f92672">{}</span>
+</span></span><span style="display:flex;"><span>      initContainers: <span style="color:#75715e"># 在应用容器启动前使用root权限创建相关文件</span>
+</span></span><span style="display:flex;"><span>      - command:
+</span></span><span style="display:flex;"><span>        - sh
+</span></span><span style="display:flex;"><span>        - -c
+</span></span><span style="display:flex;"><span>        - touch /mnt/test-init.txt
+</span></span><span style="display:flex;"><span>        image: nginx
+</span></span><span style="display:flex;"><span>        imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>        name: init-touch
+</span></span><span style="display:flex;"><span>        volumeMounts:
+</span></span><span style="display:flex;"><span>        - name: data
+</span></span><span style="display:flex;"><span>          mountPath: /mnt
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - image: nginx
+</span></span><span style="display:flex;"><span>        imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>        name: test-init
+</span></span><span style="display:flex;"><span>        volumeMounts: 
+</span></span><span style="display:flex;"><span>        - name: data
+</span></span><span style="display:flex;"><span>          mountPath: /mnt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f initcontainer.yml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deploy,po -n kube-public</span>
+</span></span><span style="display:flex;"><span>NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span style="display:flex;"><span>deployment.apps/test-init   1/1     <span style="color:#ae81ff">1</span>            <span style="color:#ae81ff">1</span>           5m5s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NAME                             READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>pod/test-init-6d4c45d5b7-4qnl8   1/1     Running   <span style="color:#ae81ff">0</span>          5m5s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 yamls<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl exec -it -n kube-public test-init-6d4c45d5b7-4qnl8 -- ls /mnt</span>
+</span></span><span style="display:flex;"><span>Defaulted container <span style="color:#e6db74">&#34;test-init&#34;</span> out of: test-init, init-touch <span style="color:#f92672">(</span>init<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>test-init.txt
+</span></span></code></pre></div><h2 id="pod探针">Pod探针<a hidden class="anchor" aria-hidden="true" href="#pod探针">#</a></h2>
+<p>生产环境中，应用容器能正常启动并不代表能正常处理请求，所以要合理配置健康检查。Pod健康检查有三种探针：</p>
+<ul>
+<li>startupProbe（1.16版本后）：用于判断容器内应用程序是否已经启动。如果配置了startupProbe，会先禁止其他的探测，直到容器成功内程序启动为止。如果探测失败，kubelet会杀死容器并根据重启策略处理；如果探测成功，或未配置startupProbe探针，则标记为success</li>
+<li>livenessProbe：用于探测容器是否在运行（存活），如果探测失败，kubelet会杀死容器根据重启策略处理。若没有配置该探针，则标记为success</li>
+<li>readinessProbe：一般用于探测容器内的程序是否准备就绪（接收处理请求），如果探测失败，Endpoint Controller将从Service的Endpoints中删除该Pod的IP地址。若未配置该探针则默认标记为success</li>
+</ul>
+<h3 id="pod探针的实现方式">Pod探针的实现方式<a hidden class="anchor" aria-hidden="true" href="#pod探针的实现方式">#</a></h3>
+<ul>
+<li>ExecAction：在容器内执行一个命令，如果返回值为0，则认为容器健康</li>
+<li>TCPSocketAction：通过TCP连接检查容器内的端口是否是通的，如果是通的就认为容器健康</li>
+<li>HTTPGetAction：通过应用程序暴露的API地址来检查程序是否是正常的，如果状态码为200~400之间，则认为容器健康</li>
+</ul>
+<p>Pod健康检查结果：</p>
+<ul>
+<li>Success：检查通过</li>
+<li>Failed：检查失败，kubelet根据Pod重启策略进一步处理</li>
+<li>Unknown：检查失败，状态未知，不进行任何处理</li>
+</ul>
+<p>Pod镜像拉取策略（imagePullPolicy）：</p>
+<ul>
+<li>Always：总是拉取直至成功，镜像tag未指定时（即latest），默认为Always</li>
+<li>Never：无论镜像是否存在都不拉取</li>
+<li>IfNotPresent：镜像不存在时拉取</li>
+</ul>
+<p>Pod重启策略（restartPolicy）：</p>
+<ul>
+<li>Always：默认策略，容器失效时，自动重启</li>
+<li>OnFailure：容器以不为0的状态码终止，自动重启</li>
+<li>Never：无论何种状态，都不重启</li>
+</ul>
+<p>下面案例coredns的健康检查配置中<code>livenessProbe</code>通过<code>httpGet</code>的方式检测提供<code>8080/health</code>接口，检查容器是否处于运行状态，检查通过后接着进行<code>ReadinessProbe</code>探针检测，<code>httpGet</code>方式检测提供的<code>8181/ready</code>接口，检测通过则表示容器内程序运行正常，可以接收流量。健康检查接口需要在镜像中预定程序源码中写好，为后续接入健康检查做准备。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 以coredns为例，可以看到健康检查配置了LivenessProbe和ReadinessProbe</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get deploy -n kube-system coredns -oyaml</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>        ...
+</span></span><span style="display:flex;"><span>        livenessProbe:
+</span></span><span style="display:flex;"><span>          failureThreshold: <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>          httpGet:
+</span></span><span style="display:flex;"><span>            path: /health
+</span></span><span style="display:flex;"><span>            port: <span style="color:#ae81ff">8080</span>
+</span></span><span style="display:flex;"><span>            scheme: HTTP
+</span></span><span style="display:flex;"><span>          initialDelaySeconds: <span style="color:#ae81ff">60</span>
+</span></span><span style="display:flex;"><span>          periodSeconds: <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>          successThreshold: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>          timeoutSeconds: <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>        ...
+</span></span><span style="display:flex;"><span>        readinessProbe:
+</span></span><span style="display:flex;"><span>          failureThreshold: <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>          httpGet:
+</span></span><span style="display:flex;"><span>            path: /ready
+</span></span><span style="display:flex;"><span>            port: <span style="color:#ae81ff">8181</span>
+</span></span><span style="display:flex;"><span>            scheme: HTTP
+</span></span><span style="display:flex;"><span>          periodSeconds: <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>          successThreshold: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>          timeoutSeconds: <span style="color:#ae81ff">11</span>
+</span></span><span style="display:flex;"><span>          ...
+</span></span></code></pre></div><p><strong>特殊情况</strong>：如果遇到容器内程序启动时间太长，超过了<code>initialDelaySeconds</code>设定的容器初始化时间，那么健康检查也不会通过，容器会不断被杀掉重启，造成服务无法正常运行。像上面这些情况就需要检测容器内程序是否健康，此时可以使用<code>startupProbe</code>。</p>
+<h3 id="探针检查参数配置">探针检查参数配置<a hidden class="anchor" aria-hidden="true" href="#探针检查参数配置">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>initialDelaySeconds: <span style="color:#ae81ff">10</span>   <span style="color:#75715e"># 容器启动且存活，等待10s后开始检测。若不配置，默认为0s</span>
+</span></span><span style="display:flex;"><span>timeoutSeconds: <span style="color:#ae81ff">2</span>         <span style="color:#75715e"># 检测超时后的等待时间，默认为1s</span>
+</span></span><span style="display:flex;"><span>periodSeconds: <span style="color:#ae81ff">20</span>         <span style="color:#75715e"># 检测间隔时间，默认为10s</span>
+</span></span><span style="display:flex;"><span>successThreshold: <span style="color:#ae81ff">1</span>       <span style="color:#75715e"># 检测连续成功1次后标记Pod就绪</span>
+</span></span><span style="display:flex;"><span>failureThreshold: <span style="color:#ae81ff">2</span>       <span style="color:#75715e"># 检测连续失败2次后标记Pod失败</span>
+</span></span></code></pre></div><h3 id="startupprobe实例">startupProbe实例<a hidden class="anchor" aria-hidden="true" href="#startupprobe实例">#</a></h3>
+<p>采用HTTPGetAction探测方式</p>
+<p>实例使用的<code>nginx:latest</code>镜像并没有预设下面所写的健康检查接口，所以检测是不会通过的，可以通过<code>Events</code>查看。重启策略如果不指定，默认是<code>restartPolicy: Always</code>，失败后会一直重启</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cat &lt;&lt; &#34;EOF&#34; &gt; startupprobe-httpget.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    test: startupprobe-httpget
+</span></span><span style="display:flex;"><span>  name: startupprobe-httpget
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: nginx
+</span></span><span style="display:flex;"><span>    image: nginx
+</span></span><span style="display:flex;"><span>    ports:
+</span></span><span style="display:flex;"><span>    - containerPort: <span style="color:#ae81ff">8080</span>
+</span></span><span style="display:flex;"><span>    startupProbe:
+</span></span><span style="display:flex;"><span>      httpGet:
+</span></span><span style="display:flex;"><span>        path: /health
+</span></span><span style="display:flex;"><span>        port: <span style="color:#ae81ff">8080</span>
+</span></span><span style="display:flex;"><span>      initialDelaySeconds: <span style="color:#ae81ff">15</span>
+</span></span><span style="display:flex;"><span>      timeoutSeconds: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f startupprobe-httpget.yaml </span>
+</span></span><span style="display:flex;"><span>pod/startupprobe-httpget created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe po startupprobe-httpget </span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>    Startup:        http-get http://:8080/health delay<span style="color:#f92672">=</span>15s timeout<span style="color:#f92672">=</span>1s period<span style="color:#f92672">=</span>10s <span style="color:#75715e">#success=1 #failure=3</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>Events:
+</span></span><span style="display:flex;"><span>  Type     Reason     Age               From               Message
+</span></span><span style="display:flex;"><span>  ----     ------     ----              ----               -------
+</span></span><span style="display:flex;"><span>  Normal   Scheduled  56s               default-Scheduler  Successfully assigned default/startupprobe-httpget to k8s-node02
+</span></span><span style="display:flex;"><span>  Normal   Pulling    56s               kubelet            Pulling image <span style="color:#e6db74">&#34;nginx&#34;</span>
+</span></span><span style="display:flex;"><span>  Normal   Pulled     40s               kubelet            Successfully pulled image <span style="color:#e6db74">&#34;nginx&#34;</span> in 15.591936231s
+</span></span><span style="display:flex;"><span>  Normal   Created    40s               kubelet            Created container nginx
+</span></span><span style="display:flex;"><span>  Normal   Started    40s               kubelet            Started container nginx
+</span></span><span style="display:flex;"><span>  Warning  Unhealthy  7s <span style="color:#f92672">(</span>x2 over 17s<span style="color:#f92672">)</span>  kubelet            Startup probe failed: Get <span style="color:#e6db74">&#34;http://172.27.14.202:8080/health&#34;</span>: dial tcp 172.27.14.202:8080: connect: connection refused
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看Pod状态，健康检查不通过，处于Running但并没有Ready，并且还在不断重启</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po</span>
+</span></span><span style="display:flex;"><span>NAME                   READY   STATUS    RESTARTS      AGE
+</span></span><span style="display:flex;"><span>startupprobe-httpget   0/1     Running   <span style="color:#ae81ff">5</span> <span style="color:#f92672">(</span>20s ago<span style="color:#f92672">)</span>   4m40s
+</span></span></code></pre></div><h3 id="livenessprobe实例">livenessProbe实例<a hidden class="anchor" aria-hidden="true" href="#livenessprobe实例">#</a></h3>
+<p>采用ExecAction探测方式</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 创建liveness.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># cat &lt;&lt; &#34;EOF&#34; &gt; livenessprobe-exec.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    test: livenessprobe-exec
+</span></span><span style="display:flex;"><span>  name: livenessprobe-exec
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: liveness
+</span></span><span style="display:flex;"><span>    image: busybox
+</span></span><span style="display:flex;"><span>    args:
+</span></span><span style="display:flex;"><span>    - /bin/sh
+</span></span><span style="display:flex;"><span>    - -c
+</span></span><span style="display:flex;"><span>    - echo ok &gt; /tmp/healthy; sleep 10; rm -rf /tmp/healthy; sleep <span style="color:#ae81ff">60</span>
+</span></span><span style="display:flex;"><span>    livenessProbe:
+</span></span><span style="display:flex;"><span>      exec:
+</span></span><span style="display:flex;"><span>        command:
+</span></span><span style="display:flex;"><span>        - cat
+</span></span><span style="display:flex;"><span>        - /tmp/healthy
+</span></span><span style="display:flex;"><span>      initialDelaySeconds: <span style="color:#ae81ff">15</span>
+</span></span><span style="display:flex;"><span>      periodSeconds: <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>EOF
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f livenessprobe-exec.yaml</span>
+</span></span><span style="display:flex;"><span>pod/livenessprobe-exec created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe po livenessprobe-exec</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>    Liveness:       exec <span style="color:#f92672">[</span>cat /tmp/healthy<span style="color:#f92672">]</span> delay<span style="color:#f92672">=</span>15s timeout<span style="color:#f92672">=</span>1s period<span style="color:#f92672">=</span>5s <span style="color:#75715e">#success=1 #failure=3</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>Events:
+</span></span><span style="display:flex;"><span>  Type     Reason     Age   From               Message
+</span></span><span style="display:flex;"><span>  ----     ------     ----  ----               -------
+</span></span><span style="display:flex;"><span>  Normal   Scheduled  34s   default-Scheduler  Successfully assigned default/livenessprobe-exec to k8s-node02
+</span></span><span style="display:flex;"><span>  Normal   Pulling    33s   kubelet            Pulling image <span style="color:#e6db74">&#34;busybox&#34;</span>
+</span></span><span style="display:flex;"><span>  Normal   Pulled     20s   kubelet            Successfully pulled image <span style="color:#e6db74">&#34;busybox&#34;</span> in 13.224110856s
+</span></span><span style="display:flex;"><span>  Normal   Created    20s   kubelet            Created container liveness
+</span></span><span style="display:flex;"><span>  Normal   Started    20s   kubelet            Started container liveness
+</span></span><span style="display:flex;"><span>  Warning  Unhealthy  4s    kubelet            Liveness probe failed: cat: can not open <span style="color:#e6db74">&#39;/tmp/healthy&#39;</span>: No such file or directory
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 观察Pod状态可以发现一开始是正常的，后面因为健康检查失败重启了</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po</span>
+</span></span><span style="display:flex;"><span>NAME                 READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>livenessprobe-exec   1/1     Running   <span style="color:#ae81ff">0</span>          75s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po</span>
+</span></span><span style="display:flex;"><span>NAME                 READY   STATUS    RESTARTS      AGE
+</span></span><span style="display:flex;"><span>livenessprobe-exec   1/1     Running   <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>21s ago<span style="color:#f92672">)</span>   91s
+</span></span></code></pre></div><p>在这个配置文件中，Pod 中只有一个容器。<code>periodSeconds</code>字段指定了 kubelet 应该每 5 秒执行一次健康检查。<code>initialDelaySeconds</code>字段告诉 kubelet 在执行第一次探测前应该等待 15 秒。 kubelet 在容器内执行命令<code>cat /tmp/healthy</code>来进行探测。 如果命令执行成功并且返回值为 0，kubelet 就会认为这个容器是健康存活的。 如果这个命令返回非 0 值，kubelet 会杀死这个容器并重新启动它。</p>
+<h3 id="readinessprobe实例">readinessProbe实例<a hidden class="anchor" aria-hidden="true" href="#readinessprobe实例">#</a></h3>
+<p>采用TCPSocketAction探测方式</p>
+<p>nginx启动后默认开启80端口，下面健康检查会通过</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># vim readinessprobe-tcpsocket.yaml</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    test: readinessprobe-tcpsocket
+</span></span><span style="display:flex;"><span>  name: readinessprobe-tcpsocket
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: nginx
+</span></span><span style="display:flex;"><span>    image: nginx
+</span></span><span style="display:flex;"><span>    imagePullPolicy: IfNotPresent
+</span></span><span style="display:flex;"><span>    ports:
+</span></span><span style="display:flex;"><span>    - containerPort: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>    readinessProbe:
+</span></span><span style="display:flex;"><span>      tcpSocket:
+</span></span><span style="display:flex;"><span>        port: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>      initialDelaySeconds: <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>      periodSeconds: <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl apply -f readinessprobe-tcpsocket.yaml </span>
+</span></span><span style="display:flex;"><span>pod/readinessprobe-tcpsocket created
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po readinessprobe-tcpsocket </span>
+</span></span><span style="display:flex;"><span>NAME                       READY   STATUS    RESTARTS   AGE
+</span></span><span style="display:flex;"><span>readinessprobe-tcpsocket   1/1     Running   <span style="color:#ae81ff">0</span>          20s
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@k8s-master01 ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe po readinessprobe-tcpsocket </span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>    Readiness:      tcp-socket :80 delay<span style="color:#f92672">=</span>5s timeout<span style="color:#f92672">=</span>1s period<span style="color:#f92672">=</span>10s <span style="color:#75715e">#success=1 #failure=3</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>Events:
+</span></span><span style="display:flex;"><span>  Type    Reason     Age   From               Message
+</span></span><span style="display:flex;"><span>  ----    ------     ----  ----               -------
+</span></span><span style="display:flex;"><span>  Normal  Scheduled  112s  default-Scheduler  Successfully assigned default/readinessprobe-tcpsocket to k8s-node02
+</span></span><span style="display:flex;"><span>  Normal  Pulling    112s  kubelet            Pulling image <span style="color:#e6db74">&#34;nginx&#34;</span>
+</span></span><span style="display:flex;"><span>  Normal  Pulled     102s  kubelet            Successfully pulled image <span style="color:#e6db74">&#34;nginx&#34;</span> in 9.699109421s
+</span></span><span style="display:flex;"><span>  Normal  Created    102s  kubelet            Created container nginx
+</span></span><span style="display:flex;"><span>  Normal  Started    102s  kubelet            Started container nginx
+</span></span></code></pre></div><p><code>Successfully pulled image &quot;nginx&quot; in 9.699109421s</code>拉取镜像花时间约9.7s，健康检查间隔时间是10s，所以大约在19.7sPod标记为Running状态</p>
+<h2 id="pod生命周期">Pod生命周期<a hidden class="anchor" aria-hidden="true" href="#pod生命周期">#</a></h2>
+<p><img loading="lazy" src="https://deemoprobe.oss-cn-shanghai.aliyuncs.com/images/kubernetes-pod-life-cycle.jpg" alt="kubernetes-pod-life-cycle"  />
+</p>
+<p>以下Pod创建和删除流程建立在容器运行时为containerd基础上进行</p>
+<h3 id="pod创建流程">Pod创建流程<a hidden class="anchor" aria-hidden="true" href="#pod创建流程">#</a></h3>
+<p><img loading="lazy" src="https://deemoprobe.oss-cn-shanghai.aliyuncs.com/images/Pod%e5%88%9b%e5%bb%ba%e6%b5%81%e7%a8%8b.drawio.png" alt="1"  />
+</p>
+<ul>
+<li>用户通过kubectl、RESTful API或其他客户端向APIServer发起创建pod请求</li>
+<li>APIServer将pod对象写入etcd持久化存储，写入成功后，APIServer将收到etcd的确认信息</li>
+<li>APIServer标记新的pod被创建</li>
+<li>Scheduler监听到APIServer处有新的pod被创建。首先检查pod是否已经调度（检查spec.nodeName字段），如果未被调度，那么Scheduler会为pod分配一个合适的调度节点，并将状态写入<code>spec.nodeName</code>字段中，完成pod的绑定</li>
+<li>Scheduler反馈pod的绑定信息到APIServer后写入etcd，同时Scheduler也持续监听pod对象的变化，若<code>spec.nodeName</code>字段不为空，则不进行任何处理</li>
+<li>kubelet监听APIServer处pod的变化，当发现pod被调度到自己所在的节点时（即<code>spec.nodeName</code>字段值为自己所在节点），kubelet调用CRI gRPC申请启动容器</li>
+<li>kubelet首先调用RunPodSandbox接口。containerd确认PodSandbox的pause镜像是否存在。由于所有PodSandbox使用同一个pause镜像，如果节点中已有其他在运行的pod，则pause就已经存在。接着创建Network Namespace，调用CNI接口设置容器网络，containerd使用这个网络启动PodSandbox</li>
+<li>kubelet申请在PodSandbox下创建容器，如果镜像不存在，则调用CRI的PullImage接口通过containerd拉取镜像</li>
+<li>kubelet调用CRI的CreateContainer接口通过containerd创建容器</li>
+<li>kubelet调用StartContainer接口通过containerd启动容器</li>
+<li>无论容器是否启动成功，kubelet都会将最新的容器状态更新到pod的<code>status</code>字段中，其他控制器组件通过该字段获取pod的状态</li>
+<li>APIServer将pod状态写入etcd，kubelet将持续监听APIServer</li>
+</ul>
+<h3 id="pod删除流程">Pod删除流程<a hidden class="anchor" aria-hidden="true" href="#pod删除流程">#</a></h3>
+<p><img loading="lazy" src="https://deemoprobe.oss-cn-shanghai.aliyuncs.com/images/Pod%e5%88%a0%e9%99%a4%e6%b5%81%e7%a8%8b.drawio.png" alt="2"  />
+</p>
+<ul>
+<li>用户通过kubectl、RESTful API或其他客户端向APIServer发起删除pod请求</li>
+<li>pod对象不会被APIServer立即删除，APIServer在pod中添加<code>deletionTimestamp</code>和<code>deletionGracePeriodSeconds（默认30s）</code>字段，并写入etcd中</li>
+<li>APIServer将pod已删除的信息返回给用户，用户查看pod状态已被更新为Terminating</li>
+<li>kubelet监听到APIServer处的自身的pod对象<code>deletionTimestamp</code>字段被设置时，开始准备删除pod</li>
+<li>kubelet调用StopContainer接口通过containerd停止容器，containerd首先会调用runc向容器发送SIGTERM信号，容器停止或<code>deletionGracePeriodSeconds</code>超时后，runc发送SIGKILL信号杀死所有容器进程，完成容器停止</li>
+<li>kubelet收到containerd的容器已停止信息后，将状态更新到pod的<code>status</code>字段中</li>
+<li>APIServer更新pod状态并写入etcd</li>
+<li>endpoint监听到pod状态发生改变后，删除pod相关的endpoint对象</li>
+<li>APIServer更新endpoint状态并写入etcd</li>
+<li>kube-proxy监听到endpoint变化后，移除pod相关的转发规则</li>
+<li>pod内所有容器被停止后，containerd调用CNI将容器的网络删除，然后通过StopPodSandbox接口停止PodSandbox，停止后，kubelet进行一系列的清理工作，例如清理pod的CGroup</li>
+<li>如果pod有<code>finalizer</code>，即使PodSandbox被停止，这个pod也不会消失，需要等待其他控制器完成finalizer相关的清理工作，finalizer清空后，canBeDeleted方法返回true，kubelet发起最终的<code>deletionGracePeriodSeconds=0</code>的删除请求</li>
+<li>APIServer将pod从etcd中彻底删除，kubelet实时监听</li>
+</ul>
+<h3 id="pod优雅退出">Pod优雅退出<a hidden class="anchor" aria-hidden="true" href="#pod优雅退出">#</a></h3>
+<p>Pod正常情况下退出（删除）流程有两个时间线：网络规则清理和Pod本身的删除。这两个时间线是并行的，大致如下：</p>
+<p>网络规则清理流程：</p>
+<ul>
+<li>APIServer会收到Pod删除的请求，在Etcd中更新Pod的状态为Terminating</li>
+<li>Endpoint Controller将该Pod的ip从Endpoint对象中删除</li>
+<li>Kube-proxy根据Endpoint对象的改变更新网络规则（iptables或ipvs），不再将流量路由到被删除的Pod</li>
+</ul>
+<p>Pod删除流程：</p>
+<ul>
+<li>APIServer 会收到Pod删除的请求，在Etcd中更新Pod的状态为Terminating；</li>
+<li>kubelet在节点上清理容器的相关资源，例如存储，网络</li>
+<li>kubelet发送SIGTERM进程给容器，如果容器中的进程未做任何配置，则容器立即退出</li>
+<li>如果容器未在默认的30秒时间内退出，Kubelet发送SIGKILL给容器，强制让容器退出</li>
+</ul>
+<p>实际环境可能会遇到的情况：</p>
+<ul>
+<li>pod的请求未处理完就被退出</li>
+<li>pod已经退出还有流量流向pod（即网络规则未清理完成Pod已经被删除了）</li>
+</ul>
+<p>上面这两种情况需要设置pod优雅退出参数来优化退出流程。可以增加<code>preStop</code>生命周期参数或修改<code>terminationGracePeriodSeconds</code>参数。<code>preStop</code>用来完成pod退出前要执行的操作，</p>
+<blockquote>
+<p>如果 preStop 回调所需要的时间长于默认30s，则必须修改 terminationGracePeriodSeconds 属性值来使其正常工作。</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 实例</span>
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Pod
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: lifecycle-demo
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  terminationGracePeriodSeconds: <span style="color:#ae81ff">45</span> <span style="color:#75715e"># set terminationGracePeriodSeconds</span>
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - name: lifecycle-demo-container
+</span></span><span style="display:flex;"><span>    image: nginx
+</span></span><span style="display:flex;"><span>    lifecycle:
+</span></span><span style="display:flex;"><span>      postStart:
+</span></span><span style="display:flex;"><span>        exec:
+</span></span><span style="display:flex;"><span>          command: <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/bin/sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;echo Hello from the postStart &gt; /usr/share/message&#34;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>      preStop:
+</span></span><span style="display:flex;"><span>        exec:
+</span></span><span style="display:flex;"><span>          command: <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/bin/sh&#34;</span>,<span style="color:#e6db74">&#34;-c&#34;</span>,<span style="color:#e6db74">&#34;nginx -s quit; while killall -0 nginx; do sleep 1; done&#34;</span><span style="color:#f92672">]</span>
+</span></span></code></pre></div>
+
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="prev" href="https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespodcontroller/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>KubernetesPodController</span>
+  </a>
+  <a class="next" href="https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesnamespace/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>KubernetesNamespace</span>
+  </a>
+</nav>
+
+        </footer>
+    </div>
+</article>
+</main>
+
+<footer class="footer">
+    
+        <span id="runtime_span"></span>
+        <script
+            type="text/javascript">function show_runtime() { window.setTimeout("show_runtime()", 1000); X = new Date("1/1/2023 1:00:00"); Y = new Date(); T = (Y.getTime() - X.getTime()); M = 24 * 60 * 60 * 1000; a = T / M; A = Math.floor(a); b = (a - A) * 24; B = Math.floor(b); c = (b - B) * 60; C = Math.floor((b - B) * 60); D = Math.floor((c - C) * 60); runtime_span.innerHTML = "网站已运行" + A + "天" + B + "小时" + C + "分" + D + "秒" } show_runtime();</script>
+    
+    
+    <br>
+    <span>
+        Copyright
+        &copy;
+        2022-2023
+        <a href="https://deemoprobe.github.io/" style="color:#939393;">William&#39;s Blog</a>
+        All Rights Reserved
+    </span>
+    
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '📄复制';
+
+        function copyingDone() {
+            copybutton.innerText = '👌🏻已复制!';
+            setTimeout(() => {
+                copybutton.innerText = '📄复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"William's Blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+
+<script>
+    $("code[class^=language] ").on("mouseover", function () {
+        if (this.clientWidth < this.scrollWidth) {
+            $(this).css("width", "135%")
+            $(this).css("border-top-right-radius", "var(--radius)")
+        }
+    }).on("mouseout", function () {
+        $(this).css("width", "100%")
+        $(this).css("border-top-right-radius", "unset")
+    })
+</script>
+</body>
+
+</html>

@@ -3,10 +3,25 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://deemoprobe.github.io/posts/tech/</loc>
-    <lastmod>2023-04-30T21:52:43+08:00</lastmod>
+    <lastmod>2023-04-30T22:13:44+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/posts/</loc>
-    <lastmod>2023-04-30T21:52:43+08:00</lastmod>
+    <lastmod>2023-04-30T22:13:44+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/tags/kubernetes/</loc>
+    <lastmod>2023-04-30T22:13:44+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/</loc>
+    <lastmod>2023-04-30T22:13:44+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesvolume/</loc>
+    <lastmod>2023-04-30T22:13:44+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/</loc>
+    <lastmod>2023-04-30T22:13:44+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/tags/</loc>
+    <lastmod>2023-04-30T22:13:44+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/tags/linux/</loc>
     <lastmod>2023-04-30T21:52:43+08:00</lastmod>
@@ -17,79 +32,73 @@
     <loc>https://deemoprobe.github.io/posts/tech/linux/nfs/</loc>
     <lastmod>2023-04-30T21:52:43+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/</loc>
-    <lastmod>2023-04-30T21:52:43+08:00</lastmod>
-  </url><url>
-    <loc>https://deemoprobe.github.io/tags/</loc>
-    <lastmod>2023-04-30T21:52:43+08:00</lastmod>
-  </url><url>
-    <loc>https://deemoprobe.github.io/tags/kubernetes/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesservicediscovery/</loc>
     <lastmod>2023-04-30T02:26:47+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetesservicediscovery/</loc>
-    <lastmod>2023-04-30T02:26:47+08:00</lastmod>
-  </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetesmetrics/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesmetrics/</loc>
     <lastmod>2023-04-29T14:32:00+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetestroubleshooting/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetestroubleshooting/</loc>
     <lastmod>2023-04-29T14:31:45+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetesupgrade/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesupgrade/</loc>
     <lastmod>2023-04-29T14:31:01+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetespodschedulingstrategy/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespodschedulingstrategy/</loc>
     <lastmod>2023-04-29T14:30:42+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetessecret/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetessecret/</loc>
     <lastmod>2023-04-29T14:28:09+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetesconfigmap/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesconfigmap/</loc>
     <lastmod>2023-04-29T14:28:03+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kuberneteswebdemo/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kuberneteswebdemo/</loc>
     <lastmod>2023-04-29T14:27:46+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kuberneteslabelselector/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kuberneteslabelselector/</loc>
     <lastmod>2023-04-29T14:27:13+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetespodcontroller/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespodcontroller/</loc>
     <lastmod>2023-04-29T14:23:19+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetespod/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetespod/</loc>
     <lastmod>2023-04-29T14:23:11+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetesnamespace/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesnamespace/</loc>
     <lastmod>2023-04-29T14:21:17+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetescli/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetescli/</loc>
     <lastmod>2023-04-29T14:19:33+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetesbinaryinstallation-ha/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesbinaryinstallation-ha/</loc>
     <lastmod>2023-04-29T14:17:51+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kuberneteskubeadminstallation-ha/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kuberneteskubeadminstallation-ha/</loc>
     <lastmod>2023-04-29T14:12:14+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/kubernetesarchitecture-ha/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/kubernetes/kubernetesarchitecture-ha/</loc>
     <lastmod>2023-04-28T11:45:50+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/tags/docker/</loc>
     <lastmod>2023-04-26T18:43:22+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/dockerimagesoptimization/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/docker/</loc>
     <lastmod>2023-04-26T18:43:22+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/dockerbuildcontext/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/docker/dockerimagesoptimization/</loc>
+    <lastmod>2023-04-26T18:43:22+08:00</lastmod>
+  </url><url>
+    <loc>https://deemoprobe.github.io/posts/tech/docker/dockerbuildcontext/</loc>
     <lastmod>2023-04-26T18:35:27+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/dockerfilegrammer/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/docker/dockerfilegrammer/</loc>
     <lastmod>2023-04-26T14:52:37+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/dockercli/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/docker/dockercli/</loc>
     <lastmod>2023-04-26T14:52:26+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/tech/docker/</loc>
+    <loc>https://deemoprobe.github.io/posts/tech/docker/docker/</loc>
     <lastmod>2023-04-26T14:51:34+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/tools/</loc>

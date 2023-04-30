@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Docker on William&#39;s Blog</title>
+    <link>https://deemoprobe.github.io/posts/tech/docker/</link>
+    <description>Recent content in Docker on William&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 26 Apr 2023 18:43:22 +0800</lastBuildDate><atom:link href="https://deemoprobe.github.io/posts/tech/docker/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>DockerImagesOptimization</title>
+      <link>https://deemoprobe.github.io/posts/tech/docker/dockerimagesoptimization/</link>
+      <pubDate>Wed, 26 Apr 2023 18:43:22 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/docker/dockerimagesoptimization/</guid>
+      <description>Docker镜像体积优化</description>
+    </item>
+    
+    <item>
+      <title>DockerbuildContext</title>
+      <link>https://deemoprobe.github.io/posts/tech/docker/dockerbuildcontext/</link>
+      <pubDate>Wed, 26 Apr 2023 18:35:27 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/docker/dockerbuildcontext/</guid>
+      <description>本文包含docker build上下文、构建方式和实例</description>
+    </item>
+    
+    <item>
+      <title>DockerfileGrammer</title>
+      <link>https://deemoprobe.github.io/posts/tech/docker/dockerfilegrammer/</link>
+      <pubDate>Wed, 26 Apr 2023 14:52:37 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/docker/dockerfilegrammer/</guid>
+      <description>Dockerfile语法，构建以及实例分析</description>
+    </item>
+    
+    <item>
+      <title>DockerCommandLineInterface</title>
+      <link>https://deemoprobe.github.io/posts/tech/docker/dockercli/</link>
+      <pubDate>Wed, 26 Apr 2023 14:52:26 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/docker/dockercli/</guid>
+      <description>docker常用命令一览</description>
+    </item>
+    
+    <item>
+      <title>Docker</title>
+      <link>https://deemoprobe.github.io/posts/tech/docker/docker/</link>
+      <pubDate>Wed, 26 Apr 2023 14:51:34 +0800</pubDate>
+      
+      <guid>https://deemoprobe.github.io/posts/tech/docker/docker/</guid>
+      <description>docker容器技术基础</description>
+    </item>
+    
+  </channel>
+</rss>

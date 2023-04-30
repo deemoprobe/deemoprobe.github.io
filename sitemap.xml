@@ -2,6 +2,9 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://deemoprobe.github.io/tags/</loc>
+    <lastmod>2023-04-30T22:13:44+08:00</lastmod>
+  </url><url>
     <loc>https://deemoprobe.github.io/posts/tech/</loc>
     <lastmod>2023-04-30T22:13:44+08:00</lastmod>
   </url><url>
@@ -18,9 +21,6 @@
     <lastmod>2023-04-30T22:13:44+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/</loc>
-    <lastmod>2023-04-30T22:13:44+08:00</lastmod>
-  </url><url>
-    <loc>https://deemoprobe.github.io/tags/</loc>
     <lastmod>2023-04-30T22:13:44+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/tags/linux/</loc>
@@ -104,10 +104,10 @@
     <loc>https://deemoprobe.github.io/tools/</loc>
     <lastmod>2023-04-26T12:51:27+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/life/4k-wallpaper/</loc>
+    <loc>https://deemoprobe.github.io/posts/life/</loc>
     <lastmod>2023-04-26T12:50:41+08:00</lastmod>
   </url><url>
-    <loc>https://deemoprobe.github.io/posts/life/</loc>
+    <loc>https://deemoprobe.github.io/posts/life/4k-wallpaper/</loc>
     <lastmod>2023-04-26T12:50:41+08:00</lastmod>
   </url><url>
     <loc>https://deemoprobe.github.io/posts/life/life/</loc>

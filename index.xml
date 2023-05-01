@@ -260,15 +260,6 @@
     </item>
     
     <item>
-      <title>Blog</title>
-      <link>https://deemoprobe.github.io/posts/blog/blog/</link>
-      <pubDate>Thu, 05 May 2022 00:18:23 +0800</pubDate>
-      
-      <guid>https://deemoprobe.github.io/posts/blog/blog/</guid>
-      <description>页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能</description>
-    </item>
-    
-    <item>
       <title>🤝友链</title>
       <link>https://deemoprobe.github.io/links/</link>
       <pubDate>Sat, 06 Nov 2021 15:15:53 +0800</pubDate>

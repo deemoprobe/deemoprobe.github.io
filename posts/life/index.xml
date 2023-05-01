@@ -16,14 +16,5 @@
       <description></description>
     </item>
     
-    <item>
-      <title>Life</title>
-      <link>https://deemoprobe.github.io/posts/life/life/</link>
-      <pubDate>Wed, 26 Apr 2023 12:17:16 +0800</pubDate>
-      
-      <guid>https://deemoprobe.github.io/posts/life/life/</guid>
-      <description>页面测试 由于访问速度问题，没有域名也无法使用CDN加速，所以，去掉了很多花里胡哨的功能</description>
-    </item>
-    
   </channel>
 </rss>
